@@ -54,6 +54,27 @@ describe("SortingPage", () => {
     expect(screen.getByText("5와 3 비교")).toBeInTheDocument();
   });
 
+  it("supports manual timeline scrubbing and playback speed selection", () => {
+    render(
+      <MemoryRouter>
+        <SortingPage />
+      </MemoryRouter>
+    );
+
+    const slider = screen.getByRole("slider", { name: "정렬 단계 슬라이더" });
+    fireEvent.change(slider, { target: { value: "2" } });
+
+    expect(screen.getByText("5와 3 교환")).toBeInTheDocument();
+    expect(slider).toHaveValue("2");
+
+    fireEvent.change(screen.getByLabelText("속도"), { target: { value: "500" } });
+
+    expect(screen.getByLabelText("속도")).toHaveValue("500");
+    expect(
+      screen.getByRole("button", { name: "자동 재생" })
+    ).toBeInTheDocument();
+  });
+
   it("shows language code tabs without executing code", () => {
     render(
       <MemoryRouter>
