@@ -14,6 +14,14 @@ export function useStepController(stepCount: number, playDelayMs = 900) {
     setCurrentIndex((index) => Math.min(index + 1, lastIndex));
   }, [lastIndex]);
 
+  const goToStep = useCallback(
+    (index: number) => {
+      setCurrentIndex(Math.min(Math.max(index, 0), lastIndex));
+      setIsPlaying(false);
+    },
+    [lastIndex]
+  );
+
   const reset = useCallback(() => {
     setCurrentIndex(0);
     setIsPlaying(false);
@@ -22,6 +30,13 @@ export function useStepController(stepCount: number, playDelayMs = 900) {
   const togglePlay = useCallback(() => {
     setIsPlaying((playing) => !playing);
   }, []);
+
+  useEffect(() => {
+    if (currentIndex > lastIndex) {
+      setCurrentIndex(lastIndex);
+      setIsPlaying(false);
+    }
+  }, [currentIndex, lastIndex]);
 
   useEffect(() => {
     if (!isPlaying) {
@@ -58,6 +73,7 @@ export function useStepController(stepCount: number, playDelayMs = 900) {
       isPlaying,
       goPrevious,
       goNext,
+      goToStep,
       reset,
       togglePlay
     }),
@@ -65,6 +81,7 @@ export function useStepController(stepCount: number, playDelayMs = 900) {
       currentIndex,
       goNext,
       goPrevious,
+      goToStep,
       isPlaying,
       lastIndex,
       reset,

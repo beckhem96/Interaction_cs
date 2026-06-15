@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { type CSSProperties, useState } from "react";
 import { Link } from "react-router";
 
 import { useStepController } from "../../shared/useStepController";
@@ -135,13 +135,18 @@ const sortingAlgorithms = [
 
 export function SortingPage() {
   const [activeAlgorithmIndex, setActiveAlgorithmIndex] = useState(0);
+  const [playDelayMs, setPlayDelayMs] = useState(900);
   const activeAlgorithm = sortingAlgorithms[activeAlgorithmIndex];
-  const controller = useStepController(activeAlgorithm.trace.length);
+  const controller = useStepController(activeAlgorithm.trace.length, playDelayMs);
   const [activeCodeIndex, setActiveCodeIndex] = useState(0);
   const currentStep = activeAlgorithm.trace[controller.currentIndex];
   const activeCodeExample = activeAlgorithm.codeExamples[activeCodeIndex];
   const activeCodeLines =
     currentStep.codeLineHighlights?.[activeCodeExample.language] ?? [];
+  const progressPercent =
+    activeAlgorithm.trace.length <= 1
+      ? 100
+      : (controller.currentIndex / (activeAlgorithm.trace.length - 1)) * 100;
 
   function selectAlgorithm(index: number) {
     setActiveAlgorithmIndex(index);
@@ -184,17 +189,75 @@ export function SortingPage() {
         className="visualization-layout"
         aria-label={`${activeAlgorithm.title} 도표`}
       >
-        <div className="visualization-panel">
+        <div className="visualization-panel cinematic-panel">
+          <div className="stage-header">
+            <div>
+              <p className="eyebrow">인터랙션 스테이지</p>
+              <h2>스테이지: {currentStep.title}</h2>
+            </div>
+            <span className="stage-counter">
+              {controller.currentIndex + 1} / {activeAlgorithm.trace.length}
+            </span>
+          </div>
+
           <SortingBars state={currentStep.state} />
-          <button
-            aria-label="도표 다음"
-            className="chart-next-button"
-            disabled={controller.isLastStep}
-            onClick={controller.goNext}
-            type="button"
-          >
-            다음
-          </button>
+
+          <div className="timeline-controls" aria-label="시각화 재생 컨트롤">
+            <div className="timeline-row">
+              <button
+                type="button"
+                onClick={controller.goPrevious}
+                disabled={controller.isFirstStep}
+              >
+                도표 이전
+              </button>
+              <button
+                className="primary-control"
+                type="button"
+                onClick={controller.togglePlay}
+                disabled={controller.isLastStep}
+              >
+                {controller.isPlaying ? "일시정지" : "자동 재생"}
+              </button>
+              <button
+                aria-label="도표 다음"
+                disabled={controller.isLastStep}
+                onClick={controller.goNext}
+                type="button"
+              >
+                다음
+              </button>
+            </div>
+
+            <label className="timeline-slider-label" htmlFor="sorting-step-slider">
+              <span>수동 단계 이동</span>
+              <input
+                id="sorting-step-slider"
+                type="range"
+                min="0"
+                max={activeAlgorithm.trace.length - 1}
+                value={controller.currentIndex}
+                onChange={(event) =>
+                  controller.goToStep(Number(event.currentTarget.value))
+                }
+                aria-label="정렬 단계 슬라이더"
+                style={{ "--progress": `${progressPercent}%` } as CSSProperties}
+              />
+            </label>
+
+            <label className="speed-control" htmlFor="sorting-speed">
+              <span>속도</span>
+              <select
+                id="sorting-speed"
+                value={playDelayMs}
+                onChange={(event) => setPlayDelayMs(Number(event.currentTarget.value))}
+              >
+                <option value="1300">느리게</option>
+                <option value="900">보통</option>
+                <option value="500">빠르게</option>
+              </select>
+            </label>
+          </div>
         </div>
       </section>
 
