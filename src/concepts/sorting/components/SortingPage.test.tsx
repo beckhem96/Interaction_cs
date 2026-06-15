@@ -15,13 +15,17 @@ describe("SortingPage", () => {
     expect(
       screen.getByRole("heading", { name: "버블 정렬" })
     ).toBeInTheDocument();
-    expect(screen.getByText("입력 배열: [5, 3, 8, 4, 2]")).toBeInTheDocument();
+    expect(
+      screen.getByText("입력 배열: [14, 3, 17, 8, 6, 12, 1, 19, 4, 10]")
+    ).toBeInTheDocument();
     expect(screen.getByRole("button", { name: "이전" })).toBeDisabled();
     expect(screen.getByRole("button", { name: "다음" })).toBeEnabled();
     expect(screen.getByRole("button", { name: "재생" })).toBeInTheDocument();
     expect(screen.getByRole("button", { name: "초기화" })).toBeInTheDocument();
     expect(screen.getByText("초기 배열")).toBeInTheDocument();
     expect(screen.getByText("시간 복잡도 O(n²)")).toBeInTheDocument();
+    expect(screen.getByLabelText("9번 인덱스, 값 10")).toBeInTheDocument();
+    expect(screen.getByText("상태 범례")).toBeInTheDocument();
   });
 
   it("moves through trace steps with the next and reset controls", () => {
@@ -33,7 +37,7 @@ describe("SortingPage", () => {
 
     fireEvent.click(screen.getByRole("button", { name: "다음" }));
 
-    expect(screen.getByText("5와 3 비교")).toBeInTheDocument();
+    expect(screen.getByText("14와 3 비교")).toBeInTheDocument();
     expect(screen.getByRole("button", { name: "이전" })).toBeEnabled();
 
     fireEvent.click(screen.getByRole("button", { name: "초기화" }));
@@ -51,7 +55,7 @@ describe("SortingPage", () => {
 
     fireEvent.click(screen.getByRole("button", { name: "도표 다음" }));
 
-    expect(screen.getByText("5와 3 비교")).toBeInTheDocument();
+    expect(screen.getByText("14와 3 비교")).toBeInTheDocument();
   });
 
   it("supports manual timeline scrubbing and playback speed selection", () => {
@@ -64,7 +68,7 @@ describe("SortingPage", () => {
     const slider = screen.getByRole("slider", { name: "정렬 단계 슬라이더" });
     fireEvent.change(slider, { target: { value: "2" } });
 
-    expect(screen.getByText("5와 3 교환")).toBeInTheDocument();
+    expect(screen.getByText("14와 3 교환")).toBeInTheDocument();
     expect(slider).toHaveValue("2");
 
     fireEvent.change(screen.getByLabelText("속도"), { target: { value: "500" } });
@@ -186,7 +190,7 @@ describe("SortingPage", () => {
 
     fireEvent.click(screen.getByRole("button", { name: "다음" }));
 
-    expect(screen.getByText("3과 현재 최소값 5 비교")).toBeInTheDocument();
+    expect(screen.getByText("3과 현재 최소값 14 비교")).toBeInTheDocument();
     expect(screen.getByText("남은 구간에서 더 작은 값을 찾는다.")).toHaveAttribute(
       "aria-current",
       "step"
@@ -221,7 +225,7 @@ describe("SortingPage", () => {
 
     fireEvent.click(screen.getByRole("button", { name: "다음" }));
 
-    expect(screen.getByText("5와 key 3 비교")).toBeInTheDocument();
+    expect(screen.getByText("14와 key 3 비교")).toBeInTheDocument();
     expect(screen.getByText("정렬된 구간에서 key보다 큰 값을 찾는다.")).toHaveAttribute(
       "aria-current",
       "step"
@@ -244,7 +248,7 @@ describe("SortingPage", () => {
 
     fireEvent.click(screen.getByRole("button", { name: "도표 다음" }));
 
-    expect(screen.getByText("0~4 구간 분할")).toBeInTheDocument();
+    expect(screen.getByText("0~9 구간 분할")).toBeInTheDocument();
     expect(screen.getByText("mergeSort.c")).toBeInTheDocument();
     expect(screen.getByText("배열을 절반으로 나눈다.")).toHaveAttribute(
       "aria-current",
@@ -269,7 +273,7 @@ describe("SortingPage", () => {
 
     fireEvent.click(screen.getByRole("button", { name: "도표 다음" }));
 
-    expect(screen.getByText("0~4 구간 피벗 선택")).toBeInTheDocument();
+    expect(screen.getByText("0~9 구간 피벗 선택")).toBeInTheDocument();
     expect(screen.getByText("quickSort.c")).toBeInTheDocument();
     expect(screen.getByText("구간의 마지막 값을 피벗으로 선택한다.")).toHaveAttribute(
       "aria-current",

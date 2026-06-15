@@ -1,7 +1,9 @@
 import type { TraceStep } from "../../shared/types";
 import type { SortingState } from "../types";
 
-export const SELECTION_SORT_DEFAULT_INPUT = [5, 3, 8, 4, 2] as const;
+export const SELECTION_SORT_DEFAULT_INPUT = [
+  14, 3, 17, 8, 6, 12, 1, 19, 4, 10
+] as const;
 
 const codeLineHighlights = {
   initial: {

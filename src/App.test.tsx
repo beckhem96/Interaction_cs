@@ -15,6 +15,8 @@ describe("App routes", () => {
     expect(
       screen.getByRole("heading", { name: "버블 정렬" })
     ).toBeInTheDocument();
-    expect(screen.getByText("입력 배열: [5, 3, 8, 4, 2]")).toBeInTheDocument();
+    expect(
+      screen.getByText("입력 배열: [14, 3, 17, 8, 6, 12, 1, 19, 4, 10]")
+    ).toBeInTheDocument();
   });
 });

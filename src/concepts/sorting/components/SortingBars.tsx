@@ -4,20 +4,20 @@ type SortingBarsProps = {
   state: SortingState;
 };
 
-const chartHeight = 220;
-const barWidth = 58;
-const barGap = 18;
+const chartHeight = 240;
 
 export function SortingBars({ state }: SortingBarsProps) {
   const maxValue = Math.max(...state.array);
+  const barWidth = state.array.length > 8 ? 44 : 58;
+  const barGap = state.array.length > 8 ? 10 : 18;
   const chartWidth = state.array.length * barWidth + (state.array.length - 1) * barGap;
 
   return (
     <figure className="sorting-visual">
       <svg
-        aria-label="버블 정렬 배열 상태"
+        aria-label="정렬 배열 상태"
         role="img"
-        viewBox={`0 0 ${chartWidth} ${chartHeight + 34}`}
+        viewBox={`0 0 ${chartWidth} ${chartHeight + 40}`}
       >
         {state.array.map((value, index) => {
           const height = (value / maxValue) * chartHeight;
@@ -38,19 +38,43 @@ export function SortingBars({ state }: SortingBarsProps) {
               <text className="bar-value" x={barWidth / 2} y={y - 10}>
                 {value}
               </text>
-              <text className="bar-index" x={barWidth / 2} y={chartHeight + 26}>
+              <text className="bar-index" x={barWidth / 2} y={chartHeight + 28}>
                 {index}
               </text>
             </g>
           );
         })}
       </svg>
+      <figcaption
+        aria-label="배열 인덱스와 값"
+        className="sorting-array-cells"
+        style={{ gridTemplateColumns: `repeat(${state.array.length}, minmax(0, 1fr))` }}
+      >
+        {state.array.map((value, index) => (
+          <span
+            aria-label={`${index}번 인덱스, 값 ${value}`}
+            className={getCellClassName(state, index)}
+            key={`${index}-${value}`}
+          >
+            <span className="array-cell-index">{index}</span>
+            <span className="array-cell-value">{value}</span>
+          </span>
+        ))}
+      </figcaption>
     </figure>
   );
 }
 
 function getBarClassName(state: SortingState, index: number): string {
-  const classNames = ["sorting-bar"];
+  return ["sorting-bar", ...getStateClassNames(state, index)].join(" ");
+}
+
+function getCellClassName(state: SortingState, index: number): string {
+  return ["array-cell", ...getStateClassNames(state, index)].join(" ");
+}
+
+function getStateClassNames(state: SortingState, index: number): string[] {
+  const classNames: string[] = [];
 
   if (isInRange(state.partitionRange, index)) {
     classNames.push("is-partition-range");
@@ -108,7 +132,7 @@ function getBarClassName(state: SortingState, index: number): string {
     classNames.push("is-write");
   }
 
-  return classNames.join(" ");
+  return classNames;
 }
 
 function isInRange(range: [number, number] | undefined, index: number): boolean {

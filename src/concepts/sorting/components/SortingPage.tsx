@@ -2,6 +2,7 @@ import { type CSSProperties, useState } from "react";
 import { Link } from "react-router";
 
 import { useStepController } from "../../shared/useStepController";
+import type { SortingState } from "../types";
 import {
   BUBBLE_SORT_DEFAULT_INPUT,
   generateBubbleSortTrace
@@ -36,9 +37,11 @@ const sortingAlgorithms = [
     title: "버블 정렬",
     summary:
       "인접한 두 값을 비교하고 필요한 경우 교환하면서 큰 값을 오른쪽으로 밀어내는 정렬 방식입니다.",
-    inputSummary: "입력 배열: [5, 3, 8, 4, 2]",
+    inputSummary: `입력 배열: ${formatArray(BUBBLE_SORT_DEFAULT_INPUT)}`,
     trace: generateBubbleSortTrace(BUBBLE_SORT_DEFAULT_INPUT),
     codeExamples: bubbleSortCodeExamples,
+    timeComplexity: "시간 복잡도 O(n²)",
+    spaceComplexity: "공간 복잡도 O(1)",
     pseudoCode: [
       "배열을 준비한다.",
       "끝 위치를 왼쪽으로 줄이며 반복한다.",
@@ -56,9 +59,11 @@ const sortingAlgorithms = [
     title: "선택 정렬",
     summary:
       "정렬되지 않은 구간에서 가장 작은 값을 찾아 현재 위치로 옮기는 정렬 방식입니다.",
-    inputSummary: "입력 배열: [5, 3, 8, 4, 2]",
+    inputSummary: `입력 배열: ${formatArray(SELECTION_SORT_DEFAULT_INPUT)}`,
     trace: generateSelectionSortTrace(SELECTION_SORT_DEFAULT_INPUT),
     codeExamples: selectionSortCodeExamples,
+    timeComplexity: "시간 복잡도 O(n²)",
+    spaceComplexity: "공간 복잡도 O(1)",
     pseudoCode: [
       "배열을 준비한다.",
       "현재 위치를 최소값 위치로 가정한다.",
@@ -76,9 +81,11 @@ const sortingAlgorithms = [
     title: "삽입 정렬",
     summary:
       "왼쪽의 정렬된 구간에 key 값을 알맞은 위치로 끼워 넣는 정렬 방식입니다.",
-    inputSummary: "입력 배열: [5, 3, 8, 4, 2]",
+    inputSummary: `입력 배열: ${formatArray(INSERTION_SORT_DEFAULT_INPUT)}`,
     trace: generateInsertionSortTrace(INSERTION_SORT_DEFAULT_INPUT),
     codeExamples: insertionSortCodeExamples,
+    timeComplexity: "시간 복잡도 최선 O(n), 평균/최악 O(n²)",
+    spaceComplexity: "공간 복잡도 O(1)",
     pseudoCode: [
       "첫 번째 값을 정렬된 구간으로 둔다.",
       "다음 값을 key로 선택한다.",
@@ -96,9 +103,11 @@ const sortingAlgorithms = [
     title: "병합 정렬",
     summary:
       "배열을 절반으로 나눈 뒤 정렬된 부분 배열을 다시 합치며 정렬하는 방식입니다.",
-    inputSummary: "입력 배열: [5, 3, 8, 4, 2]",
+    inputSummary: `입력 배열: ${formatArray(MERGE_SORT_DEFAULT_INPUT)}`,
     trace: generateMergeSortTrace(MERGE_SORT_DEFAULT_INPUT),
     codeExamples: mergeSortCodeExamples,
+    timeComplexity: "시간 복잡도 O(n log n)",
+    spaceComplexity: "공간 복잡도 O(n)",
     pseudoCode: [
       "배열을 준비한다.",
       "배열을 절반으로 나눈다.",
@@ -116,9 +125,11 @@ const sortingAlgorithms = [
     title: "퀵 정렬",
     summary:
       "피벗을 기준으로 작은 값과 큰 값을 나누고, 각 구간을 재귀적으로 정렬하는 방식입니다.",
-    inputSummary: "입력 배열: [5, 3, 8, 4, 2]",
+    inputSummary: `입력 배열: ${formatArray(QUICK_SORT_DEFAULT_INPUT)}`,
     trace: generateQuickSortTrace(QUICK_SORT_DEFAULT_INPUT),
     codeExamples: quickSortCodeExamples,
+    timeComplexity: "시간 복잡도 평균 O(n log n), 최악 O(n²)",
+    spaceComplexity: "공간 복잡도 평균 O(log n)",
     pseudoCode: [
       "배열을 준비한다.",
       "구간의 마지막 값을 피벗으로 선택한다.",
@@ -133,6 +144,18 @@ const sortingAlgorithms = [
   }
 ];
 
+const visualLegend = [
+  { className: "is-comparing", label: "비교" },
+  { className: "is-swapping", label: "교환" },
+  { className: "is-current", label: "현재" },
+  { className: "is-scanning", label: "탐색" },
+  { className: "is-key", label: "key" },
+  { className: "is-minimum", label: "최소" },
+  { className: "is-pivot", label: "피벗" },
+  { className: "is-write", label: "기록" },
+  { className: "is-sorted", label: "완료" }
+];
+
 export function SortingPage() {
   const [activeAlgorithmIndex, setActiveAlgorithmIndex] = useState(0);
   const [playDelayMs, setPlayDelayMs] = useState(900);
@@ -143,6 +166,7 @@ export function SortingPage() {
   const activeCodeExample = activeAlgorithm.codeExamples[activeCodeIndex];
   const activeCodeLines =
     currentStep.codeLineHighlights?.[activeCodeExample.language] ?? [];
+  const stageStateItems = getStateSummaryItems(currentStep.state);
   const progressPercent =
     activeAlgorithm.trace.length <= 1
       ? 100
@@ -201,6 +225,25 @@ export function SortingPage() {
           </div>
 
           <SortingBars state={currentStep.state} />
+
+          <div className="stage-state-list" aria-label="현재 단계 상태">
+            {stageStateItems.map((item) => (
+              <div className="stage-state-item" key={item.label}>
+                <span>{item.label}</span>
+                <strong>{item.value}</strong>
+              </div>
+            ))}
+          </div>
+
+          <div className="stage-legend" aria-label="상태 범례">
+            <span className="legend-title">상태 범례</span>
+            {visualLegend.map((item) => (
+              <span className="legend-item" key={item.label}>
+                <span className={`legend-swatch ${item.className}`} />
+                {item.label}
+              </span>
+            ))}
+          </div>
 
           <div className="timeline-controls" aria-label="시각화 재생 컨트롤">
             <div className="timeline-row">
@@ -388,11 +431,11 @@ export function SortingPage() {
           <dl className="complexity-list">
             <div>
               <dt>시간 복잡도</dt>
-              <dd>시간 복잡도 O(n²)</dd>
+              <dd>{activeAlgorithm.timeComplexity}</dd>
             </div>
             <div>
               <dt>공간 복잡도</dt>
-              <dd>공간 복잡도 O(1)</dd>
+              <dd>{activeAlgorithm.spaceComplexity}</dd>
             </div>
             <div>
               <dt>관찰 포인트</dt>
@@ -403,4 +446,82 @@ export function SortingPage() {
       </section>
     </main>
   );
+}
+
+function formatArray(input: readonly number[]): string {
+  return `[${input.join(", ")}]`;
+}
+
+function getStateSummaryItems(state: SortingState) {
+  const items: { label: string; value: string }[] = [];
+
+  if (state.partitionRange !== undefined) {
+    items.push({ label: "파티션 구간", value: formatRange(state.partitionRange) });
+  }
+
+  if (state.mergeRange !== undefined) {
+    items.push({ label: "병합 구간", value: formatRange(state.mergeRange) });
+  }
+
+  if (state.leftRange !== undefined) {
+    items.push({ label: "왼쪽 구간", value: formatRange(state.leftRange) });
+  }
+
+  if (state.rightRange !== undefined) {
+    items.push({ label: "오른쪽 구간", value: formatRange(state.rightRange) });
+  }
+
+  if (state.currentIndex !== undefined) {
+    items.push({ label: "현재 위치", value: formatIndex(state.currentIndex) });
+  }
+
+  if (state.scanningIndex !== undefined) {
+    items.push({ label: "탐색 위치", value: formatIndex(state.scanningIndex) });
+  }
+
+  if (state.keyIndex !== undefined) {
+    items.push({ label: "key 위치", value: formatIndex(state.keyIndex) });
+  }
+
+  if (state.minimumIndex !== undefined) {
+    items.push({ label: "최소값 위치", value: formatIndex(state.minimumIndex) });
+  }
+
+  if (state.pivotIndex !== undefined) {
+    items.push({ label: "피벗 위치", value: formatIndex(state.pivotIndex) });
+  }
+
+  if (state.writeIndex !== undefined) {
+    items.push({ label: "기록 위치", value: formatIndex(state.writeIndex) });
+  }
+
+  if (state.comparingIndices?.length) {
+    items.push({ label: "비교", value: formatIndices(state.comparingIndices) });
+  }
+
+  if (state.swappingIndices?.length) {
+    items.push({ label: "교환", value: formatIndices(state.swappingIndices) });
+  }
+
+  if (state.shiftedIndices?.length) {
+    items.push({ label: "이동", value: formatIndices(state.shiftedIndices) });
+  }
+
+  if (state.sortedIndices?.length) {
+    items.push({ label: "정렬 완료", value: formatIndices(state.sortedIndices) });
+  }
+
+  return items.length > 0 ? items : [{ label: "상태", value: "초기 배열 확인" }];
+}
+
+function formatIndex(index: number): string {
+  return `${index}번`;
+}
+
+function formatIndices(indices: readonly number[]): string {
+  return indices.map(formatIndex).join(", ");
+}
+
+function formatRange(range: [number, number]): string {
+  return `${range[0]}~${range[1]}번`;
 }
