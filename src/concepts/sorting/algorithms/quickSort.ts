@@ -1,0 +1,240 @@
+import type { TraceStep } from "../../shared/types";
+import type { SortingState } from "../types";
+
+export const QUICK_SORT_DEFAULT_INPUT = [5, 3, 8, 4, 2] as const;
+
+const codeLineHighlights = {
+  initial: {
+    C: [19],
+    Java: [18],
+    "C++": [20],
+    JavaScript: [1, 2],
+    Python: [1, 2]
+  },
+  choosePivot: {
+    C: [5],
+    Java: [4],
+    "C++": [6],
+    JavaScript: [8],
+    Python: [8]
+  },
+  scan: {
+    C: [6],
+    Java: [5],
+    "C++": [7],
+    JavaScript: [10],
+    Python: [10]
+  },
+  compare: {
+    C: [7],
+    Java: [6],
+    "C++": [8],
+    JavaScript: [11],
+    Python: [11]
+  },
+  swap: {
+    C: [8, 9, 10],
+    Java: [7, 8, 9],
+    "C++": [9],
+    JavaScript: [12],
+    Python: [12]
+  },
+  placePivot: {
+    C: [14, 15, 16],
+    Java: [13, 14, 15],
+    "C++": [15],
+    JavaScript: [16],
+    Python: [16]
+  },
+  recurse: {
+    C: [22, 23],
+    Java: [21, 22],
+    "C++": [23, 24],
+    JavaScript: [18, 19],
+    Python: [18, 19]
+  },
+  complete: {
+    C: [24],
+    Java: [23],
+    "C++": [25],
+    JavaScript: [5],
+    Python: [21]
+  }
+} satisfies Record<string, Record<string, number[]>>;
+
+export function generateQuickSortTrace(
+  input: readonly number[]
+): TraceStep<SortingState>[] {
+  const array = [...input];
+  const sortedIndices = new Set<number>();
+  const trace: TraceStep<SortingState>[] = [
+    {
+      id: "quick-initial",
+      title: "초기 배열",
+      description: "전체 배열을 첫 파티션 구간으로 두고 퀵 정렬을 시작합니다.",
+      state: {
+        array: [...array],
+        partitionRange: array.length > 0 ? [0, array.length - 1] : undefined
+      },
+      pseudoCodeLine: 1,
+      codeLineHighlights: codeLineHighlights.initial
+    }
+  ];
+
+  let stepIndex = 1;
+
+  function quickSort(start: number, end: number) {
+    if (start > end) {
+      return;
+    }
+
+    if (start === end) {
+      sortedIndices.add(start);
+      trace.push({
+        id: `quick-${stepIndex++}-single-${start}`,
+        title: `${start}번 위치 확정`,
+        description: "한 칸짜리 구간은 이미 정렬된 상태입니다.",
+        state: {
+          array: [...array],
+          currentIndex: start,
+          sortedIndices: sortedList()
+        },
+        pseudoCodeLine: 7,
+        codeLineHighlights: codeLineHighlights.recurse
+      });
+
+      return;
+    }
+
+    const pivotIndex = end;
+    const pivot = array[pivotIndex]!;
+    let storeIndex = start;
+
+    trace.push({
+      id: `quick-${stepIndex++}-choose-pivot-${start}-${end}`,
+      title: `${start}~${end} 구간 피벗 선택`,
+      description: `${end}번 값 ${pivot}을 피벗으로 선택하고, 피벗보다 작은 값을 왼쪽으로 모읍니다.`,
+      state: {
+        array: [...array],
+        pivotIndex,
+        partitionRange: [start, end],
+        currentIndex: storeIndex,
+        sortedIndices: sortedList()
+      },
+      pseudoCodeLine: 2,
+      codeLineHighlights: codeLineHighlights.choosePivot
+    });
+
+    for (let scan = start; scan < end; scan += 1) {
+      trace.push({
+        id: `quick-${stepIndex++}-compare-${scan}-${pivotIndex}`,
+        title: `${array[scan]}와 피벗 ${pivot} 비교`,
+        description: `${scan}번 값을 피벗 ${pivot}과 비교합니다. 피벗보다 작거나 같으면 왼쪽 구간으로 보냅니다.`,
+        state: {
+          array: [...array],
+          pivotIndex,
+          partitionRange: [start, end],
+          currentIndex: storeIndex,
+          scanningIndex: scan,
+          comparingIndices: [scan, pivotIndex],
+          sortedIndices: sortedList()
+        },
+        pseudoCodeLine: 4,
+        codeLineHighlights: codeLineHighlights.compare
+      });
+
+      if (array[scan]! <= pivot) {
+        const leftValue = array[storeIndex]!;
+        const scanValue = array[scan]!;
+        array[storeIndex] = scanValue;
+        array[scan] = leftValue;
+
+        trace.push({
+          id: `quick-${stepIndex++}-swap-${storeIndex}-${scan}`,
+          title: `${scanValue}를 작은 값 구간으로 이동`,
+          description: `${scanValue}가 피벗 ${pivot}보다 작거나 같으므로 ${storeIndex}번 위치와 교환합니다.`,
+          state: {
+            array: [...array],
+            pivotIndex,
+            partitionRange: [start, end],
+            currentIndex: storeIndex,
+            scanningIndex: scan,
+            swappingIndices: storeIndex === scan ? [scan] : [storeIndex, scan],
+            sortedIndices: sortedList()
+          },
+          pseudoCodeLine: 5,
+          codeLineHighlights: codeLineHighlights.swap
+        });
+
+        storeIndex += 1;
+      }
+    }
+
+    const pivotValue = array[pivotIndex]!;
+    const boundaryValue = array[storeIndex]!;
+    array[storeIndex] = pivotValue;
+    array[pivotIndex] = boundaryValue;
+    sortedIndices.add(storeIndex);
+
+    trace.push({
+      id: `quick-${stepIndex++}-place-pivot-${storeIndex}`,
+      title: `피벗 ${pivotValue}를 ${storeIndex}번 위치에 배치`,
+      description: `피벗 왼쪽에는 피벗보다 작거나 같은 값, 오른쪽에는 더 큰 값이 오도록 피벗 위치를 확정합니다.`,
+      state: {
+        array: [...array],
+        pivotIndex: storeIndex,
+        partitionRange: [start, end],
+        swappingIndices:
+          storeIndex === pivotIndex ? [storeIndex] : [storeIndex, pivotIndex],
+        sortedIndices: sortedList()
+      },
+      pseudoCodeLine: 6,
+      codeLineHighlights: codeLineHighlights.placePivot
+    });
+
+    trace.push({
+      id: `quick-${stepIndex++}-recurse-${start}-${end}`,
+      title: `${start}~${storeIndex - 1}, ${storeIndex + 1}~${end} 구간 재귀`,
+      description: "피벗을 제외한 왼쪽 구간과 오른쪽 구간을 같은 방식으로 다시 정렬합니다.",
+      state: {
+        array: [...array],
+        pivotIndex: storeIndex,
+        partitionRange: [start, end],
+        sortedIndices: sortedList()
+      },
+      pseudoCodeLine: 7,
+      codeLineHighlights: codeLineHighlights.recurse
+    });
+
+    quickSort(start, storeIndex - 1);
+    quickSort(storeIndex + 1, end);
+  }
+
+  if (array.length > 0) {
+    quickSort(0, array.length - 1);
+  }
+
+  trace.push({
+    id: "quick-complete",
+    title: "정렬 완료",
+    description: "모든 피벗 위치가 확정되어 배열 전체가 오름차순으로 정렬되었습니다.",
+    state: {
+      array: [...array],
+      sortedIndices: range(0, array.length)
+    },
+    pseudoCodeLine: 8,
+    codeLineHighlights: codeLineHighlights.complete
+  });
+
+  return trace;
+
+  function sortedList() {
+    return [...sortedIndices].sort((left, right) => left - right);
+  }
+}
+
+function range(start: number, end: number): number[] {
+  return Array.from({ length: Math.max(end - start, 0) }, (_, index) => {
+    return start + index;
+  });
+}

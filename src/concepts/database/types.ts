@@ -6,8 +6,10 @@ export type SqlLogicalPhase =
   | "select"
   | "orderBy";
 
+export type DatabaseCellValue = string | number | boolean | null;
+
 export type DatabaseTraceState = {
   phase: SqlLogicalPhase;
   query: string;
-  rows: Record<string, string | number | boolean | null>[];
+  rows: Record<string, DatabaseCellValue>[];
 };

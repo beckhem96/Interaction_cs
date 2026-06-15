@@ -18,7 +18,7 @@ const categories: CategoryCard[] = [
     title: "데이터베이스",
     description: "SELECT 쿼리의 논리적 처리 순서와 중간 결과를 따라갑니다.",
     href: "/database",
-    status: "MVP 후속 예정"
+    status: "SELECT 실행 순서"
   },
   {
     title: "트리 자료구조",

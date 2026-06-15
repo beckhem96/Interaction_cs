@@ -7,11 +7,27 @@ import {
   generateBubbleSortTrace
 } from "../algorithms/bubbleSort";
 import {
+  INSERTION_SORT_DEFAULT_INPUT,
+  generateInsertionSortTrace
+} from "../algorithms/insertionSort";
+import {
+  MERGE_SORT_DEFAULT_INPUT,
+  generateMergeSortTrace
+} from "../algorithms/mergeSort";
+import {
+  QUICK_SORT_DEFAULT_INPUT,
+  generateQuickSortTrace
+} from "../algorithms/quickSort";
+import {
   SELECTION_SORT_DEFAULT_INPUT,
   generateSelectionSortTrace
 } from "../algorithms/selectionSort";
 import { bubbleSortCodeExamples } from "../code/bubbleSortExamples";
+import { insertionSortCodeExamples } from "../code/insertionSortExamples";
+import { mergeSortCodeExamples } from "../code/mergeSortExamples";
+import { quickSortCodeExamples } from "../code/quickSortExamples";
 import { selectionSortCodeExamples } from "../code/selectionSortExamples";
+import { tokenizeCodeLine } from "../code/syntaxHighlight";
 import { SortingBars } from "./SortingBars";
 
 const sortingAlgorithms = [
@@ -54,6 +70,66 @@ const sortingAlgorithms = [
       "모든 위치가 확정되면 종료한다."
     ],
     observation: "현재 위치, 최소값 위치, 탐색 위치가 어떻게 바뀌는지 확인합니다."
+  },
+  {
+    id: "insertion",
+    title: "삽입 정렬",
+    summary:
+      "왼쪽의 정렬된 구간에 key 값을 알맞은 위치로 끼워 넣는 정렬 방식입니다.",
+    inputSummary: "입력 배열: [5, 3, 8, 4, 2]",
+    trace: generateInsertionSortTrace(INSERTION_SORT_DEFAULT_INPUT),
+    codeExamples: insertionSortCodeExamples,
+    pseudoCode: [
+      "첫 번째 값을 정렬된 구간으로 둔다.",
+      "다음 값을 key로 선택한다.",
+      "key 왼쪽의 정렬된 구간을 거꾸로 훑는다.",
+      "정렬된 구간에서 key보다 큰 값을 찾는다.",
+      "key보다 큰 값을 오른쪽으로 이동한다.",
+      "빈 위치에 key를 삽입한다.",
+      "정렬된 구간을 한 칸 넓힌다.",
+      "모든 값을 삽입하면 종료한다."
+    ],
+    observation: "key 값, 비교 위치, 오른쪽으로 밀린 값이 어떻게 바뀌는지 확인합니다."
+  },
+  {
+    id: "merge",
+    title: "병합 정렬",
+    summary:
+      "배열을 절반으로 나눈 뒤 정렬된 부분 배열을 다시 합치며 정렬하는 방식입니다.",
+    inputSummary: "입력 배열: [5, 3, 8, 4, 2]",
+    trace: generateMergeSortTrace(MERGE_SORT_DEFAULT_INPUT),
+    codeExamples: mergeSortCodeExamples,
+    pseudoCode: [
+      "배열을 준비한다.",
+      "배열을 절반으로 나눈다.",
+      "한 칸짜리 구간이 될 때까지 분할한다.",
+      "두 정렬된 구간의 앞 값을 비교한다.",
+      "더 작은 값을 결과 위치에 기록한다.",
+      "남은 값을 순서대로 기록한다.",
+      "병합된 구간을 확정한다.",
+      "전체 구간이 병합되면 종료한다."
+    ],
+    observation: "분할 구간, 좌우 부분 배열, 기록 위치가 어떻게 바뀌는지 확인합니다."
+  },
+  {
+    id: "quick",
+    title: "퀵 정렬",
+    summary:
+      "피벗을 기준으로 작은 값과 큰 값을 나누고, 각 구간을 재귀적으로 정렬하는 방식입니다.",
+    inputSummary: "입력 배열: [5, 3, 8, 4, 2]",
+    trace: generateQuickSortTrace(QUICK_SORT_DEFAULT_INPUT),
+    codeExamples: quickSortCodeExamples,
+    pseudoCode: [
+      "배열을 준비한다.",
+      "구간의 마지막 값을 피벗으로 선택한다.",
+      "피벗보다 작은 값이 들어갈 경계를 둔다.",
+      "현재 값을 피벗과 비교한다.",
+      "피벗보다 작거나 같으면 왼쪽 구간으로 옮긴다.",
+      "피벗을 경계 위치에 배치한다.",
+      "피벗 양쪽 구간을 재귀적으로 정렬한다.",
+      "모든 피벗 위치가 확정되면 종료한다."
+    ],
+    observation: "피벗, 파티션 구간, 작은 값 경계가 어떻게 이동하는지 확인합니다."
   }
 ];
 
@@ -110,6 +186,15 @@ export function SortingPage() {
       >
         <div className="visualization-panel">
           <SortingBars state={currentStep.state} />
+          <button
+            aria-label="도표 다음"
+            className="chart-next-button"
+            disabled={controller.isLastStep}
+            onClick={controller.goNext}
+            type="button"
+          >
+            다음
+          </button>
         </div>
       </section>
 
@@ -158,7 +243,18 @@ export function SortingPage() {
                   key={`${activeAlgorithm.id}-${activeCodeExample.language}-${lineNumber}`}
                 >
                   <span className="code-line-number">{lineNumber}</span>
-                  <code className="code-line-text">{line || " "}</code>
+                  <code className="code-line-text">
+                    {tokenizeCodeLine(activeCodeExample.language, line).map(
+                      (token, tokenIndex) => (
+                        <span
+                          className={`token-${token.type}`}
+                          key={`${activeAlgorithm.id}-${activeCodeExample.language}-${lineNumber}-${tokenIndex}`}
+                        >
+                          {token.text}
+                        </span>
+                      )
+                    )}
+                  </code>
                 </li>
               );
             })}

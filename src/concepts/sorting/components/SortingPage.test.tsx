@@ -42,6 +42,18 @@ describe("SortingPage", () => {
     expect(screen.getByRole("button", { name: "이전" })).toBeDisabled();
   });
 
+  it("also advances with the next button beside the chart", () => {
+    render(
+      <MemoryRouter>
+        <SortingPage />
+      </MemoryRouter>
+    );
+
+    fireEvent.click(screen.getByRole("button", { name: "도표 다음" }));
+
+    expect(screen.getByText("5와 3 비교")).toBeInTheDocument();
+  });
+
   it("shows language code tabs without executing code", () => {
     render(
       <MemoryRouter>
@@ -55,7 +67,9 @@ describe("SortingPage", () => {
       "true"
     );
     expect(screen.getByText("bubbleSort.c")).toBeInTheDocument();
-    expect(screen.getByText(/void bubbleSort/)).toBeInTheDocument();
+    expect(
+      screen.getByRole("listitem", { name: /void bubbleSort/ })
+    ).toBeInTheDocument();
 
     fireEvent.click(screen.getByRole("tab", { name: "Python" }));
 
@@ -64,7 +78,9 @@ describe("SortingPage", () => {
       "true"
     );
     expect(screen.getByText("bubbleSort.py")).toBeInTheDocument();
-    expect(screen.getByText(/def bubble_sort/)).toBeInTheDocument();
+    expect(
+      screen.getByRole("listitem", { name: /def bubble_sort/ })
+    ).toBeInTheDocument();
   });
 
   it("highlights pseudo-code and selected language code for the current step", () => {
@@ -154,5 +170,108 @@ describe("SortingPage", () => {
       "aria-current",
       "step"
     );
+  });
+
+  it("switches to Insertion Sort with synchronized code highlighting", () => {
+    render(
+      <MemoryRouter>
+        <SortingPage />
+      </MemoryRouter>
+    );
+
+    fireEvent.click(screen.getByRole("tab", { name: "삽입 정렬" }));
+
+    expect(
+      screen.getByRole("heading", { name: "삽입 정렬" })
+    ).toBeInTheDocument();
+    expect(screen.getByText("초기 배열")).toBeInTheDocument();
+
+    fireEvent.click(screen.getByRole("button", { name: "다음" }));
+
+    expect(screen.getByText("3을 삽입할 위치 찾기")).toBeInTheDocument();
+    expect(screen.getByText("insertionSort.c")).toBeInTheDocument();
+    expect(screen.getByText("다음 값을 key로 선택한다.")).toHaveAttribute(
+      "aria-current",
+      "step"
+    );
+    expect(
+      screen.getByRole("listitem", { name: /현재 코드 5/ })
+    ).toHaveTextContent("int key = values[current];");
+
+    fireEvent.click(screen.getByRole("button", { name: "다음" }));
+
+    expect(screen.getByText("5와 key 3 비교")).toBeInTheDocument();
+    expect(screen.getByText("정렬된 구간에서 key보다 큰 값을 찾는다.")).toHaveAttribute(
+      "aria-current",
+      "step"
+    );
+  });
+
+  it("switches to Merge Sort with synchronized code highlighting", () => {
+    render(
+      <MemoryRouter>
+        <SortingPage />
+      </MemoryRouter>
+    );
+
+    fireEvent.click(screen.getByRole("tab", { name: "병합 정렬" }));
+
+    expect(
+      screen.getByRole("heading", { name: "병합 정렬" })
+    ).toBeInTheDocument();
+    expect(screen.getByText("초기 배열")).toBeInTheDocument();
+
+    fireEvent.click(screen.getByRole("button", { name: "도표 다음" }));
+
+    expect(screen.getByText("0~4 구간 분할")).toBeInTheDocument();
+    expect(screen.getByText("mergeSort.c")).toBeInTheDocument();
+    expect(screen.getByText("배열을 절반으로 나눈다.")).toHaveAttribute(
+      "aria-current",
+      "step"
+    );
+    expect(
+      screen.getByRole("listitem", { name: /현재 코드 4/ })
+    ).toHaveTextContent("int mid =");
+  });
+
+  it("switches to Quick Sort with synchronized code highlighting", () => {
+    render(
+      <MemoryRouter>
+        <SortingPage />
+      </MemoryRouter>
+    );
+
+    fireEvent.click(screen.getByRole("tab", { name: "퀵 정렬" }));
+
+    expect(screen.getByRole("heading", { name: "퀵 정렬" })).toBeInTheDocument();
+    expect(screen.getByText("초기 배열")).toBeInTheDocument();
+
+    fireEvent.click(screen.getByRole("button", { name: "도표 다음" }));
+
+    expect(screen.getByText("0~4 구간 피벗 선택")).toBeInTheDocument();
+    expect(screen.getByText("quickSort.c")).toBeInTheDocument();
+    expect(screen.getByText("구간의 마지막 값을 피벗으로 선택한다.")).toHaveAttribute(
+      "aria-current",
+      "step"
+    );
+    expect(
+      screen.getByRole("listitem", { name: /현재 코드 5/ })
+    ).toHaveTextContent("int pivot =");
+  });
+
+  it("renders code with language-aware syntax colors", () => {
+    const { container } = render(
+      <MemoryRouter>
+        <SortingPage />
+      </MemoryRouter>
+    );
+
+    expect(screen.getByText("void")).toHaveClass("token-keyword");
+    expect(container.querySelector(".token-number")).not.toBeNull();
+
+    fireEvent.click(screen.getByRole("tab", { name: "Python" }));
+
+    expect(screen.getByText("def")).toHaveClass("token-keyword");
+    expect(screen.getAllByText("range")[0]).toHaveClass("token-builtin");
   });
 });
