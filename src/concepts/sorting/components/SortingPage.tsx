@@ -1,4 +1,4 @@
-import { type CSSProperties, useState } from "react";
+import { type CSSProperties, useMemo, useState } from "react";
 import { Link } from "react-router";
 
 import { useStepController } from "../../shared/useStepController";
@@ -37,8 +37,8 @@ const sortingAlgorithms = [
     title: "버블 정렬",
     summary:
       "인접한 두 값을 비교하고 필요한 경우 교환하면서 큰 값을 오른쪽으로 밀어내는 정렬 방식입니다.",
-    inputSummary: `입력 배열: ${formatArray(BUBBLE_SORT_DEFAULT_INPUT)}`,
-    trace: generateBubbleSortTrace(BUBBLE_SORT_DEFAULT_INPUT),
+    defaultInput: BUBBLE_SORT_DEFAULT_INPUT,
+    generateTrace: generateBubbleSortTrace,
     codeExamples: bubbleSortCodeExamples,
     timeComplexity: "시간 복잡도 O(n²)",
     spaceComplexity: "공간 복잡도 O(1)",
@@ -59,8 +59,8 @@ const sortingAlgorithms = [
     title: "선택 정렬",
     summary:
       "정렬되지 않은 구간에서 가장 작은 값을 찾아 현재 위치로 옮기는 정렬 방식입니다.",
-    inputSummary: `입력 배열: ${formatArray(SELECTION_SORT_DEFAULT_INPUT)}`,
-    trace: generateSelectionSortTrace(SELECTION_SORT_DEFAULT_INPUT),
+    defaultInput: SELECTION_SORT_DEFAULT_INPUT,
+    generateTrace: generateSelectionSortTrace,
     codeExamples: selectionSortCodeExamples,
     timeComplexity: "시간 복잡도 O(n²)",
     spaceComplexity: "공간 복잡도 O(1)",
@@ -81,8 +81,8 @@ const sortingAlgorithms = [
     title: "삽입 정렬",
     summary:
       "왼쪽의 정렬된 구간에 key 값을 알맞은 위치로 끼워 넣는 정렬 방식입니다.",
-    inputSummary: `입력 배열: ${formatArray(INSERTION_SORT_DEFAULT_INPUT)}`,
-    trace: generateInsertionSortTrace(INSERTION_SORT_DEFAULT_INPUT),
+    defaultInput: INSERTION_SORT_DEFAULT_INPUT,
+    generateTrace: generateInsertionSortTrace,
     codeExamples: insertionSortCodeExamples,
     timeComplexity: "시간 복잡도 최선 O(n), 평균/최악 O(n²)",
     spaceComplexity: "공간 복잡도 O(1)",
@@ -103,8 +103,8 @@ const sortingAlgorithms = [
     title: "병합 정렬",
     summary:
       "배열을 절반으로 나눈 뒤 정렬된 부분 배열을 다시 합치며 정렬하는 방식입니다.",
-    inputSummary: `입력 배열: ${formatArray(MERGE_SORT_DEFAULT_INPUT)}`,
-    trace: generateMergeSortTrace(MERGE_SORT_DEFAULT_INPUT),
+    defaultInput: MERGE_SORT_DEFAULT_INPUT,
+    generateTrace: generateMergeSortTrace,
     codeExamples: mergeSortCodeExamples,
     timeComplexity: "시간 복잡도 O(n log n)",
     spaceComplexity: "공간 복잡도 O(n)",
@@ -125,8 +125,8 @@ const sortingAlgorithms = [
     title: "퀵 정렬",
     summary:
       "피벗을 기준으로 작은 값과 큰 값을 나누고, 각 구간을 재귀적으로 정렬하는 방식입니다.",
-    inputSummary: `입력 배열: ${formatArray(QUICK_SORT_DEFAULT_INPUT)}`,
-    trace: generateQuickSortTrace(QUICK_SORT_DEFAULT_INPUT),
+    defaultInput: QUICK_SORT_DEFAULT_INPUT,
+    generateTrace: generateQuickSortTrace,
     codeExamples: quickSortCodeExamples,
     timeComplexity: "시간 복잡도 평균 O(n log n), 최악 O(n²)",
     spaceComplexity: "공간 복잡도 평균 O(log n)",
@@ -156,26 +156,81 @@ const visualLegend = [
   { className: "is-sorted", label: "완료" }
 ];
 
+const minimumArraySize = 2;
+const maximumArraySize = 16;
+const minimumValue = 1;
+const maximumValue = 99;
+
 export function SortingPage() {
   const [activeAlgorithmIndex, setActiveAlgorithmIndex] = useState(0);
   const [playDelayMs, setPlayDelayMs] = useState(900);
   const activeAlgorithm = sortingAlgorithms[activeAlgorithmIndex];
-  const controller = useStepController(activeAlgorithm.trace.length, playDelayMs);
+  const [inputArray, setInputArray] = useState<number[]>([
+    ...BUBBLE_SORT_DEFAULT_INPUT
+  ]);
+  const [newValue, setNewValue] = useState("");
+  const [arraySize, setArraySize] = useState(String(BUBBLE_SORT_DEFAULT_INPUT.length));
+  const trace = useMemo(
+    () => activeAlgorithm.generateTrace(inputArray),
+    [activeAlgorithm, inputArray]
+  );
+  const controller = useStepController(trace.length, playDelayMs);
   const [activeCodeIndex, setActiveCodeIndex] = useState(0);
-  const currentStep = activeAlgorithm.trace[controller.currentIndex];
+  const currentIndex = Math.min(controller.currentIndex, trace.length - 1);
+  const currentStep = trace[currentIndex];
   const activeCodeExample = activeAlgorithm.codeExamples[activeCodeIndex];
   const activeCodeLines =
     currentStep.codeLineHighlights?.[activeCodeExample.language] ?? [];
   const stageStateItems = getStateSummaryItems(currentStep.state);
   const progressPercent =
-    activeAlgorithm.trace.length <= 1
+    trace.length <= 1
       ? 100
-      : (controller.currentIndex / (activeAlgorithm.trace.length - 1)) * 100;
+      : (currentIndex / (trace.length - 1)) * 100;
 
   function selectAlgorithm(index: number) {
     setActiveAlgorithmIndex(index);
     setActiveCodeIndex(0);
     controller.reset();
+  }
+
+  function updateInputArray(nextArray: number[]) {
+    const normalizedArray = nextArray
+      .map((value) => clampInteger(value, minimumValue, maximumValue))
+      .slice(0, maximumArraySize);
+
+    if (normalizedArray.length < minimumArraySize) {
+      return;
+    }
+
+    setInputArray(normalizedArray);
+    setArraySize(String(normalizedArray.length));
+    controller.reset();
+  }
+
+  function addValue() {
+    const value = Number(newValue);
+
+    if (!Number.isFinite(value) || inputArray.length >= maximumArraySize) {
+      return;
+    }
+
+    updateInputArray([...inputArray, value]);
+    setNewValue("");
+  }
+
+  function deleteValue(indexToDelete: number) {
+    updateInputArray(inputArray.filter((_, index) => index !== indexToDelete));
+  }
+
+  function resetData() {
+    updateInputArray([...activeAlgorithm.defaultInput]);
+    setNewValue("");
+  }
+
+  function generateRandomData() {
+    const size = clampInteger(Number(arraySize), minimumArraySize, maximumArraySize);
+
+    updateInputArray(createRandomArray(size));
   }
 
   return (
@@ -206,166 +261,240 @@ export function SortingPage() {
             </button>
           ))}
         </div>
-        <p className="input-summary">{activeAlgorithm.inputSummary}</p>
+        <p className="input-summary">입력 배열: {formatArray(inputArray)}</p>
       </section>
 
-      <section
-        className="visualization-layout"
-        aria-label={`${activeAlgorithm.title} 도표`}
-      >
-        <div className="visualization-panel cinematic-panel">
-          <div className="stage-header">
-            <div>
-              <p className="eyebrow">인터랙션 스테이지</p>
-              <h2>스테이지: {currentStep.title}</h2>
-            </div>
-            <span className="stage-counter">
-              {controller.currentIndex + 1} / {activeAlgorithm.trace.length}
-            </span>
-          </div>
-
-          <SortingBars state={currentStep.state} />
-
-          <div className="stage-state-list" aria-label="현재 단계 상태">
-            {stageStateItems.map((item) => (
-              <div className="stage-state-item" key={item.label}>
-                <span>{item.label}</span>
-                <strong>{item.value}</strong>
-              </div>
-            ))}
-          </div>
-
-          <div className="stage-legend" aria-label="상태 범례">
-            <span className="legend-title">상태 범례</span>
-            {visualLegend.map((item) => (
-              <span className="legend-item" key={item.label}>
-                <span className={`legend-swatch ${item.className}`} />
-                {item.label}
-              </span>
-            ))}
-          </div>
-
-          <div className="timeline-controls" aria-label="시각화 재생 컨트롤">
-            <div className="timeline-row">
-              <button
-                type="button"
-                onClick={controller.goPrevious}
-                disabled={controller.isFirstStep}
-              >
-                도표 이전
-              </button>
-              <button
-                className="primary-control"
-                type="button"
-                onClick={controller.togglePlay}
-                disabled={controller.isLastStep}
-              >
-                {controller.isPlaying ? "일시정지" : "자동 재생"}
-              </button>
-              <button
-                aria-label="도표 다음"
-                disabled={controller.isLastStep}
-                onClick={controller.goNext}
-                type="button"
-              >
-                다음
-              </button>
-            </div>
-
-            <label className="timeline-slider-label" htmlFor="sorting-step-slider">
-              <span>수동 단계 이동</span>
-              <input
-                id="sorting-step-slider"
-                type="range"
-                min="0"
-                max={activeAlgorithm.trace.length - 1}
-                value={controller.currentIndex}
-                onChange={(event) =>
-                  controller.goToStep(Number(event.currentTarget.value))
-                }
-                aria-label="정렬 단계 슬라이더"
-                style={{ "--progress": `${progressPercent}%` } as CSSProperties}
-              />
-            </label>
-
-            <label className="speed-control" htmlFor="sorting-speed">
-              <span>속도</span>
-              <select
-                id="sorting-speed"
-                value={playDelayMs}
-                onChange={(event) => setPlayDelayMs(Number(event.currentTarget.value))}
-              >
-                <option value="1300">느리게</option>
-                <option value="900">보통</option>
-                <option value="500">빠르게</option>
-              </select>
-            </label>
-          </div>
-        </div>
-      </section>
-
-      <section
-        className="code-example-section"
-        aria-label={`${activeAlgorithm.title} 코드`}
-      >
-        <div className="code-example-header">
+      <section className="data-editor-panel" aria-label="배열 데이터 편집">
+        <div className="data-editor-header">
           <div>
-            <h2 id="code-title">코드 예제</h2>
-            <p>단계가 바뀌면 관련 코드 줄도 함께 표시됩니다.</p>
+            <h2>배열 데이터</h2>
+            <p>값을 직접 추가하거나 크기를 지정해 랜덤 배열을 만들 수 있습니다.</p>
           </div>
-          <span className="code-file-name">{activeCodeExample.fileName}</span>
+          <button type="button" onClick={resetData}>
+            기본값
+          </button>
         </div>
 
-        <div className="code-tabs" role="tablist" aria-label="코드 언어">
-          {activeAlgorithm.codeExamples.map((example, index) => (
-            <button
-              aria-controls="bubble-sort-code-panel"
-              aria-selected={activeCodeIndex === index}
-              className="code-tab"
-              key={example.language}
-              onClick={() => setActiveCodeIndex(index)}
-              role="tab"
-              type="button"
-            >
-              {example.language}
-            </button>
+        <div className="data-control-grid">
+          <label className="data-field" htmlFor="sorting-new-value">
+            <span>추가할 값</span>
+            <input
+              id="sorting-new-value"
+              type="number"
+              min={minimumValue}
+              max={maximumValue}
+              value={newValue}
+              onChange={(event) => setNewValue(event.currentTarget.value)}
+              onKeyDown={(event) => {
+                if (event.key === "Enter") {
+                  addValue();
+                }
+              }}
+            />
+          </label>
+          <button
+            type="button"
+            onClick={addValue}
+            disabled={inputArray.length >= maximumArraySize}
+          >
+            값 추가
+          </button>
+
+          <label className="data-field" htmlFor="sorting-array-size">
+            <span>배열 크기</span>
+            <input
+              id="sorting-array-size"
+              type="number"
+              min={minimumArraySize}
+              max={maximumArraySize}
+              value={arraySize}
+              onChange={(event) => setArraySize(event.currentTarget.value)}
+            />
+          </label>
+          <button type="button" onClick={generateRandomData}>
+            랜덤 생성
+          </button>
+        </div>
+
+        <div className="editable-array" aria-label="현재 배열 값 목록">
+          {inputArray.map((value, index) => (
+            <span className="editable-array-item" key={`${index}-${value}`}>
+              <span>
+                <strong>{index}</strong>
+                {value}
+              </span>
+              <button
+                aria-label={`${index}번 값 ${value} 삭제`}
+                type="button"
+                onClick={() => deleteValue(index)}
+                disabled={inputArray.length <= minimumArraySize}
+              >
+                x
+              </button>
+            </span>
           ))}
         </div>
+      </section>
 
-        <div className="code-panel" id="bubble-sort-code-panel" role="tabpanel">
-          <ol className="code-lines">
-            {activeCodeExample.code.split("\n").map((line, index) => {
-              const lineNumber = index + 1;
-              const isActive = activeCodeLines.includes(lineNumber);
+      <section className="sorting-workbench" aria-label="정렬 실습 작업 영역">
+        <section
+          className="visualization-layout"
+          aria-label={`${activeAlgorithm.title} 도표`}
+        >
+          <div className="visualization-panel cinematic-panel">
+            <div className="stage-header">
+              <div>
+                <p className="eyebrow">인터랙션 스테이지</p>
+                <h2>스테이지: {currentStep.title}</h2>
+              </div>
+              <span className="stage-counter">
+                {currentIndex + 1} / {trace.length}
+              </span>
+            </div>
 
-              return (
-                <li
-                  aria-label={
-                    isActive
-                      ? `현재 코드 ${lineNumber}: ${line.trim()}`
-                      : `코드 ${lineNumber}: ${line.trim()}`
-                  }
-                  className={isActive ? "code-line is-active" : "code-line"}
-                  key={`${activeAlgorithm.id}-${activeCodeExample.language}-${lineNumber}`}
+            <SortingBars state={currentStep.state} />
+
+            <div className="stage-state-list" aria-label="현재 단계 상태">
+              {stageStateItems.map((item) => (
+                <div className="stage-state-item" key={item.label}>
+                  <span>{item.label}</span>
+                  <strong>{item.value}</strong>
+                </div>
+              ))}
+            </div>
+
+            <div className="stage-legend" aria-label="상태 범례">
+              <span className="legend-title">상태 범례</span>
+              {visualLegend.map((item) => (
+                <span className="legend-item" key={item.label}>
+                  <span className={`legend-swatch ${item.className}`} />
+                  {item.label}
+                </span>
+              ))}
+            </div>
+
+            <div className="timeline-controls" aria-label="시각화 재생 컨트롤">
+              <div className="timeline-row">
+                <button
+                  type="button"
+                  onClick={controller.goPrevious}
+                  disabled={controller.isFirstStep}
                 >
-                  <span className="code-line-number">{lineNumber}</span>
-                  <code className="code-line-text">
-                    {tokenizeCodeLine(activeCodeExample.language, line).map(
-                      (token, tokenIndex) => (
-                        <span
-                          className={`token-${token.type}`}
-                          key={`${activeAlgorithm.id}-${activeCodeExample.language}-${lineNumber}-${tokenIndex}`}
-                        >
-                          {token.text}
-                        </span>
-                      )
-                    )}
-                  </code>
-                </li>
-              );
-            })}
-          </ol>
-        </div>
+                  도표 이전
+                </button>
+                <button
+                  className="primary-control"
+                  type="button"
+                  onClick={controller.togglePlay}
+                  disabled={controller.isLastStep}
+                >
+                  {controller.isPlaying ? "일시정지" : "자동 재생"}
+                </button>
+                <button
+                  aria-label="도표 다음"
+                  disabled={controller.isLastStep}
+                  onClick={controller.goNext}
+                  type="button"
+                >
+                  다음
+                </button>
+              </div>
+
+              <label className="timeline-slider-label" htmlFor="sorting-step-slider">
+                <span>수동 단계 이동</span>
+                <input
+                  id="sorting-step-slider"
+                  type="range"
+                  min="0"
+                  max={trace.length - 1}
+                  value={currentIndex}
+                  onChange={(event) =>
+                    controller.goToStep(Number(event.currentTarget.value))
+                  }
+                  aria-label="정렬 단계 슬라이더"
+                  style={{ "--progress": `${progressPercent}%` } as CSSProperties}
+                />
+              </label>
+
+              <label className="speed-control" htmlFor="sorting-speed">
+                <span>속도</span>
+                <select
+                  id="sorting-speed"
+                  value={playDelayMs}
+                  onChange={(event) => setPlayDelayMs(Number(event.currentTarget.value))}
+                >
+                  <option value="1300">느리게</option>
+                  <option value="900">보통</option>
+                  <option value="500">빠르게</option>
+                </select>
+              </label>
+            </div>
+          </div>
+        </section>
+
+        <section
+          className="code-example-section"
+          aria-label={`${activeAlgorithm.title} 코드`}
+        >
+          <div className="code-example-header">
+            <div>
+              <h2 id="code-title">코드 예제</h2>
+              <p>단계가 바뀌면 관련 코드 줄도 함께 표시됩니다.</p>
+            </div>
+            <span className="code-file-name">{activeCodeExample.fileName}</span>
+          </div>
+
+          <div className="code-tabs" role="tablist" aria-label="코드 언어">
+            {activeAlgorithm.codeExamples.map((example, index) => (
+              <button
+                aria-controls="bubble-sort-code-panel"
+                aria-selected={activeCodeIndex === index}
+                className="code-tab"
+                key={example.language}
+                onClick={() => setActiveCodeIndex(index)}
+                role="tab"
+                type="button"
+              >
+                {example.language}
+              </button>
+            ))}
+          </div>
+
+          <div className="code-panel" id="bubble-sort-code-panel" role="tabpanel">
+            <ol className="code-lines">
+              {activeCodeExample.code.split("\n").map((line, index) => {
+                const lineNumber = index + 1;
+                const isActive = activeCodeLines.includes(lineNumber);
+
+                return (
+                  <li
+                    aria-label={
+                      isActive
+                        ? `현재 코드 ${lineNumber}: ${line.trim()}`
+                        : `코드 ${lineNumber}: ${line.trim()}`
+                    }
+                    className={isActive ? "code-line is-active" : "code-line"}
+                    key={`${activeAlgorithm.id}-${activeCodeExample.language}-${lineNumber}`}
+                  >
+                    <span className="code-line-number">{lineNumber}</span>
+                    <code className="code-line-text">
+                      {tokenizeCodeLine(activeCodeExample.language, line).map(
+                        (token, tokenIndex) => (
+                          <span
+                            className={`token-${token.type}`}
+                            key={`${activeAlgorithm.id}-${activeCodeExample.language}-${lineNumber}-${tokenIndex}`}
+                          >
+                            {token.text}
+                          </span>
+                        )
+                      )}
+                    </code>
+                  </li>
+                );
+              })}
+            </ol>
+          </div>
+        </section>
       </section>
 
       <section className="step-pseudo-layout" aria-label="단계와 의사 코드">
@@ -391,7 +520,7 @@ export function SortingPage() {
         <aside className="step-panel" aria-label="현재 단계 설명">
           <h2>현재 단계</h2>
           <p className="step-count">
-            {controller.currentIndex + 1} / {activeAlgorithm.trace.length}
+            {currentIndex + 1} / {trace.length}
           </p>
           <h3>{currentStep.title}</h3>
           <p>{currentStep.description}</p>
@@ -524,4 +653,22 @@ function formatIndices(indices: readonly number[]): string {
 
 function formatRange(range: [number, number]): string {
   return `${range[0]}~${range[1]}번`;
+}
+
+function createRandomArray(size: number): number[] {
+  return Array.from({ length: size }, () => {
+    return randomInteger(minimumValue, maximumValue);
+  });
+}
+
+function randomInteger(minimum: number, maximum: number): number {
+  return Math.floor(Math.random() * (maximum - minimum + 1)) + minimum;
+}
+
+function clampInteger(value: number, minimum: number, maximum: number): number {
+  if (!Number.isFinite(value)) {
+    return minimum;
+  }
+
+  return Math.min(Math.max(Math.round(value), minimum), maximum);
 }

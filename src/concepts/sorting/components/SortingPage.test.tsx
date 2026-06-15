@@ -1,4 +1,4 @@
-import { fireEvent, render, screen } from "@testing-library/react";
+import { fireEvent, render, screen, within } from "@testing-library/react";
 import { MemoryRouter } from "react-router";
 import { describe, expect, it } from "vitest";
 
@@ -26,6 +26,9 @@ describe("SortingPage", () => {
     expect(screen.getByText("시간 복잡도 O(n²)")).toBeInTheDocument();
     expect(screen.getByLabelText("9번 인덱스, 값 10")).toBeInTheDocument();
     expect(screen.getByText("상태 범례")).toBeInTheDocument();
+    expect(screen.getByRole("heading", { name: "배열 데이터" })).toBeInTheDocument();
+    expect(screen.getByRole("button", { name: "값 추가" })).toBeEnabled();
+    expect(screen.getByRole("button", { name: "랜덤 생성" })).toBeEnabled();
   });
 
   it("moves through trace steps with the next and reset controls", () => {
@@ -132,18 +135,21 @@ describe("SortingPage", () => {
     ).toHaveTextContent("if result[index] > result[index + 1]");
   });
 
-  it("places chart, code, pseudo-code with step, and summary in the requested order", () => {
+  it("places the interaction stage and code side by side in the workbench", () => {
     render(
       <MemoryRouter>
         <SortingPage />
       </MemoryRouter>
     );
 
+    const workbench = screen.getByLabelText("정렬 실습 작업 영역");
     const chart = screen.getByLabelText("버블 정렬 도표");
     const code = screen.getByLabelText("버블 정렬 코드");
     const pseudoAndStep = screen.getByLabelText("단계와 의사 코드");
     const summary = screen.getByLabelText("핵심 요약");
 
+    expect(workbench).toContainElement(chart);
+    expect(workbench).toContainElement(code);
     expect(chart.compareDocumentPosition(code)).toBe(
       Node.DOCUMENT_POSITION_FOLLOWING
     );
@@ -159,6 +165,47 @@ describe("SortingPage", () => {
     expect(pseudoAndStep).toContainElement(
       screen.getByRole("heading", { name: "의사 코드" })
     );
+  });
+
+  it("adds and deletes array values for the generated trace", () => {
+    render(
+      <MemoryRouter>
+        <SortingPage />
+      </MemoryRouter>
+    );
+
+    fireEvent.change(screen.getByLabelText("추가할 값"), {
+      target: { value: "21" }
+    });
+    fireEvent.click(screen.getByRole("button", { name: "값 추가" }));
+
+    expect(screen.getByText("입력 배열: [14, 3, 17, 8, 6, 12, 1, 19, 4, 10, 21]")).toBeInTheDocument();
+    expect(screen.getByLabelText("10번 인덱스, 값 21")).toBeInTheDocument();
+
+    fireEvent.click(screen.getByRole("button", { name: "0번 값 14 삭제" }));
+
+    expect(screen.getByText("입력 배열: [3, 17, 8, 6, 12, 1, 19, 4, 10, 21]")).toBeInTheDocument();
+    fireEvent.click(screen.getByRole("button", { name: "도표 다음" }));
+    expect(screen.getByRole("heading", { name: "스테이지: 3와 17 비교" })).toBeInTheDocument();
+  });
+
+  it("generates a random array from the requested size", () => {
+    render(
+      <MemoryRouter>
+        <SortingPage />
+      </MemoryRouter>
+    );
+
+    fireEvent.change(screen.getByLabelText("배열 크기"), {
+      target: { value: "6" }
+    });
+    fireEvent.click(screen.getByRole("button", { name: "랜덤 생성" }));
+
+    const visualCells = within(screen.getByLabelText("배열 인덱스와 값"))
+      .getAllByLabelText(/\d+번 인덱스, 값 \d+/);
+
+    expect(visualCells).toHaveLength(6);
+    expect(screen.getByLabelText("배열 크기")).toHaveValue(6);
   });
 
   it("switches to Selection Sort with synchronized code highlighting", () => {
