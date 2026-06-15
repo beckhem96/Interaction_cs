@@ -1024,6 +1024,51 @@ button:disabled {
   line-height: 1.65;
 }
 
+.sql-query-lines {
+  display: grid;
+  gap: 2px;
+  min-width: 760px;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.sql-query-line {
+  display: grid;
+  grid-template-columns: 34px minmax(0, 1fr);
+  gap: 12px;
+  align-items: baseline;
+  min-height: 32px;
+  padding: 4px 8px;
+  border-left: 3px solid transparent;
+  border-radius: 6px;
+  color: #d7e1e6;
+  transition:
+    background-color 180ms ease,
+    border-color 180ms ease,
+    color 180ms ease,
+    transform 180ms ease;
+}
+
+.sql-query-line.is-active {
+  border-color: #f0b84f;
+  background: rgb(240 184 79 / 18%);
+  color: #ffffff;
+  transform: translateX(3px);
+}
+
+.sql-query-line-number {
+  color: #8da0a8;
+  font-size: 0.82rem;
+  font-weight: 800;
+  text-align: right;
+  user-select: none;
+}
+
+.sql-query-line.is-active .sql-query-line-number {
+  color: #ffd88f;
+}
+
 .database-step-layout {
   display: grid;
   grid-template-columns: minmax(0, 1fr) 360px;
@@ -1054,13 +1099,62 @@ button:disabled {
   font-weight: 800;
 }
 
+.phase-join {
+  background: #2f6fbb;
+}
+
+.phase-groupBy,
+.phase-union {
+  background: #6f5bb8;
+}
+
+.phase-where,
+.phase-having {
+  background: #8a6f2a;
+}
+
+.phase-orderBy,
+.phase-limit {
+  background: #7d4b2c;
+}
+
+.sql-stage-summary {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
+  gap: 8px;
+  margin: 0 0 16px;
+}
+
+.sql-stage-summary div {
+  display: grid;
+  gap: 2px;
+  padding: 10px 12px;
+  border-radius: 8px;
+  background: #f1f5f4;
+}
+
+.sql-stage-summary dt {
+  color: #42635b;
+  font-size: 0.78rem;
+  font-weight: 800;
+}
+
+.sql-stage-summary dd {
+  margin: 0;
+  color: #172026;
+  font-weight: 900;
+}
+
 .sql-table-scroll {
   overflow: auto;
+  border: 1px solid #d9e0e4;
+  border-radius: 8px;
+  background: #ffffff;
 }
 
 .sql-result-table {
   width: 100%;
-  min-width: 620px;
+  min-width: 760px;
   border-collapse: collapse;
   font-size: 0.95rem;
 }
@@ -1079,6 +1173,204 @@ button:disabled {
 
 .sql-result-table td {
   color: #172026;
+}
+
+.sql-result-table th.is-active-column,
+.sql-result-table td.is-active-column {
+  background: #fff6dc;
+}
+
+.sql-result-table tbody tr {
+  transition:
+    background-color 180ms ease,
+    box-shadow 180ms ease,
+    opacity 180ms ease,
+    transform 220ms ease;
+}
+
+.sql-result-table tbody tr[data-motion] {
+  animation-duration: 720ms;
+  animation-timing-function: cubic-bezier(0.18, 0.9, 0.2, 1);
+}
+
+.sql-row-motion-source {
+  animation-name: sql-row-source;
+}
+
+.sql-row-motion-joined {
+  animation-name: sql-row-joined;
+}
+
+.sql-row-motion-filtered {
+  animation-name: sql-row-filtered;
+}
+
+.sql-row-motion-grouped {
+  animation-name: sql-row-grouped;
+}
+
+.sql-row-motion-projected {
+  animation-name: sql-row-projected;
+}
+
+.sql-row-motion-unioned {
+  animation-name: sql-row-unioned;
+}
+
+.sql-row-motion-sorted {
+  animation-name: sql-row-sorted;
+}
+
+.sql-row-motion-limited {
+  animation-name: sql-row-limited;
+}
+
+.sql-row-motion-joined td,
+.sql-row-motion-unioned td {
+  background: #edf5ff;
+}
+
+.sql-row-motion-grouped td,
+.sql-row-motion-projected td {
+  background: #f1edff;
+}
+
+.sql-row-motion-filtered td {
+  background: #f8f0d7;
+}
+
+.sql-row-motion-sorted td,
+.sql-row-motion-limited td {
+  background: #f5eee8;
+}
+
+.sql-result-table tbody tr td.is-active-column {
+  background: #fff6dc;
+  box-shadow: inset 0 0 0 1px rgb(240 184 79 / 30%);
+  font-weight: 800;
+}
+
+@keyframes sql-row-source {
+  0% {
+    opacity: 0.45;
+    transform: translateY(8px);
+  }
+
+  100% {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes sql-row-joined {
+  0% {
+    transform: translateX(-10px);
+  }
+
+  48% {
+    transform: translateX(5px);
+  }
+
+  100% {
+    transform: translateX(0);
+  }
+}
+
+@keyframes sql-row-filtered {
+  0% {
+    opacity: 0.55;
+    transform: scale(0.985);
+  }
+
+  52% {
+    opacity: 1;
+    transform: scale(1.012);
+  }
+
+  100% {
+    transform: scale(1);
+  }
+}
+
+@keyframes sql-row-grouped {
+  0% {
+    transform: translateY(9px) scale(0.98);
+  }
+
+  54% {
+    transform: translateY(-3px) scale(1.01);
+  }
+
+  100% {
+    transform: translateY(0) scale(1);
+  }
+}
+
+@keyframes sql-row-projected {
+  0% {
+    opacity: 0.65;
+    transform: translateX(12px);
+  }
+
+  100% {
+    opacity: 1;
+    transform: translateX(0);
+  }
+}
+
+@keyframes sql-row-unioned {
+  0% {
+    opacity: 0.35;
+    transform: translateY(-12px);
+  }
+
+  58% {
+    opacity: 1;
+    transform: translateY(3px);
+  }
+
+  100% {
+    transform: translateY(0);
+  }
+}
+
+@keyframes sql-row-sorted {
+  0% {
+    transform: translateY(10px);
+  }
+
+  52% {
+    transform: translateY(-4px);
+  }
+
+  100% {
+    transform: translateY(0);
+  }
+}
+
+@keyframes sql-row-limited {
+  0% {
+    box-shadow: inset 0 0 0 0 rgb(125 75 44 / 0%);
+    transform: scale(0.99);
+  }
+
+  52% {
+    box-shadow: inset 0 0 0 2px rgb(125 75 44 / 28%);
+    transform: scale(1.01);
+  }
+
+  100% {
+    box-shadow: inset 0 0 0 0 rgb(125 75 44 / 0%);
+    transform: scale(1);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .sql-query-line,
+  .sql-result-table tbody tr {
+    animation-duration: 1ms !important;
+    transition-duration: 1ms !important;
+  }
 }
 
 @media (max-width: 820px) {

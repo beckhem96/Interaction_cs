@@ -1,15 +1,34 @@
 export type SqlLogicalPhase =
   | "from"
+  | "join"
   | "where"
   | "groupBy"
   | "having"
   | "select"
-  | "orderBy";
+  | "union"
+  | "orderBy"
+  | "limit";
 
 export type DatabaseCellValue = string | number | boolean | null;
+
+export type DatabaseRow = Record<string, DatabaseCellValue>;
+
+export type DatabaseRowMotion =
+  | "source"
+  | "joined"
+  | "filtered"
+  | "grouped"
+  | "projected"
+  | "unioned"
+  | "sorted"
+  | "limited";
 
 export type DatabaseTraceState = {
   phase: SqlLogicalPhase;
   query: string;
-  rows: Record<string, DatabaseCellValue>[];
+  activeQueryLines: number[];
+  rows: DatabaseRow[];
+  activeColumns?: string[];
+  rowMotionByKey?: Record<string, DatabaseRowMotion>;
+  summaryItems?: { label: string; value: string }[];
 };

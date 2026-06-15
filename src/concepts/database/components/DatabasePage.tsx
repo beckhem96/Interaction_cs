@@ -2,18 +2,38 @@ import { Link } from "react-router";
 
 import { useStepController } from "../../shared/useStepController";
 import { generateSelectLogicalExecutionTrace } from "../engine/selectLogicalExecution";
-import type { DatabaseCellValue } from "../types";
+import type {
+  DatabaseCellValue,
+  DatabaseRow,
+  DatabaseRowMotion,
+  SqlLogicalPhase
+} from "../types";
 
 const trace = generateSelectLogicalExecutionTrace();
 
 const pseudoCode = [
   "FROM 절의 기준 테이블을 읽는다.",
+  "JOIN 조건으로 관련 테이블의 열을 붙인다.",
   "조건 amount >= 50을 만족하는 행만 남긴다.",
-  "region 값을 기준으로 행을 그룹화한다.",
+  "담당자와 지역 값을 기준으로 행을 그룹화한다.",
   "집계 결과에 HAVING 조건을 적용한다.",
   "SELECT 절의 출력 열과 별칭을 만든다.",
-  "ORDER BY 기준으로 최종 결과를 정렬한다."
+  "UNION ALL로 같은 형태의 결과를 이어 붙인다.",
+  "ORDER BY 기준으로 최종 결과를 정렬한다.",
+  "LIMIT으로 반환할 행 수를 제한한다."
 ];
+
+const phaseLabels: Record<SqlLogicalPhase, string> = {
+  from: "FROM",
+  join: "JOIN",
+  where: "WHERE",
+  groupBy: "GROUP BY",
+  having: "HAVING",
+  select: "SELECT",
+  union: "UNION ALL",
+  orderBy: "ORDER BY",
+  limit: "LIMIT"
+};
 
 export function DatabasePage() {
   const controller = useStepController(trace.length);
@@ -36,9 +56,10 @@ export function DatabasePage() {
 
       <section className="sql-query-section" aria-label="SQL 예제">
         <h2>SQL 예제</h2>
-        <pre className="sql-query">
-          <code>{currentStep.state.query}</code>
-        </pre>
+        <SqlQueryBlock
+          activeLines={currentStep.state.activeQueryLines}
+          query={currentStep.state.query}
+        />
       </section>
 
       <section className="database-step-layout" aria-label="SQL 실행 단계">
@@ -49,11 +70,17 @@ export function DatabasePage() {
               <h2>{currentStep.title}</h2>
             </div>
             <span className={`phase-badge phase-${currentStep.state.phase}`}>
-              {currentStep.state.phase}
+              {phaseLabels[currentStep.state.phase]}
             </span>
           </div>
 
-          <SqlResultTable rows={currentStep.state.rows} />
+          <SqlStageSummary items={currentStep.state.summaryItems ?? []} />
+
+          <SqlResultTable
+            activeColumns={currentStep.state.activeColumns ?? []}
+            rowMotionByKey={currentStep.state.rowMotionByKey ?? {}}
+            rows={currentStep.state.rows}
+          />
         </div>
 
         <aside className="step-panel" aria-label="현재 SQL 단계 설명">
@@ -122,7 +149,7 @@ export function DatabasePage() {
             </div>
             <div>
               <dt>핵심</dt>
-              <dd>WHERE는 그룹 전 행 필터, HAVING은 그룹 후 집계 필터입니다.</dd>
+              <dd>JOIN은 행을 넓히고, GROUP BY는 행을 묶고, UNION ALL은 같은 열 구조의 결과를 아래로 붙입니다.</dd>
             </div>
           </dl>
         </div>
@@ -131,33 +158,112 @@ export function DatabasePage() {
   );
 }
 
-type SqlResultTableProps = {
-  rows: Record<string, DatabaseCellValue>[];
+type SqlQueryBlockProps = {
+  activeLines: number[];
+  query: string;
 };
 
-function SqlResultTable({ rows }: SqlResultTableProps) {
+function SqlQueryBlock({ activeLines, query }: SqlQueryBlockProps) {
+  return (
+    <pre className="sql-query">
+      <ol className="sql-query-lines" aria-label="실행 중인 SQL 쿼리">
+        {query.split("\n").map((line, index) => {
+          const lineNumber = index + 1;
+          const isActive = activeLines.includes(lineNumber);
+
+          return (
+            <li
+              aria-current={isActive ? "step" : undefined}
+              aria-label={
+                isActive
+                  ? `현재 쿼리 ${lineNumber}: ${line}`
+                  : `쿼리 ${lineNumber}: ${line}`
+              }
+              className={isActive ? "sql-query-line is-active" : "sql-query-line"}
+              key={`${lineNumber}-${line}`}
+            >
+              <span className="sql-query-line-number">{lineNumber}</span>
+              <code>{line}</code>
+            </li>
+          );
+        })}
+      </ol>
+    </pre>
+  );
+}
+
+type SqlStageSummaryProps = {
+  items: { label: string; value: string }[];
+};
+
+function SqlStageSummary({ items }: SqlStageSummaryProps) {
+  if (items.length === 0) {
+    return null;
+  }
+
+  return (
+    <dl className="sql-stage-summary" aria-label="현재 SQL 단계 요약">
+      {items.map((item) => (
+        <div key={item.label}>
+          <dt>{item.label}</dt>
+          <dd>{item.value}</dd>
+        </div>
+      ))}
+    </dl>
+  );
+}
+
+type SqlResultTableProps = {
+  activeColumns: string[];
+  rowMotionByKey: Record<string, DatabaseRowMotion>;
+  rows: DatabaseRow[];
+};
+
+function SqlResultTable({
+  activeColumns,
+  rowMotionByKey,
+  rows
+}: SqlResultTableProps) {
   const columns = rows.length > 0 ? Object.keys(rows[0]!) : [];
 
   return (
     <div className="sql-table-scroll">
-      <table className="sql-result-table">
+      <table className="sql-result-table" aria-label="SQL 중간 결과 테이블">
         <thead>
           <tr>
             {columns.map((column) => (
-              <th key={column} scope="col">
+              <th
+                className={activeColumns.includes(column) ? "is-active-column" : ""}
+                key={column}
+                scope="col"
+              >
                 {column}
               </th>
             ))}
           </tr>
         </thead>
         <tbody>
-          {rows.map((row, rowIndex) => (
-            <tr key={`${rowIndex}-${Object.values(row).join("-")}`}>
-              {columns.map((column) => (
-                <td key={column}>{formatCellValue(row[column])}</td>
-              ))}
-            </tr>
-          ))}
+          {rows.map((row, rowIndex) => {
+            const rowKey = getDatabaseRowKey(row);
+            const motion = rowMotionByKey[rowKey];
+
+            return (
+              <tr
+                className={motion ? `sql-row-motion-${motion}` : ""}
+                data-motion={motion}
+                key={`${rowIndex}-${rowKey}`}
+              >
+                {columns.map((column) => (
+                  <td
+                    className={activeColumns.includes(column) ? "is-active-column" : ""}
+                    key={column}
+                  >
+                    {formatCellValue(row[column])}
+                  </td>
+                ))}
+              </tr>
+            );
+          })}
         </tbody>
       </table>
     </div>
@@ -170,4 +276,10 @@ function formatCellValue(value: DatabaseCellValue): string {
   }
 
   return String(value);
+}
+
+function getDatabaseRowKey(row: DatabaseRow): string {
+  return Object.entries(row)
+    .map(([key, value]) => `${key}:${String(value)}`)
+    .join("|");
 }
