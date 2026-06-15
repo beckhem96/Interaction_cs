@@ -61,6 +61,30 @@ describe("SortingPage", () => {
     expect(screen.getByText("14와 3 비교")).toBeInTheDocument();
   });
 
+  it("marks the visual stage with motion states for animated steps", () => {
+    const { container } = render(
+      <MemoryRouter>
+        <SortingPage />
+      </MemoryRouter>
+    );
+
+    const visual = container.querySelector(".sorting-visual");
+
+    expect(visual).toHaveAttribute("data-motion", "idle");
+
+    fireEvent.click(screen.getByRole("button", { name: "도표 다음" }));
+
+    expect(visual).toHaveAttribute("data-motion", "compare");
+    expect(container.querySelectorAll(".array-cell.is-comparing")).toHaveLength(2);
+    expect(container.querySelector(".sorting-bar.is-comparing")).not.toBeNull();
+
+    fireEvent.click(screen.getByRole("button", { name: "도표 다음" }));
+
+    expect(visual).toHaveAttribute("data-motion", "swap");
+    expect(container.querySelectorAll(".array-cell.is-swapping")).toHaveLength(2);
+    expect(container.querySelector(".sorting-bar.is-swapping")).not.toBeNull();
+  });
+
   it("supports manual timeline scrubbing and playback speed selection", () => {
     render(
       <MemoryRouter>

@@ -5,15 +5,31 @@ type SortingBarsProps = {
 };
 
 const chartHeight = 240;
+type MotionState =
+  | "idle"
+  | "scan"
+  | "compare"
+  | "swap"
+  | "shift"
+  | "write"
+  | "key"
+  | "minimum"
+  | "pivot"
+  | "sorted"
+  | "complete";
 
 export function SortingBars({ state }: SortingBarsProps) {
   const maxValue = Math.max(...state.array);
   const barWidth = state.array.length > 8 ? 44 : 58;
   const barGap = state.array.length > 8 ? 10 : 18;
   const chartWidth = state.array.length * barWidth + (state.array.length - 1) * barGap;
+  const motionState = getMotionState(state);
 
   return (
-    <figure className="sorting-visual">
+    <figure
+      className={`sorting-visual motion-${motionState}`}
+      data-motion={motionState}
+    >
       <svg
         aria-label="정렬 배열 상태"
         role="img"
@@ -26,7 +42,7 @@ export function SortingBars({ state }: SortingBarsProps) {
           const className = getBarClassName(state, index);
 
           return (
-            <g key={`${index}-${value}`} transform={`translate(${x} 0)`}>
+            <g key={index} transform={`translate(${x} 0)`}>
               <rect
                 className={className}
                 width={barWidth}
@@ -48,13 +64,13 @@ export function SortingBars({ state }: SortingBarsProps) {
       <figcaption
         aria-label="배열 인덱스와 값"
         className="sorting-array-cells"
-        style={{ gridTemplateColumns: `repeat(${state.array.length}, minmax(0, 1fr))` }}
+        style={{ gridTemplateColumns: `repeat(${state.array.length}, minmax(34px, 1fr))` }}
       >
         {state.array.map((value, index) => (
           <span
             aria-label={`${index}번 인덱스, 값 ${value}`}
             className={getCellClassName(state, index)}
-            key={`${index}-${value}`}
+            key={index}
           >
             <span className="array-cell-index">{index}</span>
             <span className="array-cell-value">{value}</span>
@@ -63,6 +79,50 @@ export function SortingBars({ state }: SortingBarsProps) {
       </figcaption>
     </figure>
   );
+}
+
+function getMotionState(state: SortingState): MotionState {
+  if (state.swappingIndices?.length) {
+    return "swap";
+  }
+
+  if (state.shiftedIndices?.length) {
+    return "shift";
+  }
+
+  if (state.writeIndex !== undefined) {
+    return "write";
+  }
+
+  if (state.comparingIndices?.length) {
+    return "compare";
+  }
+
+  if (state.keyIndex !== undefined) {
+    return "key";
+  }
+
+  if (state.minimumIndex !== undefined) {
+    return "minimum";
+  }
+
+  if (state.pivotIndex !== undefined) {
+    return "pivot";
+  }
+
+  if (state.currentIndex !== undefined || state.scanningIndex !== undefined) {
+    return "scan";
+  }
+
+  if (state.sortedIndices?.length === state.array.length) {
+    return "complete";
+  }
+
+  if (state.sortedIndices?.length) {
+    return "sorted";
+  }
+
+  return "idle";
 }
 
 function getBarClassName(state: SortingState, index: number): string {
