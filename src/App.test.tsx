@@ -32,4 +32,17 @@ describe("App routes", () => {
     ).toBeInTheDocument();
     expect(screen.getByText(/삽입 값: \[42, 23, 61/)).toBeInTheDocument();
   });
+
+  it("routes to the graph learning page", () => {
+    render(
+      <MemoryRouter initialEntries={["/graphs"]}>
+        <App />
+      </MemoryRouter>
+    );
+
+    expect(
+      screen.getByRole("heading", { name: "무방향 그래프" })
+    ).toBeInTheDocument();
+    expect(screen.getByText("노드 6개 · 간선 7개")).toBeInTheDocument();
+  });
 });

@@ -1,6 +1,7 @@
 import { Navigate, Route, Routes } from "react-router";
 
 import { DatabasePage } from "./concepts/database/components/DatabasePage";
+import { GraphPage } from "./concepts/graphs/components/GraphPage";
 import { SortingPage } from "./concepts/sorting/components/SortingPage";
 import { TreePage } from "./concepts/trees/components/TreePage";
 import { HomePage } from "./pages/HomePage";
@@ -12,6 +13,7 @@ export function App() {
       <Route path="/sorting" element={<SortingPage />} />
       <Route path="/database" element={<DatabasePage />} />
       <Route path="/trees" element={<TreePage />} />
+      <Route path="/graphs" element={<GraphPage />} />
       <Route path="*" element={<Navigate to="/" replace />} />
     </Routes>
   );

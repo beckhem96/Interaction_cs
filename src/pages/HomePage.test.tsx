@@ -27,5 +27,9 @@ describe("HomePage", () => {
       "href",
       "/trees"
     );
+    expect(screen.getByRole("link", { name: /그래프 자료구조/ })).toHaveAttribute(
+      "href",
+      "/graphs"
+    );
   });
 });
