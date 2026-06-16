@@ -3,6 +3,7 @@ import { MemoryRouter } from "react-router";
 import { describe, expect, it } from "vitest";
 
 import { generateAvlRotationTrace } from "../algorithms/avlTree";
+import { generateBPlusTreeTrace } from "../algorithms/bPlusTree";
 import { generateBTreeTrace } from "../algorithms/bTree";
 import { generateBinarySearchTreeTrace } from "../algorithms/binarySearchTree";
 import { generateBinarySearchTreeDeletionTrace } from "../algorithms/binarySearchTreeDeletion";
@@ -254,6 +255,51 @@ describe("TreePage", () => {
     expect(
       screen.getByRole("listitem", {
         name: "현재 코드 39: if (node.keys[index] === key) return node;"
+      })
+    ).toBeInTheDocument();
+  });
+
+  it("switches to B+Tree mode and highlights leaf links and range scan", () => {
+    const { container } = render(
+      <MemoryRouter>
+        <TreePage />
+      </MemoryRouter>
+    );
+
+    fireEvent.click(screen.getByRole("tab", { name: "B+Tree" }));
+
+    expect(screen.getByRole("heading", { name: "B+Tree" })).toBeInTheDocument();
+    expect(screen.getByText(/range: \[6, 20\]/)).toBeInTheDocument();
+    expect(screen.getByRole("img", { name: "B+Tree 상태" })).toBeInTheDocument();
+
+    const trace = generateBPlusTreeTrace();
+    const leafSplitIndex = trace.findIndex(
+      (step) => step.id === "bplus-leaf-split-apply-30-20"
+    );
+    const rangeCompleteIndex = trace.findIndex(
+      (step) => step.id === "bplus-range-complete"
+    );
+    const slider = screen.getByRole("slider", { name: "트리 단계 슬라이더" });
+
+    fireEvent.change(slider, { target: { value: String(leafSplitIndex) } });
+
+    expect(screen.getAllByText("20 separator 부모에 복사").length).toBeGreaterThan(0);
+    expect(screen.getByLabelText("키 10, 20 separator 노드")).toBeInTheDocument();
+    expect(container.querySelector(".tree-edge.is-leaf-link")).not.toBeNull();
+    expect(container.querySelector(".tree-node.is-inserted")).not.toBeNull();
+    expect(
+      screen.getByRole("listitem", {
+        name: "현재 코드 33: leaf.next = right;"
+      })
+    ).toBeInTheDocument();
+
+    fireEvent.change(slider, { target: { value: String(rangeCompleteIndex) } });
+
+    expect(screen.getAllByText("[6, 20] range scan 완료").length).toBeGreaterThan(0);
+    expect(screen.getByText("순회 결과: 6 → 7 → 10 → 12 → 17 → 20")).toBeInTheDocument();
+    expect(
+      screen.getByRole("listitem", {
+        name: "현재 코드 45: return result;"
       })
     ).toBeInTheDocument();
   });

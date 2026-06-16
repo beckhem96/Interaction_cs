@@ -1664,6 +1664,10 @@ button:disabled {
   background: #c94f37;
 }
 
+.legend-swatch.is-leaf-link {
+  background: #3f7d58;
+}
+
 .legend-swatch.is-minimum,
 .legend-swatch.is-pivot {
   background: #c28a1d;
@@ -1885,6 +1889,17 @@ button:disabled {
   stroke: #2f6fbb;
   stroke-width: 4;
   animation: tree-edge-draw 720ms ease;
+}
+
+.tree-edge.is-leaf-link {
+  stroke: #3f7d58;
+  stroke-dasharray: 7 5;
+  stroke-width: 3;
+}
+
+.tree-edge.is-leaf-link.is-path {
+  stroke: #3f7d58;
+  stroke-width: 4;
 }
 
 .tree-node circle,

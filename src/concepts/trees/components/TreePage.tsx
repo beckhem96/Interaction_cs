@@ -7,6 +7,12 @@ import {
   generateAvlRotationTrace
 } from "../algorithms/avlTree";
 import {
+  BPLUS_TREE_INSERT_VALUES,
+  BPLUS_TREE_MAX_KEYS,
+  BPLUS_TREE_RANGE,
+  generateBPlusTreeTrace
+} from "../algorithms/bPlusTree";
+import {
   BTREE_INSERT_VALUES,
   BTREE_SEARCH_TARGET,
   generateBTreeTrace
@@ -41,6 +47,7 @@ import {
   generateTrieTrace
 } from "../algorithms/trieTree";
 import { avlTreeCodeExample } from "../code/avlTreeExample";
+import { bPlusTreeCodeExample } from "../code/bPlusTreeExample";
 import { bTreeCodeExample } from "../code/bTreeExample";
 import { binarySearchTreeDeletionCodeExample } from "../code/binarySearchTreeDeletionExample";
 import { binarySearchTreeCodeExample } from "../code/binarySearchTreeExample";
@@ -104,6 +111,19 @@ const bTreePseudoCode = [
   "승격된 key와 비교해 왼쪽 또는 오른쪽 자식으로 내려간다.",
   "탐색은 현재 노드 key와 target을 비교한다.",
   "target이 없으면 알맞은 자식 구간으로 내려간다."
+];
+
+const bPlusTreePseudoCode = [
+  "삽입할 key가 들어갈 leaf를 separator로 찾는다.",
+  "leaf에 key를 정렬된 위치로 넣는다.",
+  "leaf가 넘치면 오른쪽 leaf를 만들고 key를 나눈다.",
+  "오른쪽 leaf의 첫 key를 부모 separator로 복사한다.",
+  "leaf끼리 next link를 다시 연결한다.",
+  "부모 separator가 넘치면 internal split을 전파한다.",
+  "새 루트가 필요하면 separator만 가진 루트를 만든다.",
+  "range scan은 시작 key가 있는 leaf를 찾는다.",
+  "leaf에서 범위 안 key를 결과에 추가한다.",
+  "leaf link를 따라 다음 leaf로 이동한다."
 ];
 
 const heapPseudoCode = [
@@ -189,6 +209,18 @@ const treeConcepts = [
     trace: generateBTreeTrace(),
     pseudoCode: bTreePseudoCode,
     codeExample: bTreeCodeExample
+  },
+  {
+    id: "bplus-tree",
+    title: "B+Tree",
+    eyebrow: "leaf-linked 다중 key 트리",
+    intro:
+      "B+Tree가 내부 노드에는 separator만 두고, 실제 데이터 key를 leaf에 모은 뒤 leaf link로 range scan을 수행하는 과정을 확인합니다.",
+    inputSummary: `삽입 key: [${BPLUS_TREE_INSERT_VALUES.join(", ")}] · range: [${BPLUS_TREE_RANGE.join(", ")}] · leaf 최대 key 수: ${BPLUS_TREE_MAX_KEYS}`,
+    diagramLabel: "B+Tree 상태",
+    trace: generateBPlusTreeTrace(),
+    pseudoCode: bPlusTreePseudoCode,
+    codeExample: bPlusTreeCodeExample
   },
   {
     id: "heap",
@@ -384,6 +416,10 @@ export function TreePage() {
               <span className="legend-item">
                 <span className="legend-swatch is-updated" />
                 갱신
+              </span>
+              <span className="legend-item">
+                <span className="legend-swatch is-leaf-link" />
+                leaf link
               </span>
               <span className="legend-item">
                 <span className="legend-swatch is-sorted" />
@@ -875,6 +911,10 @@ function getNodeAriaLabel(node: TreeNodeState): string {
 function getEdgeClassName(edge: TreeEdgeState, state: TreeTraceState): string {
   const classNames = ["tree-edge"];
   const path = state.pathNodeIds ?? [];
+
+  if (edge.id.startsWith("bplus-leaf-link")) {
+    classNames.push("is-leaf-link");
+  }
 
   if (path.includes(edge.fromId) && path.includes(edge.toId)) {
     classNames.push("is-path");
