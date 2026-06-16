@@ -1,4 +1,9 @@
-export type TreeOperation = "insert" | "search" | "traversal" | "rebalance";
+export type TreeOperation =
+  | "insert"
+  | "search"
+  | "traversal"
+  | "rebalance"
+  | "delete";
 
 export type TreeMotion =
   | "idle"
@@ -7,6 +12,8 @@ export type TreeMotion =
   | "insert"
   | "balance"
   | "rotate"
+  | "remove"
+  | "replace"
   | "found"
   | "visit"
   | "complete";
@@ -39,6 +46,8 @@ export type TreeTraceState = {
   activeNodeId?: string;
   insertedNodeId?: string;
   foundNodeId?: string;
+  removedNodeId?: string;
+  successorNodeId?: string;
   rotatedNodeIds?: string[];
   targetValue?: number;
   rotationLabel?: string;

@@ -11,7 +11,13 @@ import {
   BST_SEARCH_TARGET,
   generateBinarySearchTreeTrace
 } from "../algorithms/binarySearchTree";
+import {
+  BST_DELETE_INITIAL_VALUES,
+  BST_DELETE_TARGETS,
+  generateBinarySearchTreeDeletionTrace
+} from "../algorithms/binarySearchTreeDeletion";
 import { avlTreeCodeExample } from "../code/avlTreeExample";
+import { binarySearchTreeDeletionCodeExample } from "../code/binarySearchTreeDeletionExample";
 import { binarySearchTreeCodeExample } from "../code/binarySearchTreeExample";
 import type { TreeEdgeState, TreeNodeState, TreeTraceState } from "../types";
 
@@ -38,6 +44,17 @@ const avlPseudoCode = [
   "모든 노드가 -1, 0, 1 범위인지 확인한다."
 ];
 
+const deletePseudoCode = [
+  "삭제용 BST를 준비한다.",
+  "현재 노드와 삭제할 값을 비교한다.",
+  "삭제 대상 노드를 찾는다.",
+  "자식이 없으면 부모 연결을 끊는다.",
+  "자식이 하나면 그 자식으로 대체한다.",
+  "자식이 둘이면 오른쪽 서브트리의 최소값을 찾는다.",
+  "successor 값으로 대체하고 원래 successor를 삭제한다.",
+  "남은 트리가 BST 규칙을 유지하는지 확인한다."
+];
+
 const treeConcepts = [
   {
     id: "bst",
@@ -62,6 +79,18 @@ const treeConcepts = [
     trace: generateAvlRotationTrace(),
     pseudoCode: avlPseudoCode,
     codeExample: avlTreeCodeExample
+  },
+  {
+    id: "delete",
+    title: "BST 삭제",
+    eyebrow: "이진 탐색 트리",
+    intro:
+      "BST에서 리프 노드, 자식이 하나인 노드, 자식이 둘인 노드를 삭제할 때 연결이 어떻게 바뀌는지 단계별로 확인합니다.",
+    inputSummary: `초기 값: [${BST_DELETE_INITIAL_VALUES.join(", ")}] · 삭제 값: [${BST_DELETE_TARGETS.join(", ")}]`,
+    diagramLabel: "BST 삭제 트리 상태",
+    trace: generateBinarySearchTreeDeletionTrace(),
+    pseudoCode: deletePseudoCode,
+    codeExample: binarySearchTreeDeletionCodeExample
   }
 ] as const;
 
@@ -69,7 +98,8 @@ const operationLabels = {
   insert: "삽입",
   search: "탐색",
   traversal: "순회",
-  rebalance: "균형"
+  rebalance: "균형",
+  delete: "삭제"
 } as const;
 
 export function TreePage() {
@@ -166,6 +196,14 @@ export function TreePage() {
               <span className="legend-item">
                 <span className="legend-swatch is-rotated" />
                 회전
+              </span>
+              <span className="legend-item">
+                <span className="legend-swatch is-removing" />
+                삭제
+              </span>
+              <span className="legend-item">
+                <span className="legend-swatch is-successor" />
+                successor
               </span>
               <span className="legend-item">
                 <span className="legend-swatch is-sorted" />
@@ -406,6 +444,14 @@ function getNodeClassName(node: TreeNodeState, state: TreeTraceState): string {
 
   if (state.foundNodeId === node.id) {
     classNames.push("is-found");
+  }
+
+  if (state.removedNodeId === node.id) {
+    classNames.push("is-removing");
+  }
+
+  if (state.successorNodeId === node.id) {
+    classNames.push("is-successor");
   }
 
   if (state.rotatedNodeIds?.includes(node.id)) {

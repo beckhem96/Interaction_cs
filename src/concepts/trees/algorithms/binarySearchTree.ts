@@ -475,7 +475,8 @@ function createSummaryItems({
     insert: "삽입",
     search: "탐색",
     traversal: "순회",
-    rebalance: "균형"
+    rebalance: "균형",
+    delete: "삭제"
   };
 
   const motionLabel: Record<TreeMotion, string> = {
@@ -485,6 +486,8 @@ function createSummaryItems({
     insert: "삽입",
     balance: "균형 확인",
     rotate: "회전",
+    remove: "제거",
+    replace: "대체",
     found: "발견",
     visit: "방문",
     complete: "완료"

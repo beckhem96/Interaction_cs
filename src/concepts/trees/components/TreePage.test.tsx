@@ -4,6 +4,7 @@ import { describe, expect, it } from "vitest";
 
 import { generateAvlRotationTrace } from "../algorithms/avlTree";
 import { generateBinarySearchTreeTrace } from "../algorithms/binarySearchTree";
+import { generateBinarySearchTreeDeletionTrace } from "../algorithms/binarySearchTreeDeletion";
 import { TreePage } from "./TreePage";
 
 describe("TreePage", () => {
@@ -108,6 +109,51 @@ describe("TreePage", () => {
     expect(
       screen.getByRole("listitem", {
         name: "현재 코드 13: if (balance > 1 && value < node.left.value) return rotateRight(node);"
+      })
+    ).toBeInTheDocument();
+  });
+
+  it("switches to BST deletion mode and highlights delete cases", () => {
+    const { container } = render(
+      <MemoryRouter>
+        <TreePage />
+      </MemoryRouter>
+    );
+
+    fireEvent.click(screen.getByRole("tab", { name: "BST 삭제" }));
+
+    expect(screen.getByRole("heading", { name: "BST 삭제" })).toBeInTheDocument();
+    expect(screen.getByText(/삭제 값: \[15, 72, 42\]/)).toBeInTheDocument();
+    expect(
+      screen.getByRole("img", { name: "BST 삭제 트리 상태" })
+    ).toBeInTheDocument();
+
+    const trace = generateBinarySearchTreeDeletionTrace();
+    const leafDeleteIndex = trace.findIndex((step) =>
+      step.id.startsWith("bst-delete-leaf-15")
+    );
+    const successorIndex = trace.findIndex((step) =>
+      step.id.startsWith("bst-delete-successor-found-42-54")
+    );
+    const slider = screen.getByRole("slider", { name: "트리 단계 슬라이더" });
+
+    fireEvent.change(slider, { target: { value: String(leafDeleteIndex) } });
+
+    expect(screen.getAllByText("15 리프 노드 제거").length).toBeGreaterThan(0);
+    expect(container.querySelector(".tree-node.is-removing")).not.toBeNull();
+    expect(
+      screen.getByRole("listitem", {
+        name: "현재 코드 11: if (node.left === null && node.right === null) return null;"
+      })
+    ).toBeInTheDocument();
+
+    fireEvent.change(slider, { target: { value: String(successorIndex) } });
+
+    expect(screen.getAllByText("successor 54 선택").length).toBeGreaterThan(0);
+    expect(container.querySelector(".tree-node.is-successor")).not.toBeNull();
+    expect(
+      screen.getByRole("listitem", {
+        name: "현재 코드 15: node.value = successor.value;"
       })
     ).toBeInTheDocument();
   });
