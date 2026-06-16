@@ -2,6 +2,7 @@ import { fireEvent, render, screen } from "@testing-library/react";
 import { MemoryRouter } from "react-router";
 import { describe, expect, it } from "vitest";
 
+import { generateAvlRotationTrace } from "../algorithms/avlTree";
 import { generateBinarySearchTreeTrace } from "../algorithms/binarySearchTree";
 import { TreePage } from "./TreePage";
 
@@ -77,5 +78,37 @@ describe("TreePage", () => {
     expect(screen.getAllByText(/중위 순회:/).length).toBeGreaterThan(0);
     expect(container.querySelector(".tree-node.is-visited")).not.toBeNull();
     expect(screen.getByText(/순회 결과:/)).toBeInTheDocument();
+  });
+
+  it("switches to AVL rotation mode and highlights rotation steps", () => {
+    const { container } = render(
+      <MemoryRouter>
+        <TreePage />
+      </MemoryRouter>
+    );
+
+    fireEvent.click(screen.getByRole("tab", { name: "AVL 회전" }));
+
+    expect(
+      screen.getByRole("heading", { name: "AVL 회전" })
+    ).toBeInTheDocument();
+    expect(screen.getByText(/포함 회전: LL, RR, RL/)).toBeInTheDocument();
+    expect(screen.getByRole("img", { name: "AVL 트리 상태" })).toBeInTheDocument();
+
+    const trace = generateAvlRotationTrace();
+    const firstRotationIndex = trace.findIndex((step) =>
+      step.title.includes("LL 회전 적용")
+    );
+    const slider = screen.getByRole("slider", { name: "트리 단계 슬라이더" });
+    fireEvent.change(slider, { target: { value: String(firstRotationIndex) } });
+
+    expect(screen.getAllByText(/LL 회전 적용/).length).toBeGreaterThan(0);
+    expect(container.querySelector(".tree-node.is-rotated")).not.toBeNull();
+    expect(screen.getAllByText(/BF/).length).toBeGreaterThan(0);
+    expect(
+      screen.getByRole("listitem", {
+        name: "현재 코드 13: if (balance > 1 && value < node.left.value) return rotateRight(node);"
+      })
+    ).toBeInTheDocument();
   });
 });

@@ -1,18 +1,21 @@
-import { type CSSProperties } from "react";
+import { type CSSProperties, useState } from "react";
 import { Link } from "react-router";
 
 import { useStepController } from "../../shared/useStepController";
+import {
+  AVL_ROTATION_VALUES,
+  generateAvlRotationTrace
+} from "../algorithms/avlTree";
 import {
   BST_DEFAULT_VALUES,
   BST_SEARCH_TARGET,
   generateBinarySearchTreeTrace
 } from "../algorithms/binarySearchTree";
+import { avlTreeCodeExample } from "../code/avlTreeExample";
 import { binarySearchTreeCodeExample } from "../code/binarySearchTreeExample";
 import type { TreeEdgeState, TreeNodeState, TreeTraceState } from "../types";
 
-const trace = generateBinarySearchTreeTrace();
-
-const pseudoCode = [
+const bstPseudoCode = [
   "빈 트리에 첫 값을 루트로 넣는다.",
   "현재 노드와 삽입할 값을 비교한다.",
   "작으면 왼쪽 서브트리로 내려간다.",
@@ -24,13 +27,55 @@ const pseudoCode = [
   "방문 결과가 오름차순인지 확인한다."
 ];
 
+const avlPseudoCode = [
+  "빈 AVL 트리에 첫 값을 넣는다.",
+  "현재 노드와 삽입할 값을 비교한다.",
+  "작으면 왼쪽 서브트리로 내려간다.",
+  "크거나 같으면 오른쪽 서브트리로 내려간다.",
+  "삽입 후 balance factor를 계산한다.",
+  "불균형이면 LL, RR, LR, RL 회전을 적용한다.",
+  "회전 후 높이를 다시 갱신한다.",
+  "모든 노드가 -1, 0, 1 범위인지 확인한다."
+];
+
+const treeConcepts = [
+  {
+    id: "bst",
+    title: "BST 삽입과 탐색",
+    eyebrow: "이진 탐색 트리",
+    intro:
+      "이진 탐색 트리가 값을 비교하며 내려가고, 새 노드를 붙이고, 탐색 경로와 중위 순회 결과를 만드는 과정을 단계별로 확인합니다.",
+    inputSummary: `삽입 값: [${BST_DEFAULT_VALUES.join(", ")}] · 탐색 값: ${BST_SEARCH_TARGET}`,
+    diagramLabel: "BST 트리 상태",
+    trace: generateBinarySearchTreeTrace(),
+    pseudoCode: bstPseudoCode,
+    codeExample: binarySearchTreeCodeExample
+  },
+  {
+    id: "avl",
+    title: "AVL 회전",
+    eyebrow: "균형 이진 탐색 트리",
+    intro:
+      "AVL 트리가 삽입 후 balance factor를 확인하고 LL, RR, RL 회전으로 높이 균형을 회복하는 과정을 단계별로 확인합니다.",
+    inputSummary: `삽입 값: [${AVL_ROTATION_VALUES.join(", ")}] · 포함 회전: LL, RR, RL`,
+    diagramLabel: "AVL 트리 상태",
+    trace: generateAvlRotationTrace(),
+    pseudoCode: avlPseudoCode,
+    codeExample: avlTreeCodeExample
+  }
+] as const;
+
 const operationLabels = {
   insert: "삽입",
   search: "탐색",
-  traversal: "순회"
+  traversal: "순회",
+  rebalance: "균형"
 } as const;
 
 export function TreePage() {
+  const [activeConceptIndex, setActiveConceptIndex] = useState(0);
+  const activeConcept = treeConcepts[activeConceptIndex];
+  const trace = activeConcept.trace;
   const controller = useStepController(trace.length, 900);
   const currentIndex = Math.min(controller.currentIndex, trace.length - 1);
   const currentStep = trace[currentIndex];
@@ -38,6 +83,11 @@ export function TreePage() {
     trace.length <= 1
       ? 100
       : (currentIndex / (trace.length - 1)) * 100;
+
+  function selectConcept(index: number) {
+    setActiveConceptIndex(index);
+    controller.reset();
+  }
 
   return (
     <main className="page-shell learning-page">
@@ -47,23 +97,39 @@ export function TreePage() {
 
       <section className="learning-header" aria-labelledby="tree-title">
         <p className="eyebrow">트리 자료구조</p>
-        <h1 id="tree-title">BST 삽입과 탐색</h1>
-        <p className="intro-copy">
-          이진 탐색 트리가 값을 비교하며 내려가고, 새 노드를 붙이고, 탐색 경로와
-          중위 순회 결과를 만드는 과정을 단계별로 확인합니다.
-        </p>
-        <p className="input-summary">
-          삽입 값: [{BST_DEFAULT_VALUES.join(", ")}] · 탐색 값: {BST_SEARCH_TARGET}
-        </p>
+        <h1 id="tree-title">{activeConcept.title}</h1>
+        <p className="intro-copy">{activeConcept.intro}</p>
+        <div
+          className="algorithm-tabs"
+          role="tablist"
+          aria-label="트리 실습 선택"
+        >
+          {treeConcepts.map((concept, index) => (
+            <button
+              aria-selected={activeConceptIndex === index}
+              className="algorithm-tab"
+              key={concept.id}
+              onClick={() => selectConcept(index)}
+              role="tab"
+              type="button"
+            >
+              {concept.title}
+            </button>
+          ))}
+        </div>
+        <p className="input-summary">{activeConcept.inputSummary}</p>
       </section>
 
       <section className="tree-workbench" aria-label="트리 실습 작업 영역">
-        <section className="visualization-layout" aria-label="BST 도표">
+        <section
+          className="visualization-layout"
+          aria-label={`${activeConcept.title} 도표`}
+        >
           <div className="visualization-panel cinematic-panel tree-stage-panel">
             <div className="stage-header">
               <div>
                 <p className="eyebrow">
-                  {operationLabels[currentStep.state.operation]} 단계
+                  {activeConcept.eyebrow} · {operationLabels[currentStep.state.operation]} 단계
                 </p>
                 <h2>스테이지: {currentStep.title}</h2>
               </div>
@@ -72,7 +138,7 @@ export function TreePage() {
               </span>
             </div>
 
-            <TreeDiagram state={currentStep.state} />
+            <TreeDiagram label={activeConcept.diagramLabel} state={currentStep.state} />
 
             <div className="stage-state-list" aria-label="현재 트리 단계 요약">
               {(currentStep.state.summaryItems ?? []).map((item) => (
@@ -96,6 +162,10 @@ export function TreePage() {
               <span className="legend-item">
                 <span className="legend-swatch is-write" />
                 삽입
+              </span>
+              <span className="legend-item">
+                <span className="legend-swatch is-rotated" />
+                회전
               </span>
               <span className="legend-item">
                 <span className="legend-swatch is-sorted" />
@@ -149,22 +219,22 @@ export function TreePage() {
           </div>
         </section>
 
-        <section className="code-example-section" aria-label="BST 코드">
+        <section className="code-example-section" aria-label={`${activeConcept.title} 코드`}>
           <div className="code-example-header">
             <div>
               <h2>코드 예제</h2>
               <p>단계가 바뀌면 비교, 재귀 이동, 방문 코드가 함께 강조됩니다.</p>
             </div>
-            <span className="code-file-name">{binarySearchTreeCodeExample.fileName}</span>
+            <span className="code-file-name">{activeConcept.codeExample.fileName}</span>
           </div>
 
           <div className="code-panel" role="tabpanel">
             <ol className="code-lines">
-              {binarySearchTreeCodeExample.code.split("\n").map((line, index) => {
+              {activeConcept.codeExample.code.split("\n").map((line, index) => {
                 const lineNumber = index + 1;
                 const activeLines =
                   currentStep.codeLineHighlights?.[
-                    binarySearchTreeCodeExample.language
+                    activeConcept.codeExample.language
                   ] ?? [];
                 const isActive = activeLines.includes(lineNumber);
 
@@ -192,7 +262,7 @@ export function TreePage() {
         <div className="pseudo-panel">
           <h2>트리 처리 순서</h2>
           <ol className="pseudo-code">
-            {pseudoCode.map((line, index) => (
+            {activeConcept.pseudoCode.map((line, index) => (
               <li
                 className={
                   currentStep.pseudoCodeLine === index + 1 ? "is-active" : ""
@@ -254,14 +324,15 @@ export function TreePage() {
 }
 
 type TreeDiagramProps = {
+  label: string;
   state: TreeTraceState;
 };
 
-function TreeDiagram({ state }: TreeDiagramProps) {
+function TreeDiagram({ label, state }: TreeDiagramProps) {
   return (
     <div className="tree-visual-scroll">
       <svg
-        aria-label="BST 트리 상태"
+        aria-label={label}
         className={`tree-visual motion-${state.motion}`}
         role="img"
         viewBox={`0 0 ${state.viewport.width} ${state.viewport.height}`}
@@ -288,6 +359,11 @@ function TreeDiagram({ state }: TreeDiagramProps) {
             >
               <circle r="23" />
               <text dy="6">{node.value}</text>
+              {state.balanceFactors?.[node.id] !== undefined ? (
+                <text className="tree-balance-label" dy="39">
+                  BF {state.balanceFactors[node.id]}
+                </text>
+              ) : null}
             </g>
           ))}
         </g>
@@ -330,6 +406,10 @@ function getNodeClassName(node: TreeNodeState, state: TreeTraceState): string {
 
   if (state.foundNodeId === node.id) {
     classNames.push("is-found");
+  }
+
+  if (state.rotatedNodeIds?.includes(node.id)) {
+    classNames.push("is-rotated");
   }
 
   return classNames.join(" ");
