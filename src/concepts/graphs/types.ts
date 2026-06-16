@@ -57,3 +57,37 @@ export type GraphTraceState = {
     height: number;
   };
 };
+
+export type GraphTraversalMode = "bfs" | "dfs";
+
+export type GraphTraversalMotion =
+  | "idle"
+  | "visit"
+  | "inspect"
+  | "enqueue"
+  | "push"
+  | "skip"
+  | "complete";
+
+export type GraphTraversalState = {
+  mode: GraphTraversalMode;
+  motion: GraphTraversalMotion;
+  nodes: GraphNodeState[];
+  edges: GraphEdgeState[];
+  adjacencyRows: GraphAdjacencyRow[];
+  activeNodeIds?: string[];
+  activeEdgeIds?: string[];
+  currentNodeId?: string;
+  discoveredNodeIds: string[];
+  frontierItems: string[];
+  frontierLabel: string;
+  skippedNodeIds?: string[];
+  treeEdgeIds: string[];
+  visitedNodeIds: string[];
+  visitedOrder: string[];
+  summaryItems?: { label: string; value: string }[];
+  viewport: {
+    width: number;
+    height: number;
+  };
+};

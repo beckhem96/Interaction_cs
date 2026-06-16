@@ -31,5 +31,9 @@ describe("HomePage", () => {
       "href",
       "/graphs"
     );
+    expect(screen.getByRole("link", { name: /그래프 탐색/ })).toHaveAttribute(
+      "href",
+      "/graphs/traversal"
+    );
   });
 });

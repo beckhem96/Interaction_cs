@@ -45,4 +45,17 @@ describe("App routes", () => {
     ).toBeInTheDocument();
     expect(screen.getByText("노드 6개 · 간선 7개")).toBeInTheDocument();
   });
+
+  it("routes to the graph traversal learning page", () => {
+    render(
+      <MemoryRouter initialEntries={["/graphs/traversal"]}>
+        <App />
+      </MemoryRouter>
+    );
+
+    expect(
+      screen.getByRole("heading", { name: "그래프 탐색: BFS" })
+    ).toBeInTheDocument();
+    expect(screen.getByText("노드 9개 · 간선 11개 · 시작 A")).toBeInTheDocument();
+  });
 });

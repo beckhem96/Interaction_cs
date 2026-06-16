@@ -31,6 +31,12 @@ const categories: CategoryCard[] = [
     description: "방향, 가중치, DAG, 이분 그래프의 구조 차이를 시각적으로 비교합니다.",
     href: "/graphs",
     status: "그래프 기초"
+  },
+  {
+    title: "그래프 탐색",
+    description: "DFS와 BFS가 스택과 큐로 방문 순서를 만드는 과정을 비교합니다.",
+    href: "/graphs/traversal",
+    status: "DFS와 BFS"
   }
 ];
 

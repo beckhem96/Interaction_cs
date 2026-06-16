@@ -2140,6 +2140,16 @@ button:disabled {
   animation: tree-edge-draw 720ms ease;
 }
 
+.graph-edge.is-tree-edge line {
+  stroke: #31594f;
+  stroke-width: 4;
+}
+
+.graph-edge.is-tree-edge.is-active line {
+  stroke: #c94f37;
+  stroke-width: 5;
+}
+
 .graph-edge.is-active path {
   fill: #c94f37;
 }
@@ -2208,8 +2218,86 @@ button:disabled {
   animation: tree-node-found 720ms ease;
 }
 
+.graph-node.is-visited circle {
+  fill: #e9f4ee;
+  stroke: #31594f;
+}
+
+.graph-node.is-frontier circle {
+  fill: #fff1c8;
+  stroke: #c28a1d;
+}
+
+.graph-node.is-discovered circle {
+  fill: #edf5ff;
+  stroke: #2f6fbb;
+}
+
+.graph-node.is-skipped circle {
+  stroke-dasharray: 5 4;
+}
+
+.graph-node.is-active circle {
+  fill: #f9e6e1;
+  stroke: #c94f37;
+}
+
 .graph-node.is-highlighted-group circle {
   stroke-width: 5;
+}
+
+.traversal-frontier-panel {
+  display: grid;
+  gap: 12px;
+  padding: 16px;
+  border: 1px solid #d9e0e4;
+  border-radius: 10px;
+  background: #ffffff;
+}
+
+.traversal-frontier-panel h2 {
+  margin: 0;
+  color: #172026;
+  font-size: 1rem;
+}
+
+.traversal-chip-list {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  min-height: 34px;
+}
+
+.traversal-chip,
+.traversal-empty {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 36px;
+  min-height: 32px;
+  padding: 5px 10px;
+  border-radius: 8px;
+  font-size: 0.86rem;
+  font-weight: 900;
+}
+
+.traversal-chip {
+  border: 1px solid #c28a1d;
+  background: #fff1c8;
+  color: #172026;
+}
+
+.traversal-empty {
+  border: 1px dashed #bbc7cc;
+  color: #6a767d;
+}
+
+.traversal-order-text {
+  margin: 0;
+  color: #42635b;
+  font-size: 0.88rem;
+  font-weight: 800;
+  line-height: 1.5;
 }
 
 .adjacency-panel {
