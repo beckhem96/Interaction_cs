@@ -27,6 +27,9 @@ export type TreeNodeState = {
   value: number;
   label?: string;
   subLabel?: string;
+  keyValues?: number[];
+  shape?: "circle" | "key-list";
+  width?: number;
   x: number;
   y: number;
   depth: number;

@@ -3,6 +3,7 @@ import { MemoryRouter } from "react-router";
 import { describe, expect, it } from "vitest";
 
 import { generateAvlRotationTrace } from "../algorithms/avlTree";
+import { generateBTreeTrace } from "../algorithms/bTree";
 import { generateBinarySearchTreeTrace } from "../algorithms/binarySearchTree";
 import { generateBinarySearchTreeDeletionTrace } from "../algorithms/binarySearchTreeDeletion";
 import { generateHeapTrace } from "../algorithms/heapTree";
@@ -208,6 +209,51 @@ describe("TreePage", () => {
     expect(
       screen.getByRole("listitem", {
         name: "현재 코드 20: rotateGrandparent(node.parent.parent);"
+      })
+    ).toBeInTheDocument();
+  });
+
+  it("switches to B-Tree mode and highlights split and search steps", () => {
+    const { container } = render(
+      <MemoryRouter>
+        <TreePage />
+      </MemoryRouter>
+    );
+
+    fireEvent.click(screen.getByRole("tab", { name: "B-Tree" }));
+
+    expect(screen.getByRole("heading", { name: "B-Tree" })).toBeInTheDocument();
+    expect(screen.getByText(/최대 key 수: 3/)).toBeInTheDocument();
+    expect(screen.getByRole("img", { name: "B-Tree 상태" })).toBeInTheDocument();
+
+    const trace = generateBTreeTrace();
+    const splitIndex = trace.findIndex(
+      (step) => step.id === "btree-split-apply-child-17-20"
+    );
+    const foundIndex = trace.findIndex(
+      (step) => step.id === "btree-search-found-17-btree-node-3"
+    );
+    const slider = screen.getByRole("slider", { name: "트리 단계 슬라이더" });
+
+    fireEvent.change(slider, { target: { value: String(splitIndex) } });
+
+    expect(screen.getAllByText("20 승격 후 노드 split").length).toBeGreaterThan(0);
+    expect(screen.getByLabelText("키 10, 20 internal 노드")).toBeInTheDocument();
+    expect(container.querySelector(".tree-key-box")).not.toBeNull();
+    expect(container.querySelector(".tree-node.is-inserted")).not.toBeNull();
+    expect(
+      screen.getByRole("listitem", {
+        name: "현재 코드 20: parent.keys.splice(index, 0, median);"
+      })
+    ).toBeInTheDocument();
+
+    fireEvent.change(slider, { target: { value: String(foundIndex) } });
+
+    expect(screen.getAllByText("17 탐색 성공").length).toBeGreaterThan(0);
+    expect(container.querySelector(".tree-node.is-found")).not.toBeNull();
+    expect(
+      screen.getByRole("listitem", {
+        name: "현재 코드 39: if (node.keys[index] === key) return node;"
       })
     ).toBeInTheDocument();
   });

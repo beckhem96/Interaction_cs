@@ -7,6 +7,11 @@ import {
   generateAvlRotationTrace
 } from "../algorithms/avlTree";
 import {
+  BTREE_INSERT_VALUES,
+  BTREE_SEARCH_TARGET,
+  generateBTreeTrace
+} from "../algorithms/bTree";
+import {
   BST_DEFAULT_VALUES,
   BST_SEARCH_TARGET,
   generateBinarySearchTreeTrace
@@ -21,21 +26,22 @@ import {
   generateRedBlackInsertionTrace
 } from "../algorithms/redBlackTree";
 import {
+  HEAP_INSERT_VALUES,
+  generateHeapTrace
+} from "../algorithms/heapTree";
+import {
   SEGMENT_TREE_QUERY_RANGE,
   SEGMENT_TREE_UPDATE,
   SEGMENT_TREE_VALUES,
   generateSegmentTreeTrace
 } from "../algorithms/segmentTree";
 import {
-  HEAP_INSERT_VALUES,
-  generateHeapTrace
-} from "../algorithms/heapTree";
-import {
   TRIE_PREFIX_TARGET,
   TRIE_WORDS,
   generateTrieTrace
 } from "../algorithms/trieTree";
 import { avlTreeCodeExample } from "../code/avlTreeExample";
+import { bTreeCodeExample } from "../code/bTreeExample";
 import { binarySearchTreeDeletionCodeExample } from "../code/binarySearchTreeDeletionExample";
 import { binarySearchTreeCodeExample } from "../code/binarySearchTreeExample";
 import { heapTreeCodeExample } from "../code/heapTreeExample";
@@ -87,6 +93,17 @@ const redBlackPseudoCode = [
   "부모를 검정, 조부모를 빨강으로 바꾼다.",
   "조부모를 기준으로 회전해 빨간 노드 연속을 제거한다.",
   "루트가 항상 검정인지 확인한다."
+];
+
+const bTreePseudoCode = [
+  "삽입 전 루트가 가득 찼는지 확인한다.",
+  "루트가 가득 찼으면 새 루트를 만들고 기존 루트를 split한다.",
+  "리프 노드라면 key를 정렬된 위치에 삽입한다.",
+  "내부 노드라면 key가 내려갈 자식 구간을 고른다.",
+  "내려갈 자식이 가득 찼으면 먼저 split한다.",
+  "승격된 key와 비교해 왼쪽 또는 오른쪽 자식으로 내려간다.",
+  "탐색은 현재 노드 key와 target을 비교한다.",
+  "target이 없으면 알맞은 자식 구간으로 내려간다."
 ];
 
 const heapPseudoCode = [
@@ -160,6 +177,18 @@ const treeConcepts = [
     trace: generateRedBlackInsertionTrace(),
     pseudoCode: redBlackPseudoCode,
     codeExample: redBlackTreeCodeExample
+  },
+  {
+    id: "btree",
+    title: "B-Tree",
+    eyebrow: "다중 key 탐색 트리",
+    intro:
+      "B-Tree가 한 노드에 여러 key를 보관하고, 가득 찬 노드를 split하며, key 구간에 맞는 자식으로 탐색하는 과정을 확인합니다.",
+    inputSummary: `삽입 key: [${BTREE_INSERT_VALUES.join(", ")}] · 탐색 key: ${BTREE_SEARCH_TARGET} · 최대 key 수: 3`,
+    diagramLabel: "B-Tree 상태",
+    trace: generateBTreeTrace(),
+    pseudoCode: bTreePseudoCode,
+    codeExample: bTreeCodeExample
   },
   {
     id: "heap",
@@ -556,18 +585,24 @@ function TreeDiagram({ label, state }: TreeDiagramProps) {
               key={node.id}
               transform={`translate(${node.x} ${node.y})`}
             >
-              <circle r="23" />
-              <text dy="6">{node.label ?? node.value}</text>
-              {state.balanceFactors?.[node.id] !== undefined ? (
-                <text className="tree-balance-label" dy="39">
-                  BF {state.balanceFactors[node.id]}
-                </text>
-              ) : null}
-              {node.subLabel !== undefined ? (
-                <text className="tree-node-note" dy="39">
-                  {node.subLabel}
-                </text>
-              ) : null}
+              {node.shape === "key-list" ? (
+                <KeyListNode node={node} />
+              ) : (
+                <>
+                  <circle r="23" />
+                  <text dy="6">{node.label ?? node.value}</text>
+                  {state.balanceFactors?.[node.id] !== undefined ? (
+                    <text className="tree-balance-label" dy="39">
+                      BF {state.balanceFactors[node.id]}
+                    </text>
+                  ) : null}
+                  {node.subLabel !== undefined ? (
+                    <text className="tree-node-note" dy="39">
+                      {node.subLabel}
+                    </text>
+                  ) : null}
+                </>
+              )}
             </g>
           ))}
         </g>
@@ -578,6 +613,59 @@ function TreeDiagram({ label, state }: TreeDiagramProps) {
         ) : null}
       </svg>
     </div>
+  );
+}
+
+function KeyListNode({ node }: { node: TreeNodeState }) {
+  const keys = node.keyValues ?? [];
+  const width = node.width ?? Math.max(86, keys.length * 42 + 24);
+  const cellCount = Math.max(keys.length, 1);
+  const cellWidth = width / cellCount;
+
+  return (
+    <>
+      <rect
+        className="tree-key-box"
+        height="46"
+        rx="8"
+        width={width}
+        x={-width / 2}
+        y="-23"
+      />
+      {keys.length === 0 ? (
+        <text dy="6">빈</text>
+      ) : (
+        keys.map((key, index) => (
+          <text
+            className="tree-key-text"
+            dy="6"
+            key={`${node.id}-${key}`}
+            x={-width / 2 + cellWidth * index + cellWidth / 2}
+          >
+            {key}
+          </text>
+        ))
+      )}
+      {keys.slice(1).map((key, index) => {
+        const x = -width / 2 + cellWidth * (index + 1);
+
+        return (
+          <line
+            className="tree-key-divider"
+            key={`${node.id}-divider-${key}`}
+            x1={x}
+            x2={x}
+            y1="-18"
+            y2="18"
+          />
+        );
+      })}
+      {node.subLabel !== undefined ? (
+        <text className="tree-node-note" dy="43">
+          {node.subLabel}
+        </text>
+      ) : null}
+    </>
   );
 }
 
@@ -759,6 +847,12 @@ function getSegmentArrayCellClassName(
 }
 
 function getNodeAriaLabel(node: TreeNodeState): string {
+  if (node.keyValues !== undefined) {
+    const keys = node.keyValues.length ? node.keyValues.join(", ") : "빈";
+
+    return `키 ${keys} ${node.subLabel ?? ""} 노드`.trim();
+  }
+
   if (node.label !== undefined) {
     return `${node.label} 노드`;
   }

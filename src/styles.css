@@ -1887,7 +1887,8 @@ button:disabled {
   animation: tree-edge-draw 720ms ease;
 }
 
-.tree-node circle {
+.tree-node circle,
+.tree-node .tree-key-box {
   fill: #ffffff;
   stroke: #7a8b93;
   stroke-width: 3;
@@ -1922,81 +1923,101 @@ button:disabled {
   font-weight: 900;
 }
 
-.tree-node.is-root circle {
+.tree-node .tree-key-divider {
+  stroke: #c8d2d7;
+  stroke-width: 2;
+}
+
+.tree-node.is-root circle,
+.tree-node.is-root .tree-key-box {
   stroke: #31594f;
 }
 
-.tree-node.is-path circle {
+.tree-node.is-path circle,
+.tree-node.is-path .tree-key-box {
   fill: #edf5ff;
   stroke: #2f6fbb;
 }
 
 .tree-node.is-active circle,
-.tree-node.is-compared circle {
+.tree-node.is-active .tree-key-box,
+.tree-node.is-compared circle,
+.tree-node.is-compared .tree-key-box {
   fill: #dcebf8;
   stroke: #2f6fbb;
   animation: tree-node-compare 720ms ease;
 }
 
-.tree-node.is-inserted circle {
+.tree-node.is-inserted circle,
+.tree-node.is-inserted .tree-key-box {
   fill: #f9e6e1;
   stroke: #c94f37;
   animation: tree-node-insert 720ms cubic-bezier(0.18, 0.9, 0.2, 1);
 }
 
-.tree-node.is-swapping circle {
+.tree-node.is-swapping circle,
+.tree-node.is-swapping .tree-key-box {
   fill: #f9e6e1;
   stroke: #c94f37;
   animation: tree-node-swap 780ms ease;
 }
 
-.tree-node.is-terminal circle {
+.tree-node.is-terminal circle,
+.tree-node.is-terminal .tree-key-box {
   stroke: #3f7d58;
   stroke-width: 4;
 }
 
-.tree-node.is-found circle {
+.tree-node.is-found circle,
+.tree-node.is-found .tree-key-box {
   fill: #f9edcf;
   stroke: #c28a1d;
   animation: tree-node-found 760ms ease;
 }
 
-.tree-node.is-removing circle {
+.tree-node.is-removing circle,
+.tree-node.is-removing .tree-key-box {
   fill: #fde7ea;
   stroke: #b9404a;
   stroke-dasharray: 7 4;
   animation: tree-node-remove 820ms ease;
 }
 
-.tree-node.is-successor circle {
+.tree-node.is-successor circle,
+.tree-node.is-successor .tree-key-box {
   fill: #fff1c8;
   stroke: #c28a1d;
   animation: tree-node-successor 780ms cubic-bezier(0.18, 0.9, 0.2, 1);
 }
 
-.tree-node.is-red circle {
+.tree-node.is-red circle,
+.tree-node.is-red .tree-key-box {
   fill: #fde7ea;
   stroke: #b9404a;
 }
 
-.tree-node.is-black circle {
+.tree-node.is-black circle,
+.tree-node.is-black .tree-key-box {
   fill: #172026;
   stroke: #172026;
 }
 
-.tree-node.is-recolored circle {
+.tree-node.is-recolored circle,
+.tree-node.is-recolored .tree-key-box {
   stroke: #c28a1d;
   stroke-width: 4;
   animation: tree-node-recolor 780ms ease;
 }
 
-.tree-node.is-rotated circle {
+.tree-node.is-rotated circle,
+.tree-node.is-rotated .tree-key-box {
   fill: #eeeafb;
   stroke: #6f5bb8;
   animation: tree-node-rotate 820ms cubic-bezier(0.18, 0.9, 0.2, 1);
 }
 
-.tree-node.is-visited circle {
+.tree-node.is-visited circle,
+.tree-node.is-visited .tree-key-box {
   fill: #e5f2e9;
   stroke: #3f7d58;
   animation: tree-node-visit 700ms ease;
