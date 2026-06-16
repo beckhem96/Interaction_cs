@@ -1652,6 +1652,10 @@ button:disabled {
   background: #c28a1d;
 }
 
+.legend-swatch.is-terminal {
+  background: #3f7d58;
+}
+
 .legend-swatch.is-minimum,
 .legend-swatch.is-pivot {
   background: #c28a1d;
@@ -1871,6 +1875,11 @@ button:disabled {
   animation: tree-node-swap 780ms ease;
 }
 
+.tree-node.is-terminal circle {
+  stroke: #3f7d58;
+  stroke-width: 4;
+}
+
 .tree-node.is-found circle {
   fill: #f9edcf;
   stroke: #c28a1d;
@@ -1924,6 +1933,7 @@ button:disabled {
 .tree-node.is-rotated text,
 .tree-node.is-swapping text,
 .tree-node.is-successor text,
+.tree-node.is-terminal text,
 .tree-node.is-visited text {
   fill: #11181c;
 }

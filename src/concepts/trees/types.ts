@@ -25,6 +25,7 @@ export type TreeNodeColor = "red" | "black";
 export type TreeNodeState = {
   id: string;
   value: number;
+  label?: string;
   x: number;
   y: number;
   depth: number;
@@ -56,12 +57,15 @@ export type TreeTraceState = {
   recoloredNodeIds?: string[];
   rotatedNodeIds?: string[];
   swappedNodeIds?: string[];
+  terminalNodeIds?: string[];
   targetValue?: number;
+  targetText?: string;
   rotationLabel?: string;
   balanceFactors?: Record<string, number>;
   pathNodeIds?: string[];
   visitedNodeIds?: string[];
   traversalValues?: number[];
+  wordResults?: string[];
   heapArrayValues?: number[];
   edges: TreeEdgeState[];
   viewport: {

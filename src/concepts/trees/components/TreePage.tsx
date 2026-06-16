@@ -24,11 +24,17 @@ import {
   HEAP_INSERT_VALUES,
   generateHeapTrace
 } from "../algorithms/heapTree";
+import {
+  TRIE_PREFIX_TARGET,
+  TRIE_WORDS,
+  generateTrieTrace
+} from "../algorithms/trieTree";
 import { avlTreeCodeExample } from "../code/avlTreeExample";
 import { binarySearchTreeDeletionCodeExample } from "../code/binarySearchTreeDeletionExample";
 import { binarySearchTreeCodeExample } from "../code/binarySearchTreeExample";
 import { heapTreeCodeExample } from "../code/heapTreeExample";
 import { redBlackTreeCodeExample } from "../code/redBlackTreeExample";
+import { trieTreeCodeExample } from "../code/trieTreeExample";
 import type { TreeEdgeState, TreeNodeState, TreeTraceState } from "../types";
 
 const bstPseudoCode = [
@@ -87,6 +93,17 @@ const heapPseudoCode = [
   "모든 부모가 자식보다 크거나 같은지 확인한다."
 ];
 
+const triePseudoCode = [
+  "루트에서 시작해 단어를 한 글자씩 처리한다.",
+  "현재 노드에 다음 문자 간선이 있는지 확인한다.",
+  "문자 노드가 있으면 그 경로로 내려간다.",
+  "문자 노드가 없으면 새 노드를 만들고 연결한다.",
+  "마지막 문자 노드를 단어 끝으로 표시한다.",
+  "prefix 검색은 prefix 문자를 순서대로 따라간다.",
+  "prefix 끝 노드 아래의 단어들을 수집한다.",
+  "공유 prefix와 검색 결과를 확인한다."
+];
+
 const treeConcepts = [
   {
     id: "bst",
@@ -135,6 +152,18 @@ const treeConcepts = [
     trace: generateHeapTrace(),
     pseudoCode: heapPseudoCode,
     codeExample: heapTreeCodeExample
+  },
+  {
+    id: "trie",
+    title: "트라이",
+    eyebrow: "문자열 트리",
+    intro:
+      "트라이가 문자열을 한 글자씩 공유 경로에 저장하고, prefix 검색으로 해당 경로 아래 단어를 모으는 과정을 확인합니다.",
+    inputSummary: `삽입 단어: [${TRIE_WORDS.join(", ")}] · prefix 검색: ${TRIE_PREFIX_TARGET}`,
+    diagramLabel: "트라이 상태",
+    trace: generateTrieTrace(),
+    pseudoCode: triePseudoCode,
+    codeExample: trieTreeCodeExample
   },
   {
     id: "delete",
@@ -283,6 +312,10 @@ export function TreePage() {
                 successor
               </span>
               <span className="legend-item">
+                <span className="legend-swatch is-terminal" />
+                단어 끝
+              </span>
+              <span className="legend-item">
                 <span className="legend-swatch is-sorted" />
                 방문
               </span>
@@ -405,6 +438,11 @@ export function TreePage() {
               순회 결과: {currentStep.state.traversalValues.join(" → ")}
             </p>
           ) : null}
+          {currentStep.state.wordResults?.length ? (
+            <p className="tree-traversal-output">
+              검색 결과: {currentStep.state.wordResults.join(", ")}
+            </p>
+          ) : null}
 
           <div className="step-controls" aria-label="트리 단계 컨트롤">
             <button
@@ -473,7 +511,7 @@ function TreeDiagram({ label, state }: TreeDiagramProps) {
               transform={`translate(${node.x} ${node.y})`}
             >
               <circle r="23" />
-              <text dy="6">{node.value}</text>
+              <text dy="6">{node.label ?? node.value}</text>
               {state.balanceFactors?.[node.id] !== undefined ? (
                 <text className="tree-balance-label" dy="39">
                   BF {state.balanceFactors[node.id]}
@@ -547,6 +585,10 @@ function getNodeClassName(node: TreeNodeState, state: TreeTraceState): string {
     classNames.push("is-swapping");
   }
 
+  if (state.terminalNodeIds?.includes(node.id)) {
+    classNames.push("is-terminal");
+  }
+
   if (state.rotatedNodeIds?.includes(node.id)) {
     classNames.push("is-rotated");
   }
@@ -611,6 +653,10 @@ function getHeapArrayCellClassName(
 }
 
 function getNodeAriaLabel(node: TreeNodeState): string {
+  if (node.label !== undefined) {
+    return `${node.label} 노드`;
+  }
+
   if (node.color === "red") {
     return `${node.value} 빨간 노드`;
   }

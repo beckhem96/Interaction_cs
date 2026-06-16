@@ -7,6 +7,7 @@ import { generateBinarySearchTreeTrace } from "../algorithms/binarySearchTree";
 import { generateBinarySearchTreeDeletionTrace } from "../algorithms/binarySearchTreeDeletion";
 import { generateHeapTrace } from "../algorithms/heapTree";
 import { generateRedBlackInsertionTrace } from "../algorithms/redBlackTree";
+import { generateTrieTrace } from "../algorithms/trieTree";
 import { TreePage } from "./TreePage";
 
 describe("TreePage", () => {
@@ -256,6 +257,39 @@ describe("TreePage", () => {
     expect(
       screen.getByRole("listitem", {
         name: "현재 코드 19: swap(heap, index, child);"
+      })
+    ).toBeInTheDocument();
+  });
+
+  it("switches to Trie mode and highlights prefix search results", () => {
+    const { container } = render(
+      <MemoryRouter>
+        <TreePage />
+      </MemoryRouter>
+    );
+
+    fireEvent.click(screen.getByRole("tab", { name: "트라이" }));
+
+    expect(screen.getByRole("heading", { name: "트라이" })).toBeInTheDocument();
+    expect(screen.getByText(/prefix 검색: car/)).toBeInTheDocument();
+    expect(screen.getByRole("img", { name: "트라이 상태" })).toBeInTheDocument();
+
+    const trace = generateTrieTrace();
+    const prefixFoundIndex = trace.findIndex(
+      (step) => step.id === "trie-prefix-found-car"
+    );
+    const slider = screen.getByRole("slider", { name: "트리 단계 슬라이더" });
+
+    fireEvent.change(slider, { target: { value: String(prefixFoundIndex) } });
+
+    expect(screen.getAllByText('prefix "car" 결과 수집').length).toBeGreaterThan(0);
+    expect(screen.getByText("검색 결과: car, cart")).toBeInTheDocument();
+    expect(screen.getByLabelText("r 노드")).toBeInTheDocument();
+    expect(container.querySelector(".tree-node.is-terminal")).not.toBeNull();
+    expect(container.querySelector(".tree-node.is-found")).not.toBeNull();
+    expect(
+      screen.getByRole("listitem", {
+        name: "현재 코드 18: return collectWords(node, prefix);"
       })
     ).toBeInTheDocument();
   });
