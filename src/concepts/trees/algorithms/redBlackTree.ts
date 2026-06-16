@@ -7,6 +7,7 @@ import type {
   TreeOperation,
   TreeTraceState
 } from "../types";
+import { createTreeCodeHighlights } from "./codeHighlights";
 
 export const RED_BLACK_INSERT_VALUES = [41, 38, 31, 12, 19, 8];
 
@@ -479,9 +480,7 @@ function createStep({
       })
     },
     pseudoCodeLine,
-    codeLineHighlights: {
-      TypeScript: codeLines
-    }
+    codeLineHighlights: createTreeCodeHighlights(codeLines)
   };
 }
 

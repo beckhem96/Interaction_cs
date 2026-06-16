@@ -6,6 +6,7 @@ import type {
   TreeOperation,
   TreeTraceState
 } from "../types";
+import { createTreeCodeHighlights } from "./codeHighlights";
 
 export const AVL_ROTATION_VALUES = [30, 20, 10, 40, 50, 25, 27];
 
@@ -398,9 +399,7 @@ function createStep({
       })
     },
     pseudoCodeLine,
-    codeLineHighlights: {
-      TypeScript: codeLines
-    }
+    codeLineHighlights: createTreeCodeHighlights(codeLines)
   };
 }
 

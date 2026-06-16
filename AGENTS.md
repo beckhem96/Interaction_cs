@@ -48,6 +48,19 @@ Trace generation functions should return a list of steps.
 
 React components should render the current step and should not mutate trace state.
 
+## Visualization and Code Presentation Rules
+
+* Algorithm and data-structure code examples must provide these languages: C, C++, Java, Python, and JavaScript.
+* Code language tabs must keep language labels readable and visually distinct.
+* When a step changes, the code line for the current step must be highlighted in the selected language.
+* The interaction stage and the code panel must be visible side by side on desktop layouts.
+* The primary Next button must remain in the same visible workbench area as the interaction stage and code panel.
+* Keep legends minimal. Show only states that are meaningful for the current visualization.
+* Do not use visually similar colors for different active states in the same visualization.
+* SQL pages must keep the active SQL query and table changes visible in one workbench.
+* SQL examples should be separated by operation such as JOIN, GROUP BY, UNION, ORDER BY, and LIMIT when those operations are taught.
+* SQL table visualizations should show all relevant input tables at the same time and indicate which rows and columns are being used by the active query step.
+
 ## Testing Rules
 
 * Add unit tests for trace generation.
@@ -75,4 +88,3 @@ A task is done only when:
 * Build passes
 * Relevant tests are added or updated
 * The final response summarizes changed files, commands run, and remaining risks
-

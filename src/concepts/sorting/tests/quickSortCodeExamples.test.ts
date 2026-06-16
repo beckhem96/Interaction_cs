@@ -6,10 +6,10 @@ describe("quickSortCodeExamples", () => {
   it("provides examples in every supported language", () => {
     expect(quickSortCodeExamples.map((example) => example.language)).toEqual([
       "C",
-      "Java",
       "C++",
-      "JavaScript",
-      "Python"
+      "Java",
+      "Python",
+      "JavaScript"
     ]);
   });
 

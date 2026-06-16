@@ -6,6 +6,7 @@ import type {
   TreeOperation,
   TreeTraceState
 } from "../types";
+import { createTreeCodeHighlights } from "./codeHighlights";
 
 export const HEAP_INSERT_VALUES = [45, 32, 18, 27, 12, 9, 14, 50, 41];
 
@@ -337,9 +338,7 @@ function createStep({
       })
     },
     pseudoCodeLine,
-    codeLineHighlights: {
-      TypeScript: codeLines
-    }
+    codeLineHighlights: createTreeCodeHighlights(codeLines)
   };
 }
 

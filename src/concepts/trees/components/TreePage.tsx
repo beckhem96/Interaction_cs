@@ -2,6 +2,8 @@ import { type CSSProperties, useState } from "react";
 import { Link } from "react-router";
 
 import { useStepController } from "../../shared/useStepController";
+import type { SortingCodeExample } from "../../sorting/code/types";
+import { tokenizeCodeLine } from "../../sorting/code/syntaxHighlight";
 import {
   AVL_ROTATION_VALUES,
   generateAvlRotationTrace
@@ -172,7 +174,7 @@ const treeConcepts = [
     diagramLabel: "BST 트리 상태",
     trace: generateBinarySearchTreeTrace(),
     pseudoCode: bstPseudoCode,
-    codeExample: binarySearchTreeCodeExample
+    codeExamples: binarySearchTreeCodeExample
   },
   {
     id: "avl",
@@ -184,7 +186,7 @@ const treeConcepts = [
     diagramLabel: "AVL 트리 상태",
     trace: generateAvlRotationTrace(),
     pseudoCode: avlPseudoCode,
-    codeExample: avlTreeCodeExample
+    codeExamples: avlTreeCodeExample
   },
   {
     id: "red-black",
@@ -196,7 +198,7 @@ const treeConcepts = [
     diagramLabel: "Red-Black 트리 상태",
     trace: generateRedBlackInsertionTrace(),
     pseudoCode: redBlackPseudoCode,
-    codeExample: redBlackTreeCodeExample
+    codeExamples: redBlackTreeCodeExample
   },
   {
     id: "btree",
@@ -208,7 +210,7 @@ const treeConcepts = [
     diagramLabel: "B-Tree 상태",
     trace: generateBTreeTrace(),
     pseudoCode: bTreePseudoCode,
-    codeExample: bTreeCodeExample
+    codeExamples: bTreeCodeExample
   },
   {
     id: "bplus-tree",
@@ -220,7 +222,7 @@ const treeConcepts = [
     diagramLabel: "B+Tree 상태",
     trace: generateBPlusTreeTrace(),
     pseudoCode: bPlusTreePseudoCode,
-    codeExample: bPlusTreeCodeExample
+    codeExamples: bPlusTreeCodeExample
   },
   {
     id: "heap",
@@ -232,7 +234,7 @@ const treeConcepts = [
     diagramLabel: "최대 힙 트리 상태",
     trace: generateHeapTrace(),
     pseudoCode: heapPseudoCode,
-    codeExample: heapTreeCodeExample
+    codeExamples: heapTreeCodeExample
   },
   {
     id: "trie",
@@ -244,7 +246,7 @@ const treeConcepts = [
     diagramLabel: "트라이 상태",
     trace: generateTrieTrace(),
     pseudoCode: triePseudoCode,
-    codeExample: trieTreeCodeExample
+    codeExamples: trieTreeCodeExample
   },
   {
     id: "segment-tree",
@@ -256,7 +258,7 @@ const treeConcepts = [
     diagramLabel: "세그먼트 트리 상태",
     trace: generateSegmentTreeTrace(),
     pseudoCode: segmentTreePseudoCode,
-    codeExample: segmentTreeCodeExample
+    codeExamples: segmentTreeCodeExample
   },
   {
     id: "delete",
@@ -268,7 +270,7 @@ const treeConcepts = [
     diagramLabel: "BST 삭제 트리 상태",
     trace: generateBinarySearchTreeDeletionTrace(),
     pseudoCode: deletePseudoCode,
-    codeExample: binarySearchTreeDeletionCodeExample
+    codeExamples: binarySearchTreeDeletionCodeExample
   }
 ] as const;
 
@@ -280,13 +282,77 @@ const operationLabels = {
   delete: "삭제"
 } as const;
 
+type TreeLegendItem = {
+  className: string;
+  label: string;
+};
+
+const treeLegendItemsByConcept: Record<string, TreeLegendItem[]> = {
+  bst: [
+    { className: "is-current", label: "현재" },
+    { className: "is-comparing", label: "비교" },
+    { className: "is-write", label: "삽입" },
+    { className: "is-sorted", label: "방문" }
+  ],
+  avl: [
+    { className: "is-current", label: "현재" },
+    { className: "is-comparing", label: "비교" },
+    { className: "is-write", label: "삽입" },
+    { className: "is-rotated", label: "회전" }
+  ],
+  "red-black": [
+    { className: "is-current", label: "현재" },
+    { className: "is-red-node", label: "빨강" },
+    { className: "is-black-node", label: "검정" },
+    { className: "is-recolored", label: "색 변경" },
+    { className: "is-rotated", label: "회전" }
+  ],
+  btree: [
+    { className: "is-current", label: "현재" },
+    { className: "is-comparing", label: "비교" },
+    { className: "is-write", label: "삽입" }
+  ],
+  "bplus-tree": [
+    { className: "is-current", label: "현재" },
+    { className: "is-write", label: "삽입" },
+    { className: "is-range", label: "구간" },
+    { className: "is-leaf-link", label: "leaf link" }
+  ],
+  heap: [
+    { className: "is-current", label: "현재" },
+    { className: "is-write", label: "삽입" },
+    { className: "is-swapping", label: "교환" }
+  ],
+  trie: [
+    { className: "is-current", label: "현재" },
+    { className: "is-write", label: "삽입" },
+    { className: "is-terminal", label: "단어 끝" }
+  ],
+  "segment-tree": [
+    { className: "is-current", label: "현재" },
+    { className: "is-range", label: "구간" },
+    { className: "is-updated", label: "갱신" }
+  ],
+  delete: [
+    { className: "is-current", label: "현재" },
+    { className: "is-comparing", label: "비교" },
+    { className: "is-removing", label: "삭제" },
+    { className: "is-successor", label: "successor" }
+  ]
+};
+
 export function TreePage() {
   const [activeConceptIndex, setActiveConceptIndex] = useState(0);
+  const [activeCodeIndex, setActiveCodeIndex] = useState(0);
   const activeConcept = treeConcepts[activeConceptIndex];
   const trace = activeConcept.trace;
   const controller = useStepController(trace.length, 900);
   const currentIndex = Math.min(controller.currentIndex, trace.length - 1);
   const currentStep = trace[currentIndex];
+  const activeCodeExample: SortingCodeExample =
+    activeConcept.codeExamples[activeCodeIndex] ?? activeConcept.codeExamples[0];
+  const activeLegendItems =
+    treeLegendItemsByConcept[activeConcept.id] ?? treeLegendItemsByConcept.bst;
   const progressPercent =
     trace.length <= 1
       ? 100
@@ -294,6 +360,7 @@ export function TreePage() {
 
   function selectConcept(index: number) {
     setActiveConceptIndex(index);
+    setActiveCodeIndex(0);
     controller.reset();
   }
 
@@ -365,66 +432,12 @@ export function TreePage() {
 
             <div className="stage-legend" aria-label="트리 상태 범례">
               <span className="legend-title">상태 범례</span>
-              <span className="legend-item">
-                <span className="legend-swatch is-current" />
-                현재
-              </span>
-              <span className="legend-item">
-                <span className="legend-swatch is-comparing" />
-                비교
-              </span>
-              <span className="legend-item">
-                <span className="legend-swatch is-write" />
-                삽입
-              </span>
-              <span className="legend-item">
-                <span className="legend-swatch is-rotated" />
-                회전
-              </span>
-              <span className="legend-item">
-                <span className="legend-swatch is-swapping" />
-                교환
-              </span>
-              <span className="legend-item">
-                <span className="legend-swatch is-red-node" />
-                빨강
-              </span>
-              <span className="legend-item">
-                <span className="legend-swatch is-black-node" />
-                검정
-              </span>
-              <span className="legend-item">
-                <span className="legend-swatch is-recolored" />
-                색 변경
-              </span>
-              <span className="legend-item">
-                <span className="legend-swatch is-removing" />
-                삭제
-              </span>
-              <span className="legend-item">
-                <span className="legend-swatch is-successor" />
-                successor
-              </span>
-              <span className="legend-item">
-                <span className="legend-swatch is-terminal" />
-                단어 끝
-              </span>
-              <span className="legend-item">
-                <span className="legend-swatch is-range" />
-                구간
-              </span>
-              <span className="legend-item">
-                <span className="legend-swatch is-updated" />
-                갱신
-              </span>
-              <span className="legend-item">
-                <span className="legend-swatch is-leaf-link" />
-                leaf link
-              </span>
-              <span className="legend-item">
-                <span className="legend-swatch is-sorted" />
-                방문
-              </span>
+              {activeLegendItems.map((item) => (
+                <span className="legend-item" key={`${activeConcept.id}-${item.className}`}>
+                  <span className={`legend-swatch ${item.className}`} />
+                  {item.label}
+                </span>
+              ))}
             </div>
 
             <div className="timeline-controls" aria-label="트리 단계 재생 컨트롤">
@@ -479,18 +492,32 @@ export function TreePage() {
               <h2>코드 예제</h2>
               <p>단계가 바뀌면 비교, 재귀 이동, 방문 코드가 함께 강조됩니다.</p>
             </div>
-            <span className="code-file-name">{activeConcept.codeExample.fileName}</span>
+            <span className="code-file-name">{activeCodeExample.fileName}</span>
+          </div>
+
+          <div className="code-tabs" role="tablist" aria-label="코드 언어">
+            {activeConcept.codeExamples.map((example, index) => (
+              <button
+                aria-selected={activeCodeIndex === index}
+                className="code-tab"
+                key={example.language}
+                onClick={() => setActiveCodeIndex(index)}
+                role="tab"
+                type="button"
+              >
+                {example.language}
+              </button>
+            ))}
           </div>
 
           <div className="code-panel" role="tabpanel">
             <ol className="code-lines">
-              {activeConcept.codeExample.code.split("\n").map((line, index) => {
+              {activeCodeExample.code.split("\n").map((line, index) => {
                 const lineNumber = index + 1;
                 const activeLines =
-                  currentStep.codeLineHighlights?.[
-                    activeConcept.codeExample.language
-                  ] ?? [];
+                  currentStep.codeLineHighlights?.[activeCodeExample.language] ?? [];
                 const isActive = activeLines.includes(lineNumber);
+                const tokens = tokenizeCodeLine(activeCodeExample.language, line);
 
                 return (
                   <li
@@ -503,7 +530,16 @@ export function TreePage() {
                     key={lineNumber}
                   >
                     <span className="code-line-number">{lineNumber}</span>
-                    <code className="code-line-text">{line}</code>
+                    <code className="code-line-text">
+                      {tokens.map((token, tokenIndex) => (
+                        <span
+                          className={`token-${token.type}`}
+                          key={`${lineNumber}-${tokenIndex}-${token.text}`}
+                        >
+                          {token.text}
+                        </span>
+                      ))}
+                    </code>
                   </li>
                 );
               })}

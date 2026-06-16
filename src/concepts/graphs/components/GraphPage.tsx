@@ -9,7 +9,9 @@ import {
   getGraphStructureInputSummary,
   getGraphStructureTitle
 } from "../algorithms/graphStructures";
-import { graphStructuresCodeExample } from "../code/graphStructuresExample";
+import { graphStructureCodeExamples } from "../code/graphStructuresExample";
+import { tokenizeCodeLine } from "../../sorting/code/syntaxHighlight";
+import type { SortingCodeExample } from "../../sorting/code/types";
 import type {
   GraphEdgeState,
   GraphKind,
@@ -53,13 +55,15 @@ const groupLabels: Partial<Record<GraphNodeGroup, string>> = {
 
 export function GraphPage() {
   const [activeConceptIndex, setActiveConceptIndex] = useState(0);
+  const [activeCodeIndex, setActiveCodeIndex] = useState(0);
   const activeConcept = graphConcepts[activeConceptIndex];
+  const activeCodeExample = graphStructureCodeExamples[activeCodeIndex];
   const trace = activeConcept.trace;
   const controller = useStepController(trace.length, 900);
   const currentIndex = Math.min(controller.currentIndex, trace.length - 1);
   const currentStep = trace[currentIndex];
   const activeLines =
-    currentStep.codeLineHighlights?.[graphStructuresCodeExample.language] ?? [];
+    currentStep.codeLineHighlights?.[activeCodeExample.language] ?? [];
   const progressPercent =
     trace.length <= 1
       ? 100
@@ -67,6 +71,7 @@ export function GraphPage() {
 
   function selectConcept(index: number) {
     setActiveConceptIndex(index);
+    setActiveCodeIndex(0);
     controller.reset();
   }
 
@@ -137,10 +142,6 @@ export function GraphPage() {
               활성 간선
             </span>
             <span className="legend-item">
-              <span className="legend-swatch is-range" />
-              방향/가중치
-            </span>
-            <span className="legend-item">
               <span className="legend-swatch is-updated" />
               파티션
             </span>
@@ -190,6 +191,16 @@ export function GraphPage() {
             </label>
           </div>
         </section>
+
+        <GraphCodePanel
+          activeCodeExample={activeCodeExample}
+          activeCodeIndex={activeCodeIndex}
+          activeLines={activeLines}
+          codeExamples={graphStructureCodeExamples}
+          description="그래프 유형에 따라 노드, 간선, 가중치, 파티션 코드가 강조됩니다."
+          onSelectCode={setActiveCodeIndex}
+          title="그래프 코드"
+        />
 
         <aside className="graph-side-panel" aria-label="현재 그래프 단계 설명">
           <section className="step-panel">
@@ -242,43 +253,90 @@ export function GraphPage() {
           </ol>
         </div>
 
-        <section className="code-example-section" aria-label="그래프 코드">
-          <div className="code-example-header">
-            <div>
-              <h2>코드 예제</h2>
-              <p>그래프 유형에 따라 노드, 간선, 가중치, 파티션 코드가 강조됩니다.</p>
-            </div>
-            <span className="code-file-name">
-              {graphStructuresCodeExample.fileName}
-            </span>
-          </div>
-
-          <div className="code-panel" role="tabpanel">
-            <ol className="code-lines">
-              {graphStructuresCodeExample.code.split("\n").map((line, index) => {
-                const lineNumber = index + 1;
-                const isActive = activeLines.includes(lineNumber);
-
-                return (
-                  <li
-                    aria-label={
-                      isActive
-                        ? `현재 코드 ${lineNumber}: ${line.trim()}`
-                        : `코드 ${lineNumber}: ${line.trim()}`
-                    }
-                    className={isActive ? "code-line is-active" : "code-line"}
-                    key={`${lineNumber}-${line}`}
-                  >
-                    <span className="code-line-number">{lineNumber}</span>
-                    <code className="code-line-text">{line}</code>
-                  </li>
-                );
-              })}
-            </ol>
-          </div>
-        </section>
       </section>
     </main>
+  );
+}
+
+type GraphCodePanelProps = {
+  activeCodeExample: SortingCodeExample;
+  activeCodeIndex: number;
+  activeLines: number[];
+  codeExamples: SortingCodeExample[];
+  description: string;
+  onSelectCode: (index: number) => void;
+  title: string;
+};
+
+function GraphCodePanel({
+  activeCodeExample,
+  activeCodeIndex,
+  activeLines,
+  codeExamples,
+  description,
+  onSelectCode,
+  title
+}: GraphCodePanelProps) {
+  return (
+    <section className="code-example-section" aria-label={title}>
+      <div className="code-example-header">
+        <div>
+          <h2>코드 예제</h2>
+          <p>{description}</p>
+        </div>
+        <span className="code-file-name">{activeCodeExample.fileName}</span>
+      </div>
+
+      <div className="code-tabs" role="tablist" aria-label="코드 언어">
+        {codeExamples.map((example, index) => (
+          <button
+            aria-selected={activeCodeIndex === index}
+            className="code-tab"
+            key={example.language}
+            onClick={() => onSelectCode(index)}
+            role="tab"
+            type="button"
+          >
+            {example.language}
+          </button>
+        ))}
+      </div>
+
+      <div className="code-panel" role="tabpanel">
+        <ol className="code-lines">
+          {activeCodeExample.code.split("\n").map((line, index) => {
+            const lineNumber = index + 1;
+            const isActive = activeLines.includes(lineNumber);
+
+            return (
+              <li
+                aria-label={
+                  isActive
+                    ? `현재 코드 ${lineNumber}: ${line.trim()}`
+                    : `코드 ${lineNumber}: ${line.trim()}`
+                }
+                className={isActive ? "code-line is-active" : "code-line"}
+                key={`${activeCodeExample.language}-${lineNumber}-${line}`}
+              >
+                <span className="code-line-number">{lineNumber}</span>
+                <code className="code-line-text">
+                  {tokenizeCodeLine(activeCodeExample.language, line).map(
+                    (token, tokenIndex) => (
+                      <span
+                        className={`token-${token.type}`}
+                        key={`${activeCodeExample.language}-${lineNumber}-${tokenIndex}`}
+                      >
+                        {token.text}
+                      </span>
+                    )
+                  )}
+                </code>
+              </li>
+            );
+          })}
+        </ol>
+      </div>
+    </section>
   );
 }
 

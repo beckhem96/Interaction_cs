@@ -6,10 +6,10 @@ describe("insertionSortCodeExamples", () => {
   it("provides Insertion Sort examples for the required languages", () => {
     expect(insertionSortCodeExamples.map((example) => example.language)).toEqual([
       "C",
-      "Java",
       "C++",
-      "JavaScript",
-      "Python"
+      "Java",
+      "Python",
+      "JavaScript"
     ]);
   });
 

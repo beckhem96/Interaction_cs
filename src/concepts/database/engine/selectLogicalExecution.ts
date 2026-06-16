@@ -1,5 +1,6 @@
 import type { TraceStep } from "../../shared/types";
 import type {
+  DatabaseInputTableState,
   DatabaseRow,
   DatabaseRowMotion,
   DatabaseTraceState
@@ -75,6 +76,9 @@ export function generateSelectLogicalExecutionTrace(): TraceStep<DatabaseTraceSt
         phase: "from",
         query: selectLogicalExecutionQuery,
         activeQueryLines: [2],
+        inputTables: [
+          createInputTable("sales", fromRows, ["id", "region", "product", "amount"], fromRows)
+        ],
         activeColumns: ["id", "region", "product", "amount"],
         rows: fromRows,
         rowMotionByKey: toMotionMap(fromRows, "source"),
@@ -93,6 +97,10 @@ export function generateSelectLogicalExecutionTrace(): TraceStep<DatabaseTraceSt
         phase: "join",
         query: selectLogicalExecutionQuery,
         activeQueryLines: [3],
+        inputTables: [
+          createInputTable("sales", fromRows, ["region"], fromRows),
+          createInputTable("regions", regionRows, ["region", "manager", "zone"], regionRows)
+        ],
         activeColumns: ["region", "manager", "zone"],
         rows: joinRows,
         rowMotionByKey: toMotionMap(joinRows, "joined"),
@@ -111,6 +119,9 @@ export function generateSelectLogicalExecutionTrace(): TraceStep<DatabaseTraceSt
         phase: "where",
         query: selectLogicalExecutionQuery,
         activeQueryLines: [4],
+        inputTables: [
+          createInputTable("JOIN 결과", joinRows, ["amount"], whereRows)
+        ],
         activeColumns: ["amount"],
         rows: whereRows,
         rowMotionByKey: toMotionMap(whereRows, "filtered"),
@@ -129,6 +140,9 @@ export function generateSelectLogicalExecutionTrace(): TraceStep<DatabaseTraceSt
         phase: "groupBy",
         query: selectLogicalExecutionQuery,
         activeQueryLines: [5],
+        inputTables: [
+          createInputTable("WHERE 결과", whereRows, ["manager", "region", "amount"], whereRows)
+        ],
         activeColumns: ["manager", "region", "sum_amount", "order_count"],
         rows: groupRows,
         rowMotionByKey: toMotionMap(groupRows, "grouped"),
@@ -147,6 +161,9 @@ export function generateSelectLogicalExecutionTrace(): TraceStep<DatabaseTraceSt
         phase: "having",
         query: selectLogicalExecutionQuery,
         activeQueryLines: [6],
+        inputTables: [
+          createInputTable("GROUP BY 결과", groupRows, ["sum_amount"], havingRows)
+        ],
         activeColumns: ["sum_amount"],
         rows: havingRows,
         rowMotionByKey: toMotionMap(havingRows, "filtered"),
@@ -165,6 +182,9 @@ export function generateSelectLogicalExecutionTrace(): TraceStep<DatabaseTraceSt
         phase: "select",
         query: selectLogicalExecutionQuery,
         activeQueryLines: [1],
+        inputTables: [
+          createInputTable("HAVING 결과", havingRows, ["manager", "region", "sum_amount", "order_count"], havingRows)
+        ],
         activeColumns: ["manager", "region", "total_amount", "order_count"],
         rows: selectRows,
         rowMotionByKey: toMotionMap(selectRows, "projected"),
@@ -183,6 +203,10 @@ export function generateSelectLogicalExecutionTrace(): TraceStep<DatabaseTraceSt
         phase: "union",
         query: selectLogicalExecutionQuery,
         activeQueryLines: [7, 8, 9, 10, 11],
+        inputTables: [
+          createInputTable("첫 번째 SELECT 결과", selectRows, ["manager", "region", "total_amount", "order_count"], selectRows),
+          createInputTable("online_sales", onlineSalesRows, ["channel", "amount"], onlineSalesRows.filter((row) => row.amount >= 50))
+        ],
         activeColumns: ["manager", "region", "total_amount", "order_count"],
         rows: unionRows,
         rowMotionByKey: toMotionMap(unionRows, "unioned"),
@@ -201,6 +225,9 @@ export function generateSelectLogicalExecutionTrace(): TraceStep<DatabaseTraceSt
         phase: "orderBy",
         query: selectLogicalExecutionQuery,
         activeQueryLines: [12],
+        inputTables: [
+          createInputTable("UNION ALL 결과", unionRows, ["total_amount"], unionRows)
+        ],
         activeColumns: ["total_amount"],
         rows: orderByRows,
         rowMotionByKey: toMotionMap(orderByRows, "sorted"),
@@ -219,6 +246,9 @@ export function generateSelectLogicalExecutionTrace(): TraceStep<DatabaseTraceSt
         phase: "limit",
         query: selectLogicalExecutionQuery,
         activeQueryLines: [13],
+        inputTables: [
+          createInputTable("ORDER BY 결과", orderByRows, ["manager", "region", "total_amount"], limitRows)
+        ],
         activeColumns: ["manager", "region", "total_amount"],
         rows: limitRows,
         rowMotionByKey: toMotionMap(limitRows, "limited"),
@@ -315,6 +345,20 @@ function toMotionMap(
   motion: DatabaseRowMotion
 ): Record<string, DatabaseRowMotion> {
   return Object.fromEntries(rows.map((row) => [getDatabaseRowKey(row), motion]));
+}
+
+function createInputTable(
+  name: string,
+  rows: readonly DatabaseRow[],
+  activeColumns: string[],
+  activeRows: readonly DatabaseRow[]
+): DatabaseInputTableState {
+  return {
+    name,
+    rows: rows.map((row) => ({ ...row })),
+    activeColumns,
+    activeRowKeys: activeRows.map(getDatabaseRowKey)
+  };
 }
 
 function getDatabaseRowKey(row: DatabaseRow): string {

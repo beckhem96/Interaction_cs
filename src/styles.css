@@ -895,12 +895,34 @@ button:disabled {
 .code-tab {
   min-height: 34px;
   padding: 0 12px;
+  border-color: var(--language-color, #31594f);
+  color: var(--language-color, #31594f);
 }
 
 .code-tab[aria-selected="true"] {
-  border-color: #31594f;
-  background: #31594f;
+  border-color: var(--language-color, #31594f);
+  background: var(--language-color, #31594f);
   color: #ffffff;
+}
+
+.code-tab:nth-child(1) {
+  --language-color: #31594f;
+}
+
+.code-tab:nth-child(2) {
+  --language-color: #2f6fbb;
+}
+
+.code-tab:nth-child(3) {
+  --language-color: #7a4fb0;
+}
+
+.code-tab:nth-child(4) {
+  --language-color: #8a6f2a;
+}
+
+.code-tab:nth-child(5) {
+  --language-color: #c94f37;
 }
 
 .code-panel {
@@ -1003,8 +1025,10 @@ button:disabled {
 }
 
 .sql-query-section {
-  margin-bottom: 18px;
-  padding: 24px;
+  position: sticky;
+  top: 16px;
+  min-width: 0;
+  padding: 18px;
 }
 
 .sql-query-section h2,
@@ -1029,7 +1053,7 @@ button:disabled {
 .sql-query-lines {
   display: grid;
   gap: 2px;
-  min-width: 760px;
+  min-width: 620px;
   margin: 0;
   padding: 0;
   list-style: none;
@@ -1071,15 +1095,18 @@ button:disabled {
   color: #ffd88f;
 }
 
+.database-workbench,
 .database-step-layout {
   display: grid;
-  grid-template-columns: minmax(0, 1fr) 360px;
-  gap: 18px;
+  grid-template-columns: minmax(560px, 1.12fr) minmax(420px, 0.88fr);
+  gap: 16px;
+  align-items: start;
+  margin-top: 16px;
 }
 
 .database-table-panel {
   min-width: 0;
-  padding: 24px;
+  padding: 18px;
 }
 
 .database-table-header {
@@ -1156,14 +1183,14 @@ button:disabled {
 
 .sql-result-table {
   width: 100%;
-  min-width: 760px;
+  min-width: 520px;
   border-collapse: collapse;
-  font-size: 0.95rem;
+  font-size: 0.86rem;
 }
 
 .sql-result-table th,
 .sql-result-table td {
-  padding: 11px 12px;
+  padding: 8px 10px;
   border-bottom: 1px solid #edf0f2;
   text-align: left;
 }
@@ -1180,6 +1207,43 @@ button:disabled {
 .sql-result-table th.is-active-column,
 .sql-result-table td.is-active-column {
   background: #fff6dc;
+}
+
+.sql-input-section,
+.sql-output-section {
+  display: grid;
+  gap: 10px;
+  margin-top: 14px;
+}
+
+.sql-input-section h3,
+.sql-output-section h3 {
+  margin: 0;
+  color: #172026;
+  font-size: 1rem;
+}
+
+.sql-input-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+  gap: 10px;
+}
+
+.sql-input-card {
+  display: grid;
+  min-width: 0;
+  gap: 8px;
+}
+
+.sql-input-card h4 {
+  margin: 0;
+  color: #42635b;
+  font-size: 0.88rem;
+}
+
+.sql-result-table tbody tr[data-active-row="true"] td {
+  background: #e9f4ee;
+  box-shadow: inset 0 0 0 1px rgb(63 125 88 / 20%);
 }
 
 .sql-result-table tbody tr {
@@ -1657,11 +1721,11 @@ button:disabled {
 }
 
 .legend-swatch.is-range {
-  background: #2f6fbb;
+  background: #c28a1d;
 }
 
 .legend-swatch.is-updated {
-  background: #c94f37;
+  background: #3f7d58;
 }
 
 .legend-swatch.is-leaf-link {
@@ -2071,15 +2135,30 @@ button:disabled {
 
 .graph-workbench {
   display: grid;
-  grid-template-columns: minmax(0, 1fr) minmax(260px, 0.34fr);
-  gap: 18px;
+  grid-template-columns: minmax(560px, 1.12fr) minmax(420px, 0.88fr);
+  gap: 16px;
   align-items: start;
+  margin-top: 16px;
+}
+
+.graph-workbench .code-example-section {
+  position: sticky;
+  top: 16px;
+  min-width: 0;
+  margin-top: 0;
+  padding: 18px;
 }
 
 .graph-stage-panel,
 .graph-side-panel {
   display: grid;
   gap: 14px;
+}
+
+.graph-side-panel {
+  grid-column: 1 / -1;
+  grid-template-columns: minmax(280px, 0.52fr) minmax(360px, 1fr);
+  align-items: start;
 }
 
 .graph-stage-panel {
@@ -2103,7 +2182,7 @@ button:disabled {
 
 .graph-visual {
   display: block;
-  min-width: 720px;
+  min-width: 640px;
   width: 100%;
   height: auto;
 }
@@ -2485,15 +2564,22 @@ button:disabled {
 }
 
 @media (max-width: 1100px) {
+  .database-workbench,
   .graph-workbench,
   .sorting-workbench,
   .tree-workbench {
     grid-template-columns: 1fr;
   }
 
+  .database-workbench .sql-query-section,
+  .graph-workbench .code-example-section,
   .sorting-workbench .code-example-section,
   .tree-workbench .code-example-section {
     position: static;
+  }
+
+  .graph-side-panel {
+    grid-template-columns: 1fr;
   }
 }
 

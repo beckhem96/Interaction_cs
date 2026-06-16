@@ -6,10 +6,10 @@ describe("bubbleSortCodeExamples", () => {
   it("provides Bubble Sort examples for the required languages", () => {
     expect(bubbleSortCodeExamples.map((example) => example.language)).toEqual([
       "C",
-      "Java",
       "C++",
-      "JavaScript",
-      "Python"
+      "Java",
+      "Python",
+      "JavaScript"
     ]);
   });
 

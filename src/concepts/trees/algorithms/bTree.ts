@@ -6,6 +6,7 @@ import type {
   TreeOperation,
   TreeTraceState
 } from "../types";
+import { createTreeCodeHighlights } from "./codeHighlights";
 
 export const BTREE_INSERT_VALUES = [10, 20, 5, 6, 12, 30, 7, 17];
 export const BTREE_SEARCH_TARGET = 17;
@@ -484,9 +485,7 @@ function createStep({
       })
     },
     pseudoCodeLine,
-    codeLineHighlights: {
-      TypeScript: codeLines
-    }
+    codeLineHighlights: createTreeCodeHighlights(codeLines)
   };
 }
 

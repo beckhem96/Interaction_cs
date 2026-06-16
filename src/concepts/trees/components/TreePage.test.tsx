@@ -27,6 +27,10 @@ describe("TreePage", () => {
     expect(screen.getByText(/삽입 값: \[42, 23, 61/)).toBeInTheDocument();
     expect(screen.getByRole("img", { name: "BST 트리 상태" })).toBeInTheDocument();
     expect(screen.getByText("빈 트리")).toBeInTheDocument();
+    for (const tab of ["C", "C++", "Java", "Python", "JavaScript"]) {
+      expect(screen.getByRole("tab", { name: tab })).toBeInTheDocument();
+    }
+    expect(screen.getByText("binarySearchTree.c")).toBeInTheDocument();
     for (const button of screen.getAllByRole("button", { name: "이전" })) {
       expect(button).toBeDisabled();
     }
@@ -54,7 +58,7 @@ describe("TreePage", () => {
     expect(container.querySelector(".tree-node.is-compared")).not.toBeNull();
     expect(
       screen.getByRole("listitem", {
-        name: "현재 코드 4: if (value < node.value) {"
+        name: "현재 코드 4: if (value < node->value) {"
       })
     ).toBeInTheDocument();
   });
@@ -114,7 +118,7 @@ describe("TreePage", () => {
     expect(screen.getAllByText(/BF/).length).toBeGreaterThan(0);
     expect(
       screen.getByRole("listitem", {
-        name: "현재 코드 13: if (balance > 1 && value < node.left.value) return rotateRight(node);"
+        name: "현재 코드 13: if (balance > 1 && value < node->left->value) return rotateRight(node);"
       })
     ).toBeInTheDocument();
   });
@@ -149,7 +153,7 @@ describe("TreePage", () => {
     expect(container.querySelector(".tree-node.is-removing")).not.toBeNull();
     expect(
       screen.getByRole("listitem", {
-        name: "현재 코드 11: if (node.left === null && node.right === null) return null;"
+        name: "현재 코드 11: if (node->left == NULL && node->right == NULL) return NULL;"
       })
     ).toBeInTheDocument();
 
@@ -159,7 +163,7 @@ describe("TreePage", () => {
     expect(container.querySelector(".tree-node.is-successor")).not.toBeNull();
     expect(
       screen.getByRole("listitem", {
-        name: "현재 코드 15: node.value = successor.value;"
+        name: "현재 코드 15: node->value = successor->value;"
       })
     ).toBeInTheDocument();
   });
@@ -199,7 +203,7 @@ describe("TreePage", () => {
     expect(screen.getByLabelText("38 빨간 노드")).toBeInTheDocument();
     expect(
       screen.getByRole("listitem", {
-        name: "현재 코드 9: parent.color = \"black\";"
+        name: "현재 코드 9: parent->color = BLACK;"
       })
     ).toBeInTheDocument();
 
@@ -209,7 +213,7 @@ describe("TreePage", () => {
     expect(container.querySelector(".tree-node.is-rotated")).not.toBeNull();
     expect(
       screen.getByRole("listitem", {
-        name: "현재 코드 20: rotateGrandparent(node.parent.parent);"
+        name: "현재 코드 20: rotateGrandparent(node->parent->parent);"
       })
     ).toBeInTheDocument();
   });
@@ -244,7 +248,7 @@ describe("TreePage", () => {
     expect(container.querySelector(".tree-node.is-inserted")).not.toBeNull();
     expect(
       screen.getByRole("listitem", {
-        name: "현재 코드 20: parent.keys.splice(index, 0, median);"
+        name: "현재 코드 20: insertKey(parent, index, median);"
       })
     ).toBeInTheDocument();
 
@@ -254,7 +258,7 @@ describe("TreePage", () => {
     expect(container.querySelector(".tree-node.is-found")).not.toBeNull();
     expect(
       screen.getByRole("listitem", {
-        name: "현재 코드 39: if (node.keys[index] === key) return node;"
+        name: "현재 코드 39: if (index < node->keyCount && node->keys[index] == key) return node;"
       })
     ).toBeInTheDocument();
   });
@@ -289,7 +293,7 @@ describe("TreePage", () => {
     expect(container.querySelector(".tree-node.is-inserted")).not.toBeNull();
     expect(
       screen.getByRole("listitem", {
-        name: "현재 코드 33: leaf.next = right;"
+        name: "현재 코드 33: leaf->next = right;"
       })
     ).toBeInTheDocument();
 
@@ -336,7 +340,7 @@ describe("TreePage", () => {
     expect(container.querySelector(".heap-array-cell.is-swapping")).not.toBeNull();
     expect(
       screen.getByRole("listitem", {
-        name: "현재 코드 7: swap(heap, parent, index);"
+        name: "현재 코드 7: swapHeap(heap, parent, index);"
       })
     ).toBeInTheDocument();
 
@@ -349,7 +353,7 @@ describe("TreePage", () => {
     expect(container.querySelector(".heap-array-cell.is-swapping")).not.toBeNull();
     expect(
       screen.getByRole("listitem", {
-        name: "현재 코드 19: swap(heap, index, child);"
+        name: "현재 코드 19: swapHeap(heap, index, child);"
       })
     ).toBeInTheDocument();
   });

@@ -12,23 +12,23 @@ export const bubbleSortCodeExamples: BubbleSortCodeExample[] = [
     code: bubbleSortC
   },
   {
-    language: "Java",
-    fileName: "bubbleSort.java",
-    code: bubbleSortJava
-  },
-  {
     language: "C++",
     fileName: "bubbleSort.cpp",
     code: bubbleSortCpp
   },
   {
-    language: "JavaScript",
-    fileName: "bubbleSort.js",
-    code: bubbleSortJavaScript
+    language: "Java",
+    fileName: "bubbleSort.java",
+    code: bubbleSortJava
   },
   {
     language: "Python",
     fileName: "bubbleSort.py",
     code: bubbleSortPython
+  },
+  {
+    language: "JavaScript",
+    fileName: "bubbleSort.js",
+    code: bubbleSortJavaScript
   }
 ];

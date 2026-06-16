@@ -12,23 +12,23 @@ export const quickSortCodeExamples: SortingCodeExample[] = [
     code: quickSortC
   },
   {
-    language: "Java",
-    fileName: "quickSort.java",
-    code: quickSortJava
-  },
-  {
     language: "C++",
     fileName: "quickSort.cpp",
     code: quickSortCpp
   },
   {
-    language: "JavaScript",
-    fileName: "quickSort.js",
-    code: quickSortJavaScript
+    language: "Java",
+    fileName: "quickSort.java",
+    code: quickSortJava
   },
   {
     language: "Python",
     fileName: "quickSort.py",
     code: quickSortPython
+  },
+  {
+    language: "JavaScript",
+    fileName: "quickSort.js",
+    code: quickSortJavaScript
   }
 ];

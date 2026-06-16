@@ -1,5 +1,7 @@
+export type CodeLanguage = "C" | "C++" | "Java" | "Python" | "JavaScript";
+
 export type SortingCodeExample = {
-  language: "C" | "Java" | "C++" | "JavaScript" | "Python";
+  language: CodeLanguage;
   fileName: string;
   code: string;
 };

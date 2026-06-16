@@ -23,6 +23,9 @@ describe("GraphPage", () => {
     expect(screen.getByRole("button", { name: "이전" })).toBeDisabled();
     expect(screen.getByRole("button", { name: "그래프 다음 단계" })).toBeEnabled();
     expect(screen.getByRole("slider", { name: "그래프 단계 슬라이더" })).toHaveValue("0");
+    for (const language of ["C", "C++", "Java", "Python", "JavaScript"]) {
+      expect(screen.getByRole("tab", { name: language })).toBeInTheDocument();
+    }
     expect(container.querySelector(".graph-visual.motion-idle")).not.toBeNull();
   });
 
@@ -49,7 +52,7 @@ describe("GraphPage", () => {
     expect(container.querySelector(".graph-edge.is-weighted.is-active")).not.toBeNull();
     expect(
       screen.getByRole("listitem", {
-        name: "현재 코드 17: graph.get(from)!.push(`${to}(${weight})`);"
+        name: "현재 코드 17: graphAddWeightedEdge(graph, from, to, weight);"
       })
     ).toBeInTheDocument();
   });

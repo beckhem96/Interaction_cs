@@ -297,9 +297,7 @@ function createStep(
       summaryItems: createSummaryItems(kind, nodes, edges)
     },
     pseudoCodeLine,
-    codeLineHighlights: {
-      TypeScript: codeLines
-    }
+    codeLineHighlights: createLanguageHighlights(codeLines)
   };
 }
 
@@ -487,4 +485,14 @@ function getNodeLabel(example: GraphExample, nodeId: string): string {
 
 function getEdgeId(edge: ExampleEdge): string {
   return `${edge.fromId}-${edge.toId}`;
+}
+
+function createLanguageHighlights(codeLines: number[]): Record<string, number[]> {
+  return {
+    C: codeLines,
+    "C++": codeLines,
+    Java: codeLines,
+    Python: codeLines,
+    JavaScript: codeLines
+  };
 }

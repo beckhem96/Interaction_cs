@@ -12,23 +12,23 @@ export const selectionSortCodeExamples: SortingCodeExample[] = [
     code: selectionSortC
   },
   {
-    language: "Java",
-    fileName: "selectionSort.java",
-    code: selectionSortJava
-  },
-  {
     language: "C++",
     fileName: "selectionSort.cpp",
     code: selectionSortCpp
   },
   {
-    language: "JavaScript",
-    fileName: "selectionSort.js",
-    code: selectionSortJavaScript
+    language: "Java",
+    fileName: "selectionSort.java",
+    code: selectionSortJava
   },
   {
     language: "Python",
     fileName: "selectionSort.py",
     code: selectionSortPython
+  },
+  {
+    language: "JavaScript",
+    fileName: "selectionSort.js",
+    code: selectionSortJavaScript
   }
 ];

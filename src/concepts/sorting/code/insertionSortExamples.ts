@@ -12,23 +12,23 @@ export const insertionSortCodeExamples: SortingCodeExample[] = [
     code: insertionSortC
   },
   {
-    language: "Java",
-    fileName: "insertionSort.java",
-    code: insertionSortJava
-  },
-  {
     language: "C++",
     fileName: "insertionSort.cpp",
     code: insertionSortCpp
   },
   {
-    language: "JavaScript",
-    fileName: "insertionSort.js",
-    code: insertionSortJavaScript
+    language: "Java",
+    fileName: "insertionSort.java",
+    code: insertionSortJava
   },
   {
     language: "Python",
     fileName: "insertionSort.py",
     code: insertionSortPython
+  },
+  {
+    language: "JavaScript",
+    fileName: "insertionSort.js",
+    code: insertionSortJavaScript
   }
 ];

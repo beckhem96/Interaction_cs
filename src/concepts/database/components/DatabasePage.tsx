@@ -1,15 +1,55 @@
+import { type CSSProperties, useState } from "react";
 import { Link } from "react-router";
 
 import { useStepController } from "../../shared/useStepController";
 import { generateSelectLogicalExecutionTrace } from "../engine/selectLogicalExecution";
 import type {
   DatabaseCellValue,
+  DatabaseInputTableState,
   DatabaseRow,
   DatabaseRowMotion,
   SqlLogicalPhase
 } from "../types";
 
-const trace = generateSelectLogicalExecutionTrace();
+const fullTrace = generateSelectLogicalExecutionTrace();
+
+const sqlExamples = [
+  {
+    id: "join",
+    title: "SQL: JOIN",
+    tabLabel: "JOIN",
+    intro: "sales와 regions 두 테이블의 region 열을 맞춰 주문 행에 담당자 정보를 붙입니다.",
+    trace: fullTrace.slice(0, 2)
+  },
+  {
+    id: "group-by",
+    title: "SQL: GROUP BY",
+    tabLabel: "GROUP BY",
+    intro: "조건을 통과한 행을 manager와 region으로 묶고 합계와 개수를 계산합니다.",
+    trace: fullTrace.slice(2, 4)
+  },
+  {
+    id: "having-select",
+    title: "SQL: HAVING / SELECT",
+    tabLabel: "HAVING",
+    intro: "집계된 그룹에 HAVING 조건을 적용하고 최종 출력 열과 별칭을 만듭니다.",
+    trace: fullTrace.slice(4, 6)
+  },
+  {
+    id: "union",
+    title: "SQL: UNION ALL",
+    tabLabel: "UNION",
+    intro: "첫 번째 SELECT 결과와 online_sales 집계 결과를 같은 열 구조로 아래에 붙입니다.",
+    trace: fullTrace.slice(5, 7)
+  },
+  {
+    id: "order-limit",
+    title: "SQL: ORDER BY / LIMIT",
+    tabLabel: "ORDER/LIMIT",
+    intro: "UNION 결과를 total_amount 기준으로 정렬하고 상위 행만 남깁니다.",
+    trace: fullTrace.slice(7, 9)
+  }
+] as const;
 
 const pseudoCode = [
   "FROM 절의 기준 테이블을 읽는다.",
@@ -36,8 +76,20 @@ const phaseLabels: Record<SqlLogicalPhase, string> = {
 };
 
 export function DatabasePage() {
-  const controller = useStepController(trace.length);
-  const currentStep = trace[controller.currentIndex];
+  const [activeExampleIndex, setActiveExampleIndex] = useState(0);
+  const activeExample = sqlExamples[activeExampleIndex];
+  const controller = useStepController(activeExample.trace.length, 900);
+  const currentIndex = Math.min(controller.currentIndex, activeExample.trace.length - 1);
+  const currentStep = activeExample.trace[currentIndex];
+  const progressPercent =
+    activeExample.trace.length <= 1
+      ? 100
+      : (currentIndex / (activeExample.trace.length - 1)) * 100;
+
+  function selectExample(index: number) {
+    setActiveExampleIndex(index);
+    controller.reset();
+  }
 
   return (
     <main className="page-shell learning-page">
@@ -47,26 +99,29 @@ export function DatabasePage() {
 
       <section className="learning-header" aria-labelledby="database-title">
         <p className="eyebrow">데이터베이스</p>
-        <h1 id="database-title">SQL 논리 실행 순서</h1>
-        <p className="intro-copy">
-          SELECT 문이 작성 순서가 아니라 논리 처리 순서에 따라 중간 결과를
-          만들어 가는 과정을 단계별로 확인합니다.
-        </p>
+        <h1 id="database-title">{activeExample.title}</h1>
+        <p className="intro-copy">{activeExample.intro}</p>
+        <div className="algorithm-tabs" role="tablist" aria-label="SQL 동작 선택">
+          {sqlExamples.map((example, index) => (
+            <button
+              aria-selected={activeExampleIndex === index}
+              className="algorithm-tab"
+              key={example.id}
+              onClick={() => selectExample(index)}
+              role="tab"
+              type="button"
+            >
+              {example.tabLabel}
+            </button>
+          ))}
+        </div>
       </section>
 
-      <section className="sql-query-section" aria-label="SQL 예제">
-        <h2>SQL 예제</h2>
-        <SqlQueryBlock
-          activeLines={currentStep.state.activeQueryLines}
-          query={currentStep.state.query}
-        />
-      </section>
-
-      <section className="database-step-layout" aria-label="SQL 실행 단계">
-        <div className="database-table-panel">
+      <section className="database-workbench" aria-label="SQL 실행 작업 영역">
+        <section className="database-table-panel" aria-label="SQL 테이블 변화">
           <div className="database-table-header">
             <div>
-              <p className="eyebrow">현재 논리 단계</p>
+              <p className="eyebrow">인터랙션 스테이지</p>
               <h2>{currentStep.title}</h2>
             </div>
             <span className={`phase-badge phase-${currentStep.state.phase}`}>
@@ -76,48 +131,76 @@ export function DatabasePage() {
 
           <SqlStageSummary items={currentStep.state.summaryItems ?? []} />
 
-          <SqlResultTable
-            activeColumns={currentStep.state.activeColumns ?? []}
-            rowMotionByKey={currentStep.state.rowMotionByKey ?? {}}
-            rows={currentStep.state.rows}
-          />
-        </div>
+          <SqlInputTables tables={currentStep.state.inputTables ?? []} />
 
-        <aside className="step-panel" aria-label="현재 SQL 단계 설명">
-          <h2>현재 단계</h2>
-          <p className="step-count">
-            {controller.currentIndex + 1} / {trace.length}
-          </p>
-          <h3>{currentStep.title}</h3>
-          <p>{currentStep.description}</p>
+          <section className="sql-output-section" aria-label="SQL 결과 테이블">
+            <h3>결과 테이블</h3>
+            <SqlDataTable
+              activeColumns={currentStep.state.activeColumns ?? []}
+              ariaLabel="SQL 중간 결과 테이블"
+              rowMotionByKey={currentStep.state.rowMotionByKey ?? {}}
+              rows={currentStep.state.rows}
+            />
+          </section>
 
-          <div className="step-controls" aria-label="단계 컨트롤">
-            <button
-              type="button"
-              onClick={controller.goPrevious}
-              disabled={controller.isFirstStep}
-            >
-              이전
-            </button>
-            <button
-              type="button"
-              onClick={controller.goNext}
-              disabled={controller.isLastStep}
-            >
-              다음
-            </button>
-            <button
-              type="button"
-              onClick={controller.togglePlay}
-              disabled={controller.isLastStep}
-            >
-              {controller.isPlaying ? "정지" : "재생"}
-            </button>
-            <button type="button" onClick={controller.reset}>
-              초기화
-            </button>
+          <div className="timeline-controls" aria-label="SQL 단계 재생 컨트롤">
+            <div className="timeline-row">
+              <button
+                type="button"
+                onClick={controller.goPrevious}
+                disabled={controller.isFirstStep}
+              >
+                이전
+              </button>
+              <button
+                className="primary-control"
+                type="button"
+                onClick={controller.togglePlay}
+                disabled={controller.isLastStep}
+              >
+                {controller.isPlaying ? "정지" : "자동 재생"}
+              </button>
+              <button
+                aria-label="SQL 다음 단계"
+                type="button"
+                onClick={controller.goNext}
+                disabled={controller.isLastStep}
+              >
+                다음
+              </button>
+            </div>
+
+            <label className="timeline-slider-label" htmlFor="sql-step-slider">
+              <span>수동 단계 이동</span>
+              <input
+                id="sql-step-slider"
+                type="range"
+                min="0"
+                max={activeExample.trace.length - 1}
+                value={currentIndex}
+                onChange={(event) =>
+                  controller.goToStep(Number(event.currentTarget.value))
+                }
+                aria-label="SQL 단계 슬라이더"
+                style={{ "--progress": `${progressPercent}%` } as CSSProperties}
+              />
+            </label>
           </div>
-        </aside>
+        </section>
+
+        <section className="sql-query-section" aria-label="SQL 쿼리">
+          <div className="code-example-header">
+            <div>
+              <h2>SQL 쿼리</h2>
+              <p>현재 단계에 해당하는 쿼리 라인이 강조됩니다.</p>
+            </div>
+            <span className="code-file-name">query.sql</span>
+          </div>
+          <SqlQueryBlock
+            activeLines={currentStep.state.activeQueryLines}
+            query={currentStep.state.query}
+          />
+        </section>
       </section>
 
       <section className="step-pseudo-layout" aria-label="SQL 의사 코드와 요약">
@@ -140,19 +223,14 @@ export function DatabasePage() {
           </ol>
         </div>
 
-        <div className="summary-panel">
-          <h2>핵심 요약</h2>
-          <dl className="complexity-list">
-            <div>
-              <dt>주의</dt>
-              <dd>논리 실행 순서는 학습용 모델이며 실제 실행 계획은 옵티마이저가 바꿀 수 있습니다.</dd>
-            </div>
-            <div>
-              <dt>핵심</dt>
-              <dd>JOIN은 행을 넓히고, GROUP BY는 행을 묶고, UNION ALL은 같은 열 구조의 결과를 아래로 붙입니다.</dd>
-            </div>
-          </dl>
-        </div>
+        <aside className="step-panel" aria-label="현재 SQL 단계 설명">
+          <h2>현재 단계</h2>
+          <p className="step-count">
+            {currentIndex + 1} / {activeExample.trace.length}
+          </p>
+          <h3>{currentStep.title}</h3>
+          <p>{currentStep.description}</p>
+        </aside>
       </section>
     </main>
   );
@@ -213,22 +291,52 @@ function SqlStageSummary({ items }: SqlStageSummaryProps) {
   );
 }
 
-type SqlResultTableProps = {
+function SqlInputTables({ tables }: { tables: DatabaseInputTableState[] }) {
+  if (tables.length === 0) {
+    return null;
+  }
+
+  return (
+    <section className="sql-input-section" aria-label="SQL 입력 테이블">
+      <h3>입력 테이블</h3>
+      <div className="sql-input-grid">
+        {tables.map((table) => (
+          <div className="sql-input-card" key={table.name}>
+            <h4>{table.name}</h4>
+            <SqlDataTable
+              activeColumns={table.activeColumns ?? []}
+              activeRowKeys={table.activeRowKeys ?? []}
+              ariaLabel={`${table.name} 입력 테이블`}
+              rows={table.rows}
+            />
+          </div>
+        ))}
+      </div>
+    </section>
+  );
+}
+
+type SqlDataTableProps = {
   activeColumns: string[];
-  rowMotionByKey: Record<string, DatabaseRowMotion>;
+  activeRowKeys?: string[];
+  ariaLabel: string;
+  rowMotionByKey?: Record<string, DatabaseRowMotion>;
   rows: DatabaseRow[];
 };
 
-function SqlResultTable({
+function SqlDataTable({
   activeColumns,
-  rowMotionByKey,
+  activeRowKeys = [],
+  ariaLabel,
+  rowMotionByKey = {},
   rows
-}: SqlResultTableProps) {
+}: SqlDataTableProps) {
   const columns = rows.length > 0 ? Object.keys(rows[0]!) : [];
+  const activeRowKeySet = new Set(activeRowKeys);
 
   return (
     <div className="sql-table-scroll">
-      <table className="sql-result-table" aria-label="SQL 중간 결과 테이블">
+      <table className="sql-result-table" aria-label={ariaLabel}>
         <thead>
           <tr>
             {columns.map((column) => (
@@ -246,11 +354,13 @@ function SqlResultTable({
           {rows.map((row, rowIndex) => {
             const rowKey = getDatabaseRowKey(row);
             const motion = rowMotionByKey[rowKey];
+            const isActiveRow = activeRowKeySet.has(rowKey);
 
             return (
               <tr
                 className={motion ? `sql-row-motion-${motion}` : ""}
                 data-motion={motion}
+                data-active-row={isActiveRow ? "true" : undefined}
                 key={`${rowIndex}-${rowKey}`}
               >
                 {columns.map((column) => (

@@ -6,6 +6,7 @@ import type {
   TreeOperation,
   TreeTraceState
 } from "../types";
+import { createTreeCodeHighlights } from "./codeHighlights";
 
 export const TRIE_WORDS = ["cat", "car", "cart", "dog", "dot"];
 export const TRIE_PREFIX_TARGET = "car";
@@ -322,9 +323,7 @@ function createStep({
       })
     },
     pseudoCodeLine,
-    codeLineHighlights: {
-      TypeScript: codeLines
-    }
+    codeLineHighlights: createTreeCodeHighlights(codeLines)
   };
 }
 

@@ -23,10 +23,18 @@ export type DatabaseRowMotion =
   | "sorted"
   | "limited";
 
+export type DatabaseInputTableState = {
+  name: string;
+  rows: DatabaseRow[];
+  activeColumns?: string[];
+  activeRowKeys?: string[];
+};
+
 export type DatabaseTraceState = {
   phase: SqlLogicalPhase;
   query: string;
   activeQueryLines: number[];
+  inputTables?: DatabaseInputTableState[];
   rows: DatabaseRow[];
   activeColumns?: string[];
   rowMotionByKey?: Record<string, DatabaseRowMotion>;

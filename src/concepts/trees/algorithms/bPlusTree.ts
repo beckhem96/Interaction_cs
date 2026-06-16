@@ -6,6 +6,7 @@ import type {
   TreeOperation,
   TreeTraceState
 } from "../types";
+import { createTreeCodeHighlights } from "./codeHighlights";
 
 export const BPLUS_TREE_INSERT_VALUES = [10, 20, 5, 6, 12, 30, 7, 17, 4, 3, 2];
 export const BPLUS_TREE_RANGE = [6, 20] as const;
@@ -493,9 +494,7 @@ function createStep({
       })
     },
     pseudoCodeLine,
-    codeLineHighlights: {
-      TypeScript: codeLines
-    }
+    codeLineHighlights: createTreeCodeHighlights(codeLines)
   };
 }
 

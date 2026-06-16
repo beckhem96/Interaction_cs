@@ -308,7 +308,7 @@ function createCompleteStep(
     visitedOrder,
     treeEdgeIds,
     pseudoCodeLine: 7,
-    codeLines: mode === "bfs" ? [29] : [49]
+    codeLines: mode === "bfs" ? [28] : [47]
   });
 }
 
@@ -366,9 +366,7 @@ function createStep({
       viewport: { width: 720, height: 410 }
     },
     pseudoCodeLine,
-    codeLineHighlights: {
-      TypeScript: codeLines
-    }
+    codeLineHighlights: createLanguageHighlights(codeLines)
   };
 }
 
@@ -415,4 +413,14 @@ function createAdjacencyMap(
 
 function getEdgeId(firstId: string, secondId: string): string {
   return [firstId, secondId].sort().join("-");
+}
+
+function createLanguageHighlights(codeLines: number[]): Record<string, number[]> {
+  return {
+    C: codeLines,
+    "C++": codeLines,
+    Java: codeLines,
+    Python: codeLines,
+    JavaScript: codeLines
+  };
 }

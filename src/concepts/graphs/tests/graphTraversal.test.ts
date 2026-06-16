@@ -32,7 +32,7 @@ describe("generateGraphTraversalTrace", () => {
     expect(discoverB?.state.frontierLabel).toBe("큐 앞 → 뒤");
     expect(discoverB?.state.frontierItems).toEqual(["B"]);
     expect(discoverB?.state.treeEdgeIds).toContain("A-B");
-    expect(discoverB?.codeLineHighlights?.TypeScript).toEqual([24, 25]);
+    expect(discoverB?.codeLineHighlights?.C).toEqual([24, 25]);
     expect(complete.state.visitedOrder).toEqual([
       "A",
       "B",
@@ -57,7 +57,7 @@ describe("generateGraphTraversalTrace", () => {
     expect(discoverD?.state.frontierLabel).toBe("스택 위 → 아래");
     expect(discoverD?.state.frontierItems).toEqual(["D"]);
     expect(discoverD?.state.treeEdgeIds).toContain("A-D");
-    expect(discoverD?.codeLineHighlights?.TypeScript).toEqual([44, 45]);
+    expect(discoverD?.codeLineHighlights?.C).toEqual([44, 45]);
     expect(complete.state.visitedOrder).toEqual([
       "A",
       "B",

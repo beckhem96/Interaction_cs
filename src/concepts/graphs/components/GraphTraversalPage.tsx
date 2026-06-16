@@ -9,7 +9,9 @@ import {
   getGraphTraversalInputSummary,
   getGraphTraversalTitle
 } from "../algorithms/graphTraversal";
-import { graphTraversalCodeExample } from "../code/graphTraversalExample";
+import { graphTraversalCodeExamples } from "../code/graphTraversalExample";
+import { tokenizeCodeLine } from "../../sorting/code/syntaxHighlight";
+import type { SortingCodeExample } from "../../sorting/code/types";
 import type {
   GraphEdgeState,
   GraphNodeState,
@@ -42,13 +44,15 @@ const modeLabels: Record<GraphTraversalMode, string> = {
 
 export function GraphTraversalPage() {
   const [activeConceptIndex, setActiveConceptIndex] = useState(0);
+  const [activeCodeIndex, setActiveCodeIndex] = useState(0);
   const activeConcept = traversalConcepts[activeConceptIndex];
+  const activeCodeExample = graphTraversalCodeExamples[activeCodeIndex];
   const trace = activeConcept.trace;
   const controller = useStepController(trace.length, 850);
   const currentIndex = Math.min(controller.currentIndex, trace.length - 1);
   const currentStep = trace[currentIndex];
   const activeLines =
-    currentStep.codeLineHighlights?.[graphTraversalCodeExample.language] ?? [];
+    currentStep.codeLineHighlights?.[activeCodeExample.language] ?? [];
   const progressPercent =
     trace.length <= 1
       ? 100
@@ -56,6 +60,7 @@ export function GraphTraversalPage() {
 
   function selectConcept(index: number) {
     setActiveConceptIndex(index);
+    setActiveCodeIndex(0);
     controller.reset();
   }
 
@@ -183,6 +188,14 @@ export function GraphTraversalPage() {
           </div>
         </section>
 
+        <GraphTraversalCodePanel
+          activeCodeExample={activeCodeExample}
+          activeCodeIndex={activeCodeIndex}
+          activeLines={activeLines}
+          codeExamples={graphTraversalCodeExamples}
+          onSelectCode={setActiveCodeIndex}
+        />
+
         <aside className="graph-side-panel" aria-label="현재 그래프 탐색 단계 설명">
           <section className="step-panel">
             <h2>현재 단계</h2>
@@ -255,43 +268,86 @@ export function GraphTraversalPage() {
           </ol>
         </div>
 
-        <section className="code-example-section" aria-label="그래프 탐색 코드">
-          <div className="code-example-header">
-            <div>
-              <h2>코드 예제</h2>
-              <p>대기 목록에서 꺼내고, 이웃을 발견하고, 방문 순서를 반환하는 줄을 강조합니다.</p>
-            </div>
-            <span className="code-file-name">
-              {graphTraversalCodeExample.fileName}
-            </span>
-          </div>
-
-          <div className="code-panel" role="tabpanel">
-            <ol className="code-lines">
-              {graphTraversalCodeExample.code.split("\n").map((line, index) => {
-                const lineNumber = index + 1;
-                const isActive = activeLines.includes(lineNumber);
-
-                return (
-                  <li
-                    aria-label={
-                      isActive
-                        ? `현재 코드 ${lineNumber}: ${line.trim()}`
-                        : `코드 ${lineNumber}: ${line.trim()}`
-                    }
-                    className={isActive ? "code-line is-active" : "code-line"}
-                    key={`${lineNumber}-${line}`}
-                  >
-                    <span className="code-line-number">{lineNumber}</span>
-                    <code className="code-line-text">{line}</code>
-                  </li>
-                );
-              })}
-            </ol>
-          </div>
-        </section>
       </section>
     </main>
+  );
+}
+
+type GraphTraversalCodePanelProps = {
+  activeCodeExample: SortingCodeExample;
+  activeCodeIndex: number;
+  activeLines: number[];
+  codeExamples: SortingCodeExample[];
+  onSelectCode: (index: number) => void;
+};
+
+function GraphTraversalCodePanel({
+  activeCodeExample,
+  activeCodeIndex,
+  activeLines,
+  codeExamples,
+  onSelectCode
+}: GraphTraversalCodePanelProps) {
+  return (
+    <section className="code-example-section" aria-label="그래프 탐색 코드">
+      <div className="code-example-header">
+        <div>
+          <h2>코드 예제</h2>
+          <p>대기 목록에서 꺼내고, 이웃을 발견하고, 방문 순서를 반환하는 줄을 강조합니다.</p>
+        </div>
+        <span className="code-file-name">{activeCodeExample.fileName}</span>
+      </div>
+
+      <div className="code-tabs" role="tablist" aria-label="코드 언어">
+        {codeExamples.map((example, index) => (
+          <button
+            aria-selected={activeCodeIndex === index}
+            className="code-tab"
+            key={example.language}
+            onClick={() => onSelectCode(index)}
+            role="tab"
+            type="button"
+          >
+            {example.language}
+          </button>
+        ))}
+      </div>
+
+      <div className="code-panel" role="tabpanel">
+        <ol className="code-lines">
+          {activeCodeExample.code.split("\n").map((line, index) => {
+            const lineNumber = index + 1;
+            const isActive = activeLines.includes(lineNumber);
+
+            return (
+              <li
+                aria-label={
+                  isActive
+                    ? `현재 코드 ${lineNumber}: ${line.trim()}`
+                    : `코드 ${lineNumber}: ${line.trim()}`
+                }
+                className={isActive ? "code-line is-active" : "code-line"}
+                key={`${activeCodeExample.language}-${lineNumber}-${line}`}
+              >
+                <span className="code-line-number">{lineNumber}</span>
+                <code className="code-line-text">
+                  {tokenizeCodeLine(activeCodeExample.language, line).map(
+                    (token, tokenIndex) => (
+                      <span
+                        className={`token-${token.type}`}
+                        key={`${activeCodeExample.language}-${lineNumber}-${tokenIndex}`}
+                      >
+                        {token.text}
+                      </span>
+                    )
+                  )}
+                </code>
+              </li>
+            );
+          })}
+        </ol>
+      </div>
+    </section>
   );
 }
 

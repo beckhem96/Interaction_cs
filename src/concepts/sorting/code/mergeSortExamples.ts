@@ -12,23 +12,23 @@ export const mergeSortCodeExamples: SortingCodeExample[] = [
     code: mergeSortC
   },
   {
-    language: "Java",
-    fileName: "mergeSort.java",
-    code: mergeSortJava
-  },
-  {
     language: "C++",
     fileName: "mergeSort.cpp",
     code: mergeSortCpp
   },
   {
-    language: "JavaScript",
-    fileName: "mergeSort.js",
-    code: mergeSortJavaScript
+    language: "Java",
+    fileName: "mergeSort.java",
+    code: mergeSortJava
   },
   {
     language: "Python",
     fileName: "mergeSort.py",
     code: mergeSortPython
+  },
+  {
+    language: "JavaScript",
+    fileName: "mergeSort.js",
+    code: mergeSortJavaScript
   }
 ];

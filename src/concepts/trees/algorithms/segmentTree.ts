@@ -6,6 +6,7 @@ import type {
   TreeOperation,
   TreeTraceState
 } from "../types";
+import { createTreeCodeHighlights } from "./codeHighlights";
 
 export const SEGMENT_TREE_VALUES = [5, 8, 6, 3, 7, 2, 9, 4];
 export const SEGMENT_TREE_QUERY_RANGE = [2, 6] as const;
@@ -506,9 +507,7 @@ function createStep({
       })
     },
     pseudoCodeLine,
-    codeLineHighlights: {
-      TypeScript: codeLines
-    }
+    codeLineHighlights: createTreeCodeHighlights(codeLines)
   };
 }
 

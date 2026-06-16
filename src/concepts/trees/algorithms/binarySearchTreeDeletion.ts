@@ -6,6 +6,7 @@ import type {
   TreeOperation,
   TreeTraceState
 } from "../types";
+import { createTreeCodeHighlights } from "./codeHighlights";
 
 export const BST_DELETE_INITIAL_VALUES = [42, 23, 61, 15, 31, 54, 72, 28, 37, 67];
 export const BST_DELETE_TARGETS = [15, 72, 42];
@@ -367,9 +368,7 @@ function createStep({
       })
     },
     pseudoCodeLine,
-    codeLineHighlights: {
-      TypeScript: codeLines
-    }
+    codeLineHighlights: createTreeCodeHighlights(codeLines)
   };
 }
 

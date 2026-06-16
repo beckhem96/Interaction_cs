@@ -25,6 +25,9 @@ describe("GraphTraversalPage", () => {
     expect(
       screen.getByRole("slider", { name: "그래프 탐색 단계 슬라이더" })
     ).toHaveValue("0");
+    for (const language of ["C", "C++", "Java", "Python", "JavaScript"]) {
+      expect(screen.getByRole("tab", { name: language })).toBeInTheDocument();
+    }
     expect(screen.getByLabelText("A 현재 노드")).toBeInTheDocument();
     expect(container.querySelector(".graph-visual.motion-idle")).not.toBeNull();
   });
@@ -54,7 +57,7 @@ describe("GraphTraversalPage", () => {
     expect(container.querySelector(".graph-edge.is-tree-edge.is-active")).not.toBeNull();
     expect(
       screen.getByRole("listitem", {
-        name: "현재 코드 25: queue.push(next);"
+        name: "현재 코드 25: queuePush(&queue, next);"
       })
     ).toBeInTheDocument();
   });
@@ -87,7 +90,7 @@ describe("GraphTraversalPage", () => {
     expect(container.querySelectorAll(".graph-edge.is-tree-edge")).toHaveLength(8);
     expect(
       screen.getByRole("listitem", {
-        name: "현재 코드 49: return visited;"
+        name: "현재 코드 47: return visited;"
       })
     ).toBeInTheDocument();
   });

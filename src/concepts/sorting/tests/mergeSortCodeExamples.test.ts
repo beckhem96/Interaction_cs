@@ -6,10 +6,10 @@ describe("mergeSortCodeExamples", () => {
   it("provides Merge Sort examples for the required languages", () => {
     expect(mergeSortCodeExamples.map((example) => example.language)).toEqual([
       "C",
-      "Java",
       "C++",
-      "JavaScript",
-      "Python"
+      "Java",
+      "Python",
+      "JavaScript"
     ]);
   });
 
