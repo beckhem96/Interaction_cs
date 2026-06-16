@@ -1632,6 +1632,18 @@ button:disabled {
   background: #6f5bb8;
 }
 
+.legend-swatch.is-red-node {
+  background: #b9404a;
+}
+
+.legend-swatch.is-black-node {
+  background: #172026;
+}
+
+.legend-swatch.is-recolored {
+  background: #c28a1d;
+}
+
 .legend-swatch.is-removing {
   background: #b9404a;
 }
@@ -1813,6 +1825,22 @@ button:disabled {
   animation: tree-node-successor 780ms cubic-bezier(0.18, 0.9, 0.2, 1);
 }
 
+.tree-node.is-red circle {
+  fill: #fde7ea;
+  stroke: #b9404a;
+}
+
+.tree-node.is-black circle {
+  fill: #172026;
+  stroke: #172026;
+}
+
+.tree-node.is-recolored circle {
+  stroke: #c28a1d;
+  stroke-width: 4;
+  animation: tree-node-recolor 780ms ease;
+}
+
 .tree-node.is-rotated circle {
   fill: #eeeafb;
   stroke: #6f5bb8;
@@ -1832,6 +1860,10 @@ button:disabled {
 .tree-node.is-successor text,
 .tree-node.is-visited text {
   fill: #11181c;
+}
+
+.tree-node.is-black text {
+  fill: #ffffff;
 }
 
 .tree-empty-label {
@@ -1912,6 +1944,17 @@ button:disabled {
 
   100% {
     transform: translateY(0) scale(1);
+  }
+}
+
+@keyframes tree-node-recolor {
+  0%,
+  100% {
+    transform: scale(1);
+  }
+
+  50% {
+    transform: scale(1.17);
   }
 }
 

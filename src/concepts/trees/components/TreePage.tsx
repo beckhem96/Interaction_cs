@@ -16,9 +16,14 @@ import {
   BST_DELETE_TARGETS,
   generateBinarySearchTreeDeletionTrace
 } from "../algorithms/binarySearchTreeDeletion";
+import {
+  RED_BLACK_INSERT_VALUES,
+  generateRedBlackInsertionTrace
+} from "../algorithms/redBlackTree";
 import { avlTreeCodeExample } from "../code/avlTreeExample";
 import { binarySearchTreeDeletionCodeExample } from "../code/binarySearchTreeDeletionExample";
 import { binarySearchTreeCodeExample } from "../code/binarySearchTreeExample";
+import { redBlackTreeCodeExample } from "../code/redBlackTreeExample";
 import type { TreeEdgeState, TreeNodeState, TreeTraceState } from "../types";
 
 const bstPseudoCode = [
@@ -55,6 +60,17 @@ const deletePseudoCode = [
   "남은 트리가 BST 규칙을 유지하는지 확인한다."
 ];
 
+const redBlackPseudoCode = [
+  "새 노드를 빨간색으로 BST 위치에 삽입한다.",
+  "부모가 검정이면 Red-Black 규칙을 만족한다.",
+  "부모와 삼촌이 빨강이면 부모와 삼촌을 검정, 조부모를 빨강으로 바꾼다.",
+  "조부모로 올라가 같은 규칙을 반복한다.",
+  "부모와 새 노드가 꺾인 모양이면 먼저 한 번 회전한다.",
+  "부모를 검정, 조부모를 빨강으로 바꾼다.",
+  "조부모를 기준으로 회전해 빨간 노드 연속을 제거한다.",
+  "루트가 항상 검정인지 확인한다."
+];
+
 const treeConcepts = [
   {
     id: "bst",
@@ -79,6 +95,18 @@ const treeConcepts = [
     trace: generateAvlRotationTrace(),
     pseudoCode: avlPseudoCode,
     codeExample: avlTreeCodeExample
+  },
+  {
+    id: "red-black",
+    title: "Red-Black 삽입",
+    eyebrow: "균형 이진 탐색 트리",
+    intro:
+      "Red-Black 트리가 새 노드를 빨간색으로 넣은 뒤 재색칠과 회전으로 균형 규칙을 회복하는 과정을 단계별로 확인합니다.",
+    inputSummary: `삽입 값: [${RED_BLACK_INSERT_VALUES.join(", ")}] · 포함 복구: 재색칠, LL, LR`,
+    diagramLabel: "Red-Black 트리 상태",
+    trace: generateRedBlackInsertionTrace(),
+    pseudoCode: redBlackPseudoCode,
+    codeExample: redBlackTreeCodeExample
   },
   {
     id: "delete",
@@ -196,6 +224,18 @@ export function TreePage() {
               <span className="legend-item">
                 <span className="legend-swatch is-rotated" />
                 회전
+              </span>
+              <span className="legend-item">
+                <span className="legend-swatch is-red-node" />
+                빨강
+              </span>
+              <span className="legend-item">
+                <span className="legend-swatch is-black-node" />
+                검정
+              </span>
+              <span className="legend-item">
+                <span className="legend-swatch is-recolored" />
+                색 변경
               </span>
               <span className="legend-item">
                 <span className="legend-swatch is-removing" />
@@ -390,7 +430,7 @@ function TreeDiagram({ label, state }: TreeDiagramProps) {
         <g className="tree-nodes">
           {state.nodes.map((node) => (
             <g
-              aria-label={`${node.value} 노드`}
+              aria-label={getNodeAriaLabel(node)}
               className={getNodeClassName(node, state)}
               key={node.id}
               transform={`translate(${node.x} ${node.y})`}
@@ -417,6 +457,14 @@ function TreeDiagram({ label, state }: TreeDiagramProps) {
 
 function getNodeClassName(node: TreeNodeState, state: TreeTraceState): string {
   const classNames = ["tree-node"];
+
+  if (node.color === "red") {
+    classNames.push("is-red");
+  }
+
+  if (node.color === "black") {
+    classNames.push("is-black");
+  }
 
   if (node.depth === 0) {
     classNames.push("is-root");
@@ -454,11 +502,27 @@ function getNodeClassName(node: TreeNodeState, state: TreeTraceState): string {
     classNames.push("is-successor");
   }
 
+  if (state.recoloredNodeIds?.includes(node.id)) {
+    classNames.push("is-recolored");
+  }
+
   if (state.rotatedNodeIds?.includes(node.id)) {
     classNames.push("is-rotated");
   }
 
   return classNames.join(" ");
+}
+
+function getNodeAriaLabel(node: TreeNodeState): string {
+  if (node.color === "red") {
+    return `${node.value} 빨간 노드`;
+  }
+
+  if (node.color === "black") {
+    return `${node.value} 검정 노드`;
+  }
+
+  return `${node.value} 노드`;
 }
 
 function getEdgeClassName(edge: TreeEdgeState, state: TreeTraceState): string {

@@ -12,11 +12,14 @@ export type TreeMotion =
   | "insert"
   | "balance"
   | "rotate"
+  | "recolor"
   | "remove"
   | "replace"
   | "found"
   | "visit"
   | "complete";
+
+export type TreeNodeColor = "red" | "black";
 
 export type TreeNodeState = {
   id: string;
@@ -24,6 +27,7 @@ export type TreeNodeState = {
   x: number;
   y: number;
   depth: number;
+  color?: TreeNodeColor;
   leftId?: string;
   rightId?: string;
 };
@@ -48,6 +52,7 @@ export type TreeTraceState = {
   foundNodeId?: string;
   removedNodeId?: string;
   successorNodeId?: string;
+  recoloredNodeIds?: string[];
   rotatedNodeIds?: string[];
   targetValue?: number;
   rotationLabel?: string;

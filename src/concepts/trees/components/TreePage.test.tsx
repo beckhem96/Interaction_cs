@@ -5,6 +5,7 @@ import { describe, expect, it } from "vitest";
 import { generateAvlRotationTrace } from "../algorithms/avlTree";
 import { generateBinarySearchTreeTrace } from "../algorithms/binarySearchTree";
 import { generateBinarySearchTreeDeletionTrace } from "../algorithms/binarySearchTreeDeletion";
+import { generateRedBlackInsertionTrace } from "../algorithms/redBlackTree";
 import { TreePage } from "./TreePage";
 
 describe("TreePage", () => {
@@ -154,6 +155,56 @@ describe("TreePage", () => {
     expect(
       screen.getByRole("listitem", {
         name: "현재 코드 15: node.value = successor.value;"
+      })
+    ).toBeInTheDocument();
+  });
+
+  it("switches to Red-Black insertion mode and highlights recoloring", () => {
+    const { container } = render(
+      <MemoryRouter>
+        <TreePage />
+      </MemoryRouter>
+    );
+
+    fireEvent.click(screen.getByRole("tab", { name: "Red-Black 삽입" }));
+
+    expect(
+      screen.getByRole("heading", { name: "Red-Black 삽입" })
+    ).toBeInTheDocument();
+    expect(screen.getByText(/포함 복구: 재색칠, LL, LR/)).toBeInTheDocument();
+    expect(
+      screen.getByRole("img", { name: "Red-Black 트리 상태" })
+    ).toBeInTheDocument();
+
+    const trace = generateRedBlackInsertionTrace();
+    const recolorIndex = trace.findIndex(
+      (step) => step.id === "rb-recolor-12-31-41-38"
+    );
+    const rotationIndex = trace.findIndex(
+      (step) => step.id === "rb-rotation-19-LR-2"
+    );
+    const slider = screen.getByRole("slider", { name: "트리 단계 슬라이더" });
+
+    fireEvent.change(slider, { target: { value: String(recolorIndex) } });
+
+    expect(screen.getAllByText("부모와 삼촌 재색칠").length).toBeGreaterThan(0);
+    expect(container.querySelector(".tree-node.is-recolored")).not.toBeNull();
+    expect(container.querySelector(".tree-node.is-red")).not.toBeNull();
+    expect(container.querySelector(".tree-node.is-black")).not.toBeNull();
+    expect(screen.getByLabelText("38 빨간 노드")).toBeInTheDocument();
+    expect(
+      screen.getByRole("listitem", {
+        name: "현재 코드 9: parent.color = \"black\";"
+      })
+    ).toBeInTheDocument();
+
+    fireEvent.change(slider, { target: { value: String(rotationIndex) } });
+
+    expect(screen.getAllByText("LR 2차 회전 적용").length).toBeGreaterThan(0);
+    expect(container.querySelector(".tree-node.is-rotated")).not.toBeNull();
+    expect(
+      screen.getByRole("listitem", {
+        name: "현재 코드 20: rotateGrandparent(node.parent.parent);"
       })
     ).toBeInTheDocument();
   });

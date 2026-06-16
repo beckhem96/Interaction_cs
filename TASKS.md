@@ -98,6 +98,52 @@ Each tree page should show:
 * Rotation type when applicable
 * Explanation of why the next operation occurs
 
+## Expanded Learning Backlog
+
+### Trees
+
+Additional tree topics:
+
+* Red-Black Tree insertion and recoloring
+* B-Tree / B+Tree search and split
+* Heap insertion and deletion
+* Trie insertion and prefix search
+* Segment Tree range query and update
+
+### Graph Data Structures
+
+Graph representations and properties:
+
+* Directed and undirected graph
+* Weighted graph
+* DAG (Directed Acyclic Graph)
+* Bipartite graph
+
+### Graph Algorithms
+
+Traversal and optimization algorithms:
+
+* DFS
+* BFS
+* Dijkstra
+* Bellman-Ford
+* Floyd-Warshall
+* Kruskal
+* Prim
+* Topological Sort
+* Tarjan / Kosaraju
+
+### Coding Test Essentials
+
+Core algorithm topics:
+
+* Heap Sort
+* Binary Search
+* Dynamic Programming
+* Greedy
+* Backtracking
+* KMP string matching
+
 ## Out of Scope for MVP
 
 * User login
@@ -118,4 +164,3 @@ MVP is complete when:
 * BST insertion is visualized step by step
 * Shared StepController is reused across all three domains
 * Build and tests pass
-
