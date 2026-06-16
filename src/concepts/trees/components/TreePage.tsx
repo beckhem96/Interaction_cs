@@ -20,9 +20,14 @@ import {
   RED_BLACK_INSERT_VALUES,
   generateRedBlackInsertionTrace
 } from "../algorithms/redBlackTree";
+import {
+  HEAP_INSERT_VALUES,
+  generateHeapTrace
+} from "../algorithms/heapTree";
 import { avlTreeCodeExample } from "../code/avlTreeExample";
 import { binarySearchTreeDeletionCodeExample } from "../code/binarySearchTreeDeletionExample";
 import { binarySearchTreeCodeExample } from "../code/binarySearchTreeExample";
+import { heapTreeCodeExample } from "../code/heapTreeExample";
 import { redBlackTreeCodeExample } from "../code/redBlackTreeExample";
 import type { TreeEdgeState, TreeNodeState, TreeTraceState } from "../types";
 
@@ -71,6 +76,17 @@ const redBlackPseudoCode = [
   "루트가 항상 검정인지 확인한다."
 ];
 
+const heapPseudoCode = [
+  "새 값을 배열 끝에 넣어 완전 이진트리 모양을 유지한다.",
+  "새 값과 부모 값을 비교한다.",
+  "부모가 더 크거나 같으면 삽입 복구를 끝낸다.",
+  "새 값이 더 크면 부모와 교환하며 위로 올린다.",
+  "최대값 삭제는 루트 값을 제거 대상으로 표시한다.",
+  "마지막 값을 루트로 옮겨 빈 자리를 메운다.",
+  "루트에서 더 큰 자식과 비교하며 아래로 내려보낸다.",
+  "모든 부모가 자식보다 크거나 같은지 확인한다."
+];
+
 const treeConcepts = [
   {
     id: "bst",
@@ -107,6 +123,18 @@ const treeConcepts = [
     trace: generateRedBlackInsertionTrace(),
     pseudoCode: redBlackPseudoCode,
     codeExample: redBlackTreeCodeExample
+  },
+  {
+    id: "heap",
+    title: "최대 힙",
+    eyebrow: "완전 이진트리",
+    intro:
+      "최대 힙이 배열 끝에 값을 넣고 bubble-up으로 부모와 교환한 뒤, 루트 삭제 후 heapify-down으로 힙 속성을 회복하는 과정을 확인합니다.",
+    inputSummary: `삽입 값: [${HEAP_INSERT_VALUES.join(", ")}] · 삭제: extractMax`,
+    diagramLabel: "최대 힙 트리 상태",
+    trace: generateHeapTrace(),
+    pseudoCode: heapPseudoCode,
+    codeExample: heapTreeCodeExample
   },
   {
     id: "delete",
@@ -196,7 +224,12 @@ export function TreePage() {
               </span>
             </div>
 
-            <TreeDiagram label={activeConcept.diagramLabel} state={currentStep.state} />
+            <TreeDiagram
+              label={activeConcept.diagramLabel}
+              state={currentStep.state}
+            />
+
+            <HeapArrayStrip state={currentStep.state} />
 
             <div className="stage-state-list" aria-label="현재 트리 단계 요약">
               {(currentStep.state.summaryItems ?? []).map((item) => (
@@ -224,6 +257,10 @@ export function TreePage() {
               <span className="legend-item">
                 <span className="legend-swatch is-rotated" />
                 회전
+              </span>
+              <span className="legend-item">
+                <span className="legend-swatch is-swapping" />
+                교환
               </span>
               <span className="legend-item">
                 <span className="legend-swatch is-red-node" />
@@ -506,8 +543,68 @@ function getNodeClassName(node: TreeNodeState, state: TreeTraceState): string {
     classNames.push("is-recolored");
   }
 
+  if (state.swappedNodeIds?.includes(node.id)) {
+    classNames.push("is-swapping");
+  }
+
   if (state.rotatedNodeIds?.includes(node.id)) {
     classNames.push("is-rotated");
+  }
+
+  return classNames.join(" ");
+}
+
+function HeapArrayStrip({ state }: { state: TreeTraceState }) {
+  if (state.heapArrayValues === undefined) {
+    return null;
+  }
+
+  return (
+    <div className="heap-array-strip" aria-label="힙 배열 상태">
+      <span className="heap-array-title">배열</span>
+      <div className="heap-array-cells">
+        {state.heapArrayValues.map((value, index) => {
+          const nodeId = `heap-index-${index}`;
+
+          return (
+            <span
+              className={getHeapArrayCellClassName(nodeId, state)}
+              key={`${nodeId}-${value}`}
+            >
+              <strong>{index}</strong>
+              <span>{value}</span>
+            </span>
+          );
+        })}
+      </div>
+    </div>
+  );
+}
+
+function getHeapArrayCellClassName(
+  nodeId: string,
+  state: TreeTraceState
+): string {
+  const classNames = ["heap-array-cell"];
+
+  if (state.activeNodeId === nodeId) {
+    classNames.push("is-active");
+  }
+
+  if (state.comparedNodeId === nodeId) {
+    classNames.push("is-compared");
+  }
+
+  if (state.insertedNodeId === nodeId) {
+    classNames.push("is-inserted");
+  }
+
+  if (state.removedNodeId === nodeId) {
+    classNames.push("is-removing");
+  }
+
+  if (state.swappedNodeIds?.includes(nodeId)) {
+    classNames.push("is-swapping");
   }
 
   return classNames.join(" ");

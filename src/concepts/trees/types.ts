@@ -13,6 +13,7 @@ export type TreeMotion =
   | "balance"
   | "rotate"
   | "recolor"
+  | "swap"
   | "remove"
   | "replace"
   | "found"
@@ -54,12 +55,14 @@ export type TreeTraceState = {
   successorNodeId?: string;
   recoloredNodeIds?: string[];
   rotatedNodeIds?: string[];
+  swappedNodeIds?: string[];
   targetValue?: number;
   rotationLabel?: string;
   balanceFactors?: Record<string, number>;
   pathNodeIds?: string[];
   visitedNodeIds?: string[];
   traversalValues?: number[];
+  heapArrayValues?: number[];
   edges: TreeEdgeState[];
   viewport: {
     width: number;

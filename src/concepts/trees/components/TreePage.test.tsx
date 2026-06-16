@@ -5,6 +5,7 @@ import { describe, expect, it } from "vitest";
 import { generateAvlRotationTrace } from "../algorithms/avlTree";
 import { generateBinarySearchTreeTrace } from "../algorithms/binarySearchTree";
 import { generateBinarySearchTreeDeletionTrace } from "../algorithms/binarySearchTreeDeletion";
+import { generateHeapTrace } from "../algorithms/heapTree";
 import { generateRedBlackInsertionTrace } from "../algorithms/redBlackTree";
 import { TreePage } from "./TreePage";
 
@@ -205,6 +206,56 @@ describe("TreePage", () => {
     expect(
       screen.getByRole("listitem", {
         name: "현재 코드 20: rotateGrandparent(node.parent.parent);"
+      })
+    ).toBeInTheDocument();
+  });
+
+  it("switches to max heap mode and highlights swaps in the tree and array", () => {
+    const { container } = render(
+      <MemoryRouter>
+        <TreePage />
+      </MemoryRouter>
+    );
+
+    fireEvent.click(screen.getByRole("tab", { name: "최대 힙" }));
+
+    expect(screen.getByRole("heading", { name: "최대 힙" })).toBeInTheDocument();
+    expect(screen.getByText(/삭제: extractMax/)).toBeInTheDocument();
+    expect(
+      screen.getByRole("img", { name: "최대 힙 트리 상태" })
+    ).toBeInTheDocument();
+    expect(screen.getByLabelText("힙 배열 상태")).toBeInTheDocument();
+
+    const trace = generateHeapTrace();
+    const bubbleUpIndex = trace.findIndex(
+      (step) => step.id === "heap-swap-up-50-1-0"
+    );
+    const heapifyDownIndex = trace.findIndex(
+      (step) => step.id === "heap-swap-down-32-1-3"
+    );
+    const slider = screen.getByRole("slider", { name: "트리 단계 슬라이더" });
+
+    fireEvent.change(slider, { target: { value: String(bubbleUpIndex) } });
+
+    expect(screen.getAllByText("50를 부모와 교환").length).toBeGreaterThan(0);
+    expect(container.querySelector(".tree-node.is-swapping")).not.toBeNull();
+    expect(container.querySelector(".heap-array-cell.is-swapping")).not.toBeNull();
+    expect(
+      screen.getByRole("listitem", {
+        name: "현재 코드 7: swap(heap, parent, index);"
+      })
+    ).toBeInTheDocument();
+
+    fireEvent.change(slider, { target: { value: String(heapifyDownIndex) } });
+
+    expect(
+      screen.getAllByText("32를 더 큰 자식과 교환").length
+    ).toBeGreaterThan(0);
+    expect(container.querySelector(".tree-node.is-swapping")).not.toBeNull();
+    expect(container.querySelector(".heap-array-cell.is-swapping")).not.toBeNull();
+    expect(
+      screen.getByRole("listitem", {
+        name: "현재 코드 19: swap(heap, index, child);"
       })
     ).toBeInTheDocument();
   });

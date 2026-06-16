@@ -701,6 +701,7 @@ function createSummaryItems({
     balance: "규칙 확인",
     rotate: "회전",
     recolor: "색 변경",
+    swap: "교환",
     remove: "제거",
     replace: "대체",
     found: "발견",
