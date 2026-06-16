@@ -24,7 +24,7 @@ const categories: CategoryCard[] = [
     title: "트리 자료구조",
     description: "탐색 경로와 노드 변화로 BST와 AVL 연산을 이해합니다.",
     href: "/trees",
-    status: "MVP 후속 예정"
+    status: "BST 삽입과 탐색"
   }
 ];
 
