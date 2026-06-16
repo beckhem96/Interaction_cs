@@ -1656,6 +1656,14 @@ button:disabled {
   background: #3f7d58;
 }
 
+.legend-swatch.is-range {
+  background: #2f6fbb;
+}
+
+.legend-swatch.is-updated {
+  background: #c94f37;
+}
+
 .legend-swatch.is-minimum,
 .legend-swatch.is-pivot {
   background: #c28a1d;
@@ -1784,6 +1792,67 @@ button:disabled {
   background: #fde7ea;
 }
 
+.segment-array-strip {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px 10px;
+  align-items: center;
+  padding: 10px 12px;
+  border: 1px solid #d9e0e4;
+  border-radius: 8px;
+  background: #fbfcfc;
+}
+
+.segment-array-title,
+.segment-array-note {
+  color: #42635b;
+  font-size: 0.78rem;
+  font-weight: 900;
+}
+
+.segment-array-note {
+  padding: 4px 7px;
+  border-radius: 999px;
+  background: #edf5ff;
+}
+
+.segment-array-cells {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+}
+
+.segment-array-cell {
+  display: inline-grid;
+  grid-template-columns: auto auto;
+  gap: 5px;
+  align-items: center;
+  min-width: 44px;
+  padding: 6px 8px;
+  border: 1px solid #c8d2d7;
+  border-radius: 6px;
+  background: #ffffff;
+  color: #172026;
+  font-weight: 900;
+}
+
+.segment-array-cell strong {
+  color: #6a767d;
+  font-size: 0.7rem;
+}
+
+.segment-array-cell.is-query {
+  border-color: #2f6fbb;
+  background: #edf5ff;
+}
+
+.segment-array-cell.is-active,
+.segment-array-cell.is-updated {
+  border-color: #c94f37;
+  background: #f9e6e1;
+  animation: tree-node-swap 780ms ease;
+}
+
 .tree-visual-scroll {
   overflow: auto;
   border: 1px solid #d9e0e4;
@@ -1845,6 +1914,12 @@ button:disabled {
   fill: #6a767d;
   font-size: 0.7rem;
   font-weight: 800;
+}
+
+.tree-node .tree-node-note {
+  fill: #6a767d;
+  font-size: 0.66rem;
+  font-weight: 900;
 }
 
 .tree-node.is-root circle {

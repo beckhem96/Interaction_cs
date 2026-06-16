@@ -7,6 +7,7 @@ import { generateBinarySearchTreeTrace } from "../algorithms/binarySearchTree";
 import { generateBinarySearchTreeDeletionTrace } from "../algorithms/binarySearchTreeDeletion";
 import { generateHeapTrace } from "../algorithms/heapTree";
 import { generateRedBlackInsertionTrace } from "../algorithms/redBlackTree";
+import { generateSegmentTreeTrace } from "../algorithms/segmentTree";
 import { generateTrieTrace } from "../algorithms/trieTree";
 import { TreePage } from "./TreePage";
 
@@ -292,5 +293,65 @@ describe("TreePage", () => {
         name: "현재 코드 18: return collectWords(node, prefix);"
       })
     ).toBeInTheDocument();
+  });
+
+  it("switches to Segment Tree mode and highlights range query and update", () => {
+    const { container } = render(
+      <MemoryRouter>
+        <TreePage />
+      </MemoryRouter>
+    );
+
+    fireEvent.click(screen.getByRole("tab", { name: "세그먼트 트리" }));
+
+    expect(
+      screen.getByRole("heading", { name: "세그먼트 트리" })
+    ).toBeInTheDocument();
+    expect(screen.getByText(/query: \[2, 6\]/)).toBeInTheDocument();
+    expect(
+      screen.getByRole("img", { name: "세그먼트 트리 상태" })
+    ).toBeInTheDocument();
+    expect(screen.getByLabelText("세그먼트 배열 상태")).toBeInTheDocument();
+
+    const trace = generateSegmentTreeTrace();
+    const initialQueryIndex = trace.findIndex(
+      (step) => step.id === "segment-query-initial-combine-0-7"
+    );
+    const updateIndex = trace.findIndex(
+      (step) => step.id === "segment-update-leaf-3"
+    );
+    const updatedQueryIndex = trace.findIndex(
+      (step) => step.id === "segment-query-after-update-combine-0-7"
+    );
+    const slider = screen.getByRole("slider", { name: "트리 단계 슬라이더" });
+
+    fireEvent.change(slider, { target: { value: String(initialQueryIndex) } });
+
+    expect(screen.getAllByText("[0, 7] 부분 결과 27 결합").length).toBeGreaterThan(0);
+    expect(screen.getByText("구간 합 결과: 27")).toBeInTheDocument();
+    expect(container.querySelector(".tree-node.is-found")).not.toBeNull();
+    expect(container.querySelector(".segment-array-cell.is-query")).not.toBeNull();
+    expect(
+      screen.getByRole("listitem", {
+        name: "현재 코드 16: return query(node * 2, left, mid, ql, qr)"
+      })
+    ).toBeInTheDocument();
+
+    fireEvent.change(slider, { target: { value: String(updateIndex) } });
+
+    expect(
+      screen.getAllByText("인덱스 3 값을 10으로 갱신").length
+    ).toBeGreaterThan(0);
+    expect(screen.getByText("구간 합 결과: 10")).toBeInTheDocument();
+    expect(container.querySelector(".segment-array-cell.is-updated")).not.toBeNull();
+    expect(
+      screen.getByRole("listitem", {
+        name: "현재 코드 22: tree[node] = value;"
+      })
+    ).toBeInTheDocument();
+
+    fireEvent.change(slider, { target: { value: String(updatedQueryIndex) } });
+
+    expect(screen.getByText("구간 합 결과: 34")).toBeInTheDocument();
   });
 });

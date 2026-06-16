@@ -26,6 +26,7 @@ export type TreeNodeState = {
   id: string;
   value: number;
   label?: string;
+  subLabel?: string;
   x: number;
   y: number;
   depth: number;
@@ -67,6 +68,14 @@ export type TreeTraceState = {
   traversalValues?: number[];
   wordResults?: string[];
   heapArrayValues?: number[];
+  segmentArrayValues?: number[];
+  segmentQueryRange?: readonly [number, number];
+  segmentResult?: number;
+  segmentUpdate?: {
+    index: number;
+    value: number;
+  };
+  activeArrayIndices?: number[];
   edges: TreeEdgeState[];
   viewport: {
     width: number;

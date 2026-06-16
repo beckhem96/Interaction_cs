@@ -21,6 +21,12 @@ import {
   generateRedBlackInsertionTrace
 } from "../algorithms/redBlackTree";
 import {
+  SEGMENT_TREE_QUERY_RANGE,
+  SEGMENT_TREE_UPDATE,
+  SEGMENT_TREE_VALUES,
+  generateSegmentTreeTrace
+} from "../algorithms/segmentTree";
+import {
   HEAP_INSERT_VALUES,
   generateHeapTrace
 } from "../algorithms/heapTree";
@@ -34,6 +40,7 @@ import { binarySearchTreeDeletionCodeExample } from "../code/binarySearchTreeDel
 import { binarySearchTreeCodeExample } from "../code/binarySearchTreeExample";
 import { heapTreeCodeExample } from "../code/heapTreeExample";
 import { redBlackTreeCodeExample } from "../code/redBlackTreeExample";
+import { segmentTreeCodeExample } from "../code/segmentTreeExample";
 import { trieTreeCodeExample } from "../code/trieTreeExample";
 import type { TreeEdgeState, TreeNodeState, TreeTraceState } from "../types";
 
@@ -104,6 +111,19 @@ const triePseudoCode = [
   "공유 prefix와 검색 결과를 확인한다."
 ];
 
+const segmentTreePseudoCode = [
+  "배열 전체 범위를 루트 구간으로 둔다.",
+  "리프 구간이면 배열 값을 노드 합으로 저장한다.",
+  "왼쪽과 오른쪽 자식 합을 더해 부모 구간 합을 만든다.",
+  "구간 질의는 현재 노드와 질의 범위의 겹침을 확인한다.",
+  "겹치지 않으면 0을 반환한다.",
+  "완전히 포함되면 저장된 구간 합을 그대로 사용한다.",
+  "부분적으로 겹치면 양쪽 결과를 더한다.",
+  "점 갱신은 대상 인덱스가 있는 리프까지 내려간다.",
+  "리프 값을 바꾼다.",
+  "되돌아오며 부모 구간 합을 다시 계산한다."
+];
+
 const treeConcepts = [
   {
     id: "bst",
@@ -164,6 +184,18 @@ const treeConcepts = [
     trace: generateTrieTrace(),
     pseudoCode: triePseudoCode,
     codeExample: trieTreeCodeExample
+  },
+  {
+    id: "segment-tree",
+    title: "세그먼트 트리",
+    eyebrow: "구간 합 트리",
+    intro:
+      "세그먼트 트리가 배열을 구간 합 노드로 나누고, range query와 point update를 O(log n) 경로로 처리하는 과정을 확인합니다.",
+    inputSummary: `배열: [${SEGMENT_TREE_VALUES.join(", ")}] · query: [${SEGMENT_TREE_QUERY_RANGE.join(", ")}] · update: index ${SEGMENT_TREE_UPDATE.index} = ${SEGMENT_TREE_UPDATE.value}`,
+    diagramLabel: "세그먼트 트리 상태",
+    trace: generateSegmentTreeTrace(),
+    pseudoCode: segmentTreePseudoCode,
+    codeExample: segmentTreeCodeExample
   },
   {
     id: "delete",
@@ -259,6 +291,7 @@ export function TreePage() {
             />
 
             <HeapArrayStrip state={currentStep.state} />
+            <SegmentArrayStrip state={currentStep.state} />
 
             <div className="stage-state-list" aria-label="현재 트리 단계 요약">
               {(currentStep.state.summaryItems ?? []).map((item) => (
@@ -314,6 +347,14 @@ export function TreePage() {
               <span className="legend-item">
                 <span className="legend-swatch is-terminal" />
                 단어 끝
+              </span>
+              <span className="legend-item">
+                <span className="legend-swatch is-range" />
+                구간
+              </span>
+              <span className="legend-item">
+                <span className="legend-swatch is-updated" />
+                갱신
               </span>
               <span className="legend-item">
                 <span className="legend-swatch is-sorted" />
@@ -443,6 +484,11 @@ export function TreePage() {
               검색 결과: {currentStep.state.wordResults.join(", ")}
             </p>
           ) : null}
+          {currentStep.state.segmentResult !== undefined ? (
+            <p className="tree-traversal-output">
+              구간 합 결과: {currentStep.state.segmentResult}
+            </p>
+          ) : null}
 
           <div className="step-controls" aria-label="트리 단계 컨트롤">
             <button
@@ -515,6 +561,11 @@ function TreeDiagram({ label, state }: TreeDiagramProps) {
               {state.balanceFactors?.[node.id] !== undefined ? (
                 <text className="tree-balance-label" dy="39">
                   BF {state.balanceFactors[node.id]}
+                </text>
+              ) : null}
+              {node.subLabel !== undefined ? (
+                <text className="tree-node-note" dy="39">
+                  {node.subLabel}
                 </text>
               ) : null}
             </g>
@@ -623,6 +674,39 @@ function HeapArrayStrip({ state }: { state: TreeTraceState }) {
   );
 }
 
+function SegmentArrayStrip({ state }: { state: TreeTraceState }) {
+  if (state.segmentArrayValues === undefined) {
+    return null;
+  }
+
+  return (
+    <div className="segment-array-strip" aria-label="세그먼트 배열 상태">
+      <span className="segment-array-title">원본 배열</span>
+      <div className="segment-array-cells">
+        {state.segmentArrayValues.map((value, index) => (
+          <span
+            className={getSegmentArrayCellClassName(index, state)}
+            key={`segment-array-${index}`}
+          >
+            <strong>{index}</strong>
+            <span>{value}</span>
+          </span>
+        ))}
+      </div>
+      {state.segmentQueryRange !== undefined ? (
+        <span className="segment-array-note">
+          query [{state.segmentQueryRange.join(", ")}]
+        </span>
+      ) : null}
+      {state.segmentUpdate !== undefined ? (
+        <span className="segment-array-note">
+          update index {state.segmentUpdate.index} = {state.segmentUpdate.value}
+        </span>
+      ) : null}
+    </div>
+  );
+}
+
 function getHeapArrayCellClassName(
   nodeId: string,
   state: TreeTraceState
@@ -652,9 +736,35 @@ function getHeapArrayCellClassName(
   return classNames.join(" ");
 }
 
+function getSegmentArrayCellClassName(
+  index: number,
+  state: TreeTraceState
+): string {
+  const classNames = ["segment-array-cell"];
+  const [queryLeft, queryRight] = state.segmentQueryRange ?? [-1, -1];
+
+  if (queryLeft <= index && index <= queryRight) {
+    classNames.push("is-query");
+  }
+
+  if (state.activeArrayIndices?.includes(index)) {
+    classNames.push("is-active");
+  }
+
+  if (state.segmentUpdate?.index === index) {
+    classNames.push("is-updated");
+  }
+
+  return classNames.join(" ");
+}
+
 function getNodeAriaLabel(node: TreeNodeState): string {
   if (node.label !== undefined) {
     return `${node.label} 노드`;
+  }
+
+  if (node.subLabel !== undefined) {
+    return `${node.value} ${node.subLabel} 노드`;
   }
 
   if (node.color === "red") {
