@@ -6,9 +6,22 @@ import type {
   TreeOperation,
   TreeTraceState
 } from "../types";
-import { createTreeCodeHighlights } from "./codeHighlights";
+import {
+  createTreeCodeHighlights,
+  type TreeCodeHighlightMap,
+} from "./codeHighlights";
 
 export const HEAP_INSERT_VALUES = [45, 32, 18, 27, 12, 9, 14, 50, 41];
+
+const heapTreeLineMap = {
+  "21": { Python: [18] },
+  "12,13": { Python: [10, 11] },
+  "13,14": { Python: [11, 12] },
+  "15": { Python: [13] },
+  "15,16,17": { Python: [13, 14, 15] },
+  "17": { Python: [15] },
+  "18,19": { Python: [16, 17] },
+} satisfies TreeCodeHighlightMap;
 
 type HeapStepOptions = {
   activeNodeId?: string;
@@ -179,7 +192,7 @@ function appendExtractMaxTrace(
       removedNodeId: getNodeId(0),
       targetValue: maxValue,
       pseudoCodeLine: 5,
-      codeLines: [11, 12]
+      codeLines: [12, 13]
     })
   );
 
@@ -338,7 +351,7 @@ function createStep({
       })
     },
     pseudoCodeLine,
-    codeLineHighlights: createTreeCodeHighlights(codeLines)
+    codeLineHighlights: createTreeCodeHighlights(codeLines, heapTreeLineMap)
   };
 }
 

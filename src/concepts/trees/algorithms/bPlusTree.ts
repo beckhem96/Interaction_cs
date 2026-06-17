@@ -6,11 +6,29 @@ import type {
   TreeOperation,
   TreeTraceState
 } from "../types";
-import { createTreeCodeHighlights } from "./codeHighlights";
+import {
+  createTreeCodeHighlights,
+  type TreeCodeHighlightMap,
+} from "./codeHighlights";
 
 export const BPLUS_TREE_INSERT_VALUES = [10, 20, 5, 6, 12, 30, 7, 17, 4, 3, 2];
 export const BPLUS_TREE_RANGE = [6, 20] as const;
 export const BPLUS_TREE_MAX_KEYS = 3;
+
+const bPlusTreeLineMap = {
+  "5,6,7,8,9": { Python: [5, 6, 7, 8, 9] },
+  "14,15": { Python: [12, 13] },
+  "16,17": { Python: [14, 15] },
+  "20,21": { Python: [17, 18] },
+  "23,24,31,32,33,34": { Python: [20, 21, 27, 28, 29, 30] },
+  "23,24,26": { Python: [20, 21, 23] },
+  "25,26": { Python: [22, 23] },
+  "37,38": { Python: [32, 33] },
+  "38": { Python: [33] },
+  "40,41": { Python: [35, 36] },
+  "42,43": { Python: [37, 38] },
+  "45": { Python: [39] },
+} satisfies TreeCodeHighlightMap;
 
 type MutableBPlusNode = {
   id: string;
@@ -160,7 +178,7 @@ function insertRecursive(
       pathNodeIds: currentPath,
       targetValue: value,
       pseudoCodeLine: node.leaf ? 3 : 4,
-      codeLines: node.leaf ? [13, 14, 15] : [20, 21]
+      codeLines: node.leaf ? [14, 15] : [20, 21]
     })
   );
 
@@ -494,7 +512,7 @@ function createStep({
       })
     },
     pseudoCodeLine,
-    codeLineHighlights: createTreeCodeHighlights(codeLines)
+    codeLineHighlights: createTreeCodeHighlights(codeLines, bPlusTreeLineMap)
   };
 }
 

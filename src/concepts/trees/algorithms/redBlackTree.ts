@@ -7,9 +7,22 @@ import type {
   TreeOperation,
   TreeTraceState
 } from "../types";
-import { createTreeCodeHighlights } from "./codeHighlights";
+import {
+  createTreeCodeHighlights,
+  type TreeCodeHighlightMap,
+} from "./codeHighlights";
 
 export const RED_BLACK_INSERT_VALUES = [41, 38, 31, 12, 19, 8];
+
+const redBlackTreeLineMap = {
+  "22": { Python: [19] },
+  "2,3,22": { Python: [2, 3, 19] },
+  "4,7": { Python: [4, 7] },
+  "8,9,10,11,12": { Python: [8, 9, 10, 11, 12] },
+  "15,16,17": { Python: [14, 15] },
+  "18,19": { Python: [16, 17] },
+  "20": { Python: [18] },
+} satisfies TreeCodeHighlightMap;
 
 type MutableRedBlackNode = {
   id: string;
@@ -480,7 +493,7 @@ function createStep({
       })
     },
     pseudoCodeLine,
-    codeLineHighlights: createTreeCodeHighlights(codeLines)
+    codeLineHighlights: createTreeCodeHighlights(codeLines, redBlackTreeLineMap)
   };
 }
 

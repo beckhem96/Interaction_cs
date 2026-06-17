@@ -6,10 +6,24 @@ import type {
   TreeOperation,
   TreeTraceState
 } from "../types";
-import { createTreeCodeHighlights } from "./codeHighlights";
+import {
+  createTreeCodeHighlights,
+  type TreeCodeHighlightMap,
+} from "./codeHighlights";
 
 export const TRIE_WORDS = ["cat", "car", "cart", "dog", "dot"];
 export const TRIE_PREFIX_TARGET = "car";
+
+const trieTreeLineMap = {
+  "18": { Python: [14] },
+  "7": { Python: [6] },
+  "9": { Python: [7] },
+  "12,13": { Python: [9, 10] },
+  "14,15": { Python: [11, 12] },
+  "15": { Python: [12] },
+  "16": { Python: [13] },
+  "18,19": { Python: [14] },
+} satisfies TreeCodeHighlightMap;
 
 type MutableTrieNode = {
   id: string;
@@ -323,7 +337,7 @@ function createStep({
       })
     },
     pseudoCodeLine,
-    codeLineHighlights: createTreeCodeHighlights(codeLines)
+    codeLineHighlights: createTreeCodeHighlights(codeLines, trieTreeLineMap)
   };
 }
 

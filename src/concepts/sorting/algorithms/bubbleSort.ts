@@ -38,7 +38,7 @@ const codeLineHighlights = {
     C: [13],
     Java: [12],
     "C++": [14],
-    JavaScript: [13],
+    JavaScript: [14],
     Python: [9]
   }
 } satisfies Record<string, Record<string, number[]>>;

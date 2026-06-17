@@ -6,11 +6,27 @@ import type {
   TreeOperation,
   TreeTraceState
 } from "../types";
-import { createTreeCodeHighlights } from "./codeHighlights";
+import {
+  createTreeCodeHighlights,
+  type TreeCodeHighlightMap,
+} from "./codeHighlights";
 
 export const SEGMENT_TREE_VALUES = [5, 8, 6, 3, 7, 2, 9, 4];
 export const SEGMENT_TREE_QUERY_RANGE = [2, 6] as const;
 export const SEGMENT_TREE_UPDATE = { index: 3, value: 10 };
+
+const segmentTreeLineMap = {
+  "16,17": { Python: [14, 15] },
+  "6,7,8,9": { Python: [5, 6, 7, 8] },
+  "12": { Python: [10] },
+  "13,14": { Python: [11, 12] },
+  "13": { Python: [11] },
+  "14": { Python: [12] },
+  "20": { Python: [17] },
+  "25,26,27": { Python: [21, 22, 23] },
+  "21,22,23": { Python: [18, 19, 20] },
+  "28,29": { Python: [24, 25] },
+} satisfies TreeCodeHighlightMap;
 
 type SegmentNode = {
   id: string;
@@ -507,7 +523,7 @@ function createStep({
       })
     },
     pseudoCodeLine,
-    codeLineHighlights: createTreeCodeHighlights(codeLines)
+    codeLineHighlights: createTreeCodeHighlights(codeLines, segmentTreeLineMap)
   };
 }
 

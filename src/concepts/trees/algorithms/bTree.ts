@@ -6,11 +6,28 @@ import type {
   TreeOperation,
   TreeTraceState
 } from "../types";
-import { createTreeCodeHighlights } from "./codeHighlights";
+import {
+  createTreeCodeHighlights,
+  type TreeCodeHighlightMap,
+} from "./codeHighlights";
 
 export const BTREE_INSERT_VALUES = [10, 20, 5, 6, 12, 30, 7, 17];
 export const BTREE_SEARCH_TARGET = 17;
 export const BTREE_MAX_KEYS = 3;
+
+const bTreeLineMap = {
+  "37,38,39": { Python: [31, 32, 33] },
+  "7,8,10": { Python: [7, 8, 9] },
+  "25,26,27": { Python: [22, 23, 24] },
+  "29,34": { Python: [25, 29] },
+  "30,31": { Python: [26, 27] },
+  "32,34": { Python: [28, 29] },
+  "14,15,16": { Python: [12, 13, 14] },
+  "17,18,19,20,21": { Python: [15, 16, 17, 18, 19] },
+  "39": { Python: [33] },
+  "40": { Python: [34] },
+  "41": { Python: [35] },
+} satisfies TreeCodeHighlightMap;
 
 type MutableBTreeNode = {
   id: string;
@@ -485,7 +502,7 @@ function createStep({
       })
     },
     pseudoCodeLine,
-    codeLineHighlights: createTreeCodeHighlights(codeLines)
+    codeLineHighlights: createTreeCodeHighlights(codeLines, bTreeLineMap)
   };
 }
 

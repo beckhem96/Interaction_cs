@@ -6,10 +6,20 @@ import type {
   TreeOperation,
   TreeTraceState
 } from "../types";
-import { createTreeCodeHighlights } from "./codeHighlights";
+import {
+  createTreeCodeHighlights,
+  type TreeCodeHighlightMap,
+} from "./codeHighlights";
 
 export const BST_DEFAULT_VALUES = [42, 23, 61, 15, 31, 54, 72, 28, 37, 67];
 export const BST_SEARCH_TARGET = 37;
+
+const binarySearchTreeLineMap = {
+  "23": { Python: [20] },
+  "15,16": { Python: [13, 14] },
+  "15": { Python: [13] },
+  "22,23,24": { Python: [19, 20, 21] },
+} satisfies TreeCodeHighlightMap;
 
 type MutableTreeNode = {
   id: string;
@@ -338,7 +348,7 @@ function createStep({
       })
     },
     pseudoCodeLine,
-    codeLineHighlights: createTreeCodeHighlights(codeLines)
+    codeLineHighlights: createTreeCodeHighlights(codeLines, binarySearchTreeLineMap)
   };
 }
 

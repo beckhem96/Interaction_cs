@@ -6,9 +6,21 @@ import type {
   TreeOperation,
   TreeTraceState
 } from "../types";
-import { createTreeCodeHighlights } from "./codeHighlights";
+import {
+  createTreeCodeHighlights,
+  type TreeCodeHighlightMap,
+} from "./codeHighlights";
 
 export const AVL_ROTATION_VALUES = [30, 20, 10, 40, 50, 25, 27];
+
+const avlTreeLineMap = {
+  "21": { Python: [19] },
+  "10,11": { Python: [9, 10] },
+  "13": { Python: [12] },
+  "14": { Python: [13] },
+  "15,16,17": { Python: [14, 15, 16] },
+  "19,20,21": { Python: [17, 18, 19] },
+} satisfies TreeCodeHighlightMap;
 
 type MutableAvlNode = {
   id: string;
@@ -399,7 +411,7 @@ function createStep({
       })
     },
     pseudoCodeLine,
-    codeLineHighlights: createTreeCodeHighlights(codeLines)
+    codeLineHighlights: createTreeCodeHighlights(codeLines, avlTreeLineMap)
   };
 }
 

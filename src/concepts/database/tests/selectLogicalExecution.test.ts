@@ -1,104 +1,163 @@
 import { describe, expect, it } from "vitest";
 
-import {
-  generateSelectLogicalExecutionTrace,
-  selectLogicalExecutionQuery
-} from "../engine/selectLogicalExecution";
+import { generateSqlOperationExamples } from "../engine/selectLogicalExecution";
+import type { DatabaseRow } from "../types";
 
-describe("generateSelectLogicalExecutionTrace", () => {
-  it("generates SELECT logical execution steps with intermediate rows", () => {
-    const trace = generateSelectLogicalExecutionTrace();
+const getDatabaseRowKey = (row: DatabaseRow): string => {
+  if (row.cid !== undefined && row.status !== undefined && row.color !== undefined) {
+    return `${row.cid}:${row.status}:${row.color}`;
+  }
 
-    expect(trace.map((step) => step.state.phase)).toEqual([
-      "from",
+  if (row.cid !== undefined && row.status !== undefined && row.product_id !== undefined) {
+    return `${row.cid}:${row.status}:${row.product_id}`;
+  }
+
+  if (row.source !== undefined && row.email !== undefined) {
+    return `${row.source}:${row.email}`;
+  }
+
+  return String(
+    row.order_id ??
+      row.id ??
+      row.client_id ??
+      row.email ??
+      row.product ??
+      row.region ??
+      row.department ??
+      JSON.stringify(row),
+  );
+};
+
+describe("generateSqlOperationExamples", () => {
+  const examples = generateSqlOperationExamples();
+
+  it("returns independent operation examples with separate queries", () => {
+    expect(examples.map((example) => example.id)).toEqual([
+      "sub-query",
       "join",
-      "where",
-      "groupBy",
+      "group-by",
       "having",
-      "select",
       "union",
-      "orderBy",
-      "limit"
+      "order-limit",
     ]);
 
-    expect(trace[0]).toMatchObject({
-      id: "sql-from",
-      title: "FROM: 기준 테이블 읽기",
-      state: {
-        query: selectLogicalExecutionQuery,
-        rows: expect.arrayContaining([
-          expect.objectContaining({ region: "서울", amount: 120 })
-        ])
-      },
-      pseudoCodeLine: 1
-    });
+    expect(new Set(examples.map((example) => example.query)).size).toBe(examples.length);
+    expect(examples.find((example) => example.id === "sub-query")?.query).toContain("WHERE id IN");
+    expect(examples.find((example) => example.id === "join")?.query).toContain("JOIN customers");
+    expect(examples.find((example) => example.id === "group-by")?.query).not.toContain("JOIN");
+    expect(examples.find((example) => example.id === "having")?.query).toContain("HAVING");
+    expect(examples.find((example) => example.id === "union")?.query).toContain("UNION");
+    expect(examples.find((example) => example.id === "order-limit")?.query).toContain("LIMIT 3");
+  });
 
-    expect(trace[1]).toMatchObject({
-      id: "sql-join",
-      title: "JOIN: 지역 담당자 붙이기",
-      state: {
-        activeQueryLines: [3],
-        rows: expect.arrayContaining([
-          expect.objectContaining({
-            sale_id: 1,
-            region: "서울",
-            manager: "민서",
-            zone: "수도권"
-          })
-        ])
-      },
-      pseudoCodeLine: 2
-    });
+  it("keeps every trace multi-step and query line highlights in range", () => {
+    for (const example of examples) {
+      const queryLineCount = example.query.split("\n").length;
 
-    expect(trace[2]).toMatchObject({
-      title: "WHERE: 행 필터링",
-      state: {
-        activeQueryLines: [4],
-        rows: expect.not.arrayContaining([
-          expect.objectContaining({ amount: 35 }),
-          expect.objectContaining({ amount: 25 })
-        ])
-      },
-      pseudoCodeLine: 3
-    });
-    expect(trace[2].state.rows).toHaveLength(6);
+      expect(example.trace.length).toBeGreaterThanOrEqual(4);
 
-    expect(trace[3]).toMatchObject({
-      title: "GROUP BY: 담당자와 지역으로 묶기",
-      state: {
-        rows: [
-          { manager: "민서", region: "서울", order_count: 3, sum_amount: 255 },
-          { manager: "준호", region: "부산", order_count: 1, sum_amount: 150 },
-          { manager: "민서", region: "인천", order_count: 1, sum_amount: 95 },
-          { manager: "준호", region: "대구", order_count: 1, sum_amount: 70 }
-        ]
-      },
-      pseudoCodeLine: 4
-    });
+      for (const step of example.trace) {
+        expect(step.state.query).toBe(example.query);
+        expect(step.pseudoCodeLine).toBeGreaterThanOrEqual(1);
+        expect(step.pseudoCodeLine).toBeLessThanOrEqual(example.pseudoCode.length);
 
-    expect(trace[6]).toMatchObject({
-      title: "UNION ALL: 온라인 집계 붙이기",
-      state: {
-        activeQueryLines: [7, 8, 9, 10, 11],
-        rows: expect.arrayContaining([
-          { manager: "온라인", region: "온라인", total_amount: 180, order_count: 1 },
-          { manager: "온라인", region: "모바일", total_amount: 90, order_count: 1 },
-          { manager: "온라인", region: "파트너", total_amount: 130, order_count: 1 }
-        ])
-      },
-      pseudoCodeLine: 7
-    });
+        for (const line of step.state.activeQueryLines) {
+          expect(line).toBeGreaterThanOrEqual(1);
+          expect(line).toBeLessThanOrEqual(queryLineCount);
+        }
+      }
+    }
+  });
 
-    expect(trace.at(-1)).toMatchObject({
-      title: "LIMIT: 상위 결과만 남기기",
-      state: {
-        rows: [
-          { manager: "민서", region: "서울", total_amount: 255, order_count: 3 },
-          { manager: "온라인", region: "온라인", total_amount: 180, order_count: 1 },
-          { manager: "준호", region: "부산", total_amount: 150, order_count: 1 }
-        ]
-      },
-      pseudoCodeLine: 9
-    });
+  it("keeps SQL cell highlights pointed at real rows and columns", () => {
+    for (const example of examples) {
+      for (const step of example.trace) {
+        for (const highlight of step.state.cellHighlights ?? []) {
+          const rows =
+            highlight.scope === "input"
+              ? (step.state.inputTables ?? []).find((table) => table.name === highlight.tableName)
+                  ?.rows ?? []
+              : step.state.rows;
+          const columns = rows.length > 0 ? Object.keys(rows[0]!) : [];
+          const rowKeys = new Set(rows.map(getDatabaseRowKey));
+
+          expect(columns, `${step.id} has column ${highlight.column}`).toContain(highlight.column);
+          expect(rowKeys, `${step.id} has row ${highlight.rowKey}`).toContain(highlight.rowKey);
+        }
+      }
+    }
+  });
+
+  it("shows SUB QUERY with three inputs, cell highlights, and final client rows", () => {
+    const subQuery = examples.find((example) => example.id === "sub-query");
+
+    expect(subQuery).toBeDefined();
+    expect(subQuery?.trace).toHaveLength(7);
+    expect(subQuery?.trace[0].state.inputTables?.map((table) => table.name)).toEqual([
+      "client",
+      "delivery",
+      "product",
+    ]);
+
+    const statusStep = subQuery?.trace.find((step) => step.id === "subquery-filter-status");
+    const colorStep = subQuery?.trace.find((step) => step.id === "subquery-filter-color");
+    const finalStep = subQuery?.trace.find((step) => step.id === "subquery-outer-filter");
+
+    expect(statusStep?.state.cellHighlights?.some((highlight) => highlight.tone === "match")).toBe(true);
+    expect(colorStep?.state.cellHighlights?.some((highlight) => highlight.tone === "reject")).toBe(true);
+    expect(finalStep?.state.cellHighlights?.some((highlight) => highlight.scope === "output")).toBe(true);
+    expect(finalStep?.state.rows).toEqual([
+      { id: 1, name: "Jisoo" },
+      { id: 4, name: "Ara" },
+    ]);
+  });
+
+  it("shows JOIN with two input tables and joined rows", () => {
+    const join = examples.find((example) => example.id === "join");
+
+    expect(join).toBeDefined();
+    expect(join?.trace[0].state.inputTables).toHaveLength(2);
+
+    const joinedStep = join?.trace.find((step) => step.id === "join-output-row");
+    expect(joinedStep?.state.rows).toEqual([
+      expect.objectContaining({
+        order_id: 101,
+        name: "Minseo",
+        tier: "Gold",
+        total: 120,
+      }),
+    ]);
+    expect(Object.values(joinedStep?.state.rowMotionByKey ?? {})).toContain("joined");
+  });
+
+  it("shows UNION with two inputs and duplicate removal", () => {
+    const union = examples.find((example) => example.id === "union");
+
+    expect(union).toBeDefined();
+    expect(union?.trace[0].state.inputTables).toHaveLength(2);
+
+    const appendStep = union?.trace.find((step) => step.id === "union-append");
+    const dedupeStep = union?.trace.find((step) => step.id === "union-deduplicate");
+    const finalEmails = dedupeStep?.state.rows.map((row) => row.email);
+
+    expect(appendStep?.state.rows).toHaveLength(8);
+    expect(dedupeStep?.state.rows).toHaveLength(new Set(finalEmails).size);
+    expect(Object.values(dedupeStep?.state.rowMotionByKey ?? {})).toContain("deduped");
+  });
+
+  it("marks ORDER/LIMIT cutoff rows and keeps only the top three at the end", () => {
+    const orderLimit = examples.find((example) => example.id === "order-limit");
+
+    expect(orderLimit).toBeDefined();
+
+    const cutoffStep = orderLimit?.trace.find((step) => step.id === "order-limit-cutoff");
+    const finalStep = orderLimit?.trace.at(-1);
+
+    expect(Object.values(cutoffStep?.state.rowMotionByKey ?? {})).toContain("cutoff");
+    expect(finalStep?.state.rows).toEqual([
+      { product: "Monitor", total_sales: 860 },
+      { product: "Headset", total_sales: 640 },
+      { product: "Laptop Stand", total_sales: 510 },
+    ]);
   });
 });

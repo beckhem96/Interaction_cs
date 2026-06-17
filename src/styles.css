@@ -1095,6 +1095,46 @@ button:disabled {
   color: #ffd88f;
 }
 
+.sql-token-plain {
+  color: inherit;
+}
+
+.sql-token-keyword {
+  color: #76c7ff;
+  font-weight: 900;
+}
+
+.sql-token-function {
+  color: #d7b7ff;
+  font-weight: 900;
+}
+
+.sql-token-string {
+  color: #8be0a4;
+}
+
+.sql-token-number {
+  color: #ffc66d;
+}
+
+.sql-token-identifier {
+  color: #eef6f8;
+}
+
+.sql-token-operator {
+  color: #ffdd8a;
+  font-weight: 800;
+}
+
+.sql-query-line.is-active .sql-token-keyword,
+.sql-query-line.is-active .sql-token-function,
+.sql-query-line.is-active .sql-token-string,
+.sql-query-line.is-active .sql-token-number,
+.sql-query-line.is-active .sql-token-identifier,
+.sql-query-line.is-active .sql-token-operator {
+  filter: brightness(1.12) saturate(1.1);
+}
+
 .database-workbench,
 .database-step-layout {
   display: grid;
@@ -1241,6 +1281,14 @@ button:disabled {
   font-size: 0.88rem;
 }
 
+.sql-pseudo-panel {
+  margin-top: 16px;
+}
+
+.sql-step-panel {
+  margin-top: 16px;
+}
+
 .sql-result-table tbody tr[data-active-row="true"] td {
   background: #e9f4ee;
   box-shadow: inset 0 0 0 1px rgb(63 125 88 / 20%);
@@ -1263,6 +1311,14 @@ button:disabled {
   animation-name: sql-row-source;
 }
 
+.sql-row-motion-candidate {
+  animation-name: sql-row-source;
+}
+
+.sql-row-motion-matched {
+  animation-name: sql-row-joined;
+}
+
 .sql-row-motion-joined {
   animation-name: sql-row-joined;
 }
@@ -1271,7 +1327,15 @@ button:disabled {
   animation-name: sql-row-filtered;
 }
 
+.sql-row-motion-rejected {
+  animation-name: sql-row-filtered;
+}
+
 .sql-row-motion-grouped {
+  animation-name: sql-row-grouped;
+}
+
+.sql-row-motion-aggregated {
   animation-name: sql-row-grouped;
 }
 
@@ -1283,6 +1347,10 @@ button:disabled {
   animation-name: sql-row-unioned;
 }
 
+.sql-row-motion-deduped {
+  animation-name: sql-row-filtered;
+}
+
 .sql-row-motion-sorted {
   animation-name: sql-row-sorted;
 }
@@ -1291,18 +1359,39 @@ button:disabled {
   animation-name: sql-row-limited;
 }
 
+.sql-row-motion-cutoff {
+  animation-name: sql-row-filtered;
+}
+
+.sql-row-motion-candidate td {
+  background: #e8f6f8;
+}
+
+.sql-row-motion-matched td {
+  background: #e8f6ed;
+}
+
 .sql-row-motion-joined td,
 .sql-row-motion-unioned td {
   background: #edf5ff;
 }
 
 .sql-row-motion-grouped td,
+.sql-row-motion-aggregated td,
 .sql-row-motion-projected td {
   background: #f1edff;
 }
 
 .sql-row-motion-filtered td {
   background: #f8f0d7;
+}
+
+.sql-row-motion-rejected td,
+.sql-row-motion-deduped td,
+.sql-row-motion-cutoff td {
+  background: #f7e8e5;
+  color: #7a3d34;
+  opacity: 0.76;
 }
 
 .sql-row-motion-sorted td,
@@ -1314,6 +1403,239 @@ button:disabled {
   background: #fff6dc;
   box-shadow: inset 0 0 0 1px rgb(240 184 79 / 30%);
   font-weight: 800;
+}
+
+.database-cinematic-page {
+  color: #d9f6ff;
+}
+
+.database-cinematic-page .back-link {
+  color: #27c8d8;
+}
+
+.database-cinematic-page .learning-header h1,
+.database-cinematic-page .database-table-header h2,
+.database-cinematic-page .sql-query-section h2,
+.database-cinematic-page .sql-input-section h3,
+.database-cinematic-page .sql-output-section h3,
+.database-cinematic-page .sql-step-panel h2,
+.database-cinematic-page .sql-step-panel h3 {
+  color: #f8fdff;
+}
+
+.database-cinematic-page .eyebrow,
+.database-cinematic-page .intro-copy,
+.database-cinematic-page .code-example-header p {
+  color: #93aeb7;
+}
+
+.database-cinematic-page .algorithm-tab {
+  border: 1px solid rgb(80 194 208 / 34%);
+  background: #0b1115;
+  color: #bfeef5;
+}
+
+.database-cinematic-page .algorithm-tab[aria-selected="true"] {
+  border-color: #4ce7f3;
+  background: #10282d;
+  color: #ffffff;
+  box-shadow: 0 0 0 1px rgb(76 231 243 / 24%), 0 10px 24px rgb(0 0 0 / 24%);
+}
+
+.database-cinematic-page .database-table-panel,
+.database-cinematic-page .sql-query-section,
+.database-cinematic-page .sql-step-panel {
+  border-color: rgb(76 231 243 / 24%);
+  background:
+    linear-gradient(180deg, rgb(9 15 18 / 96%), rgb(4 8 10 / 98%)),
+    repeating-linear-gradient(
+      90deg,
+      rgb(76 231 243 / 8%) 0,
+      rgb(76 231 243 / 8%) 1px,
+      transparent 1px,
+      transparent 44px
+    );
+  box-shadow:
+    inset 0 1px 0 rgb(255 255 255 / 5%),
+    0 20px 44px rgb(0 0 0 / 18%);
+}
+
+.database-cinematic-page .database-workbench {
+  grid-template-columns: minmax(520px, 1fr) minmax(460px, 0.95fr);
+}
+
+.database-cinematic-page .sql-query-section {
+  top: 12px;
+}
+
+.database-cinematic-page .phase-badge {
+  border: 1px solid rgb(255 255 255 / 12%);
+  background: #16262d;
+  box-shadow: inset 0 0 18px rgb(76 231 243 / 13%);
+}
+
+.database-cinematic-page .sql-stage-summary div {
+  border: 1px solid rgb(76 231 243 / 18%);
+  background: #0b171b;
+}
+
+.database-cinematic-page .sql-stage-summary dt {
+  color: #66dfea;
+}
+
+.database-cinematic-page .sql-stage-summary dd {
+  color: #ffffff;
+}
+
+.database-cinematic-page .timeline-controls {
+  margin: 12px 0 16px;
+  border-color: rgb(76 231 243 / 20%);
+  background: #071013;
+}
+
+.database-cinematic-page .sql-input-card {
+  padding: 10px;
+  border: 1px solid rgb(76 231 243 / 16%);
+  border-radius: 8px;
+  background: rgb(8 15 18 / 72%);
+}
+
+.database-cinematic-page .sql-input-card h4 {
+  color: #7df1ff;
+}
+
+.database-cinematic-page .sql-table-scroll {
+  border-color: rgb(76 231 243 / 18%);
+  background: #04080a;
+  box-shadow: inset 0 0 0 1px rgb(255 255 255 / 3%);
+}
+
+.database-cinematic-page .sql-result-table th,
+.database-cinematic-page .sql-result-table td {
+  border-bottom-color: rgb(255 255 255 / 8%);
+}
+
+.database-cinematic-page .sql-result-table th {
+  background: #081116;
+  color: #72e8f3;
+}
+
+.database-cinematic-page .sql-result-table td {
+  color: #dff8fb;
+}
+
+.database-cinematic-page .sql-result-table th.is-active-column,
+.database-cinematic-page .sql-result-table td.is-active-column {
+  background: rgb(255 198 85 / 14%);
+  box-shadow: inset 0 0 0 1px rgb(255 198 85 / 24%);
+}
+
+.database-cinematic-page .sql-result-table tbody tr[data-active-row="true"] td {
+  background: rgb(76 231 243 / 10%);
+  box-shadow: inset 0 0 0 1px rgb(76 231 243 / 22%);
+}
+
+.database-cinematic-page .sql-row-motion-candidate td {
+  background: rgb(80 194 208 / 8%);
+}
+
+.database-cinematic-page .sql-row-motion-matched td,
+.database-cinematic-page .sql-row-motion-filtered td {
+  background: rgb(41 220 130 / 10%);
+}
+
+.database-cinematic-page .sql-row-motion-joined td,
+.database-cinematic-page .sql-row-motion-unioned td {
+  background: rgb(91 141 255 / 12%);
+}
+
+.database-cinematic-page .sql-row-motion-rejected td,
+.database-cinematic-page .sql-row-motion-deduped td,
+.database-cinematic-page .sql-row-motion-cutoff td {
+  background: rgb(255 94 112 / 10%);
+  color: #ffbdc7;
+  opacity: 0.72;
+}
+
+.database-cinematic-page .sql-query {
+  border: 1px solid rgb(76 231 243 / 18%);
+  background:
+    linear-gradient(180deg, rgb(3 8 10 / 96%), rgb(7 12 15 / 98%)),
+    repeating-linear-gradient(
+      0deg,
+      rgb(255 255 255 / 3%) 0,
+      rgb(255 255 255 / 3%) 1px,
+      transparent 1px,
+      transparent 32px
+    );
+  box-shadow: inset 0 0 24px rgb(0 0 0 / 40%);
+}
+
+.database-cinematic-page .sql-query-line.is-active {
+  border-color: #ff9f3f;
+  background: linear-gradient(90deg, rgb(255 159 63 / 24%), rgb(76 231 243 / 8%));
+  box-shadow: inset 0 0 0 1px rgb(255 159 63 / 16%), 0 0 18px rgb(255 159 63 / 10%);
+}
+
+.database-cinematic-page .sql-query-line.is-active .sql-query-line-number {
+  color: #ffc777;
+}
+
+.database-cinematic-page .sql-cell-highlight-active,
+.database-cinematic-page .sql-cell-highlight-join,
+.database-cinematic-page .sql-cell-highlight-match,
+.database-cinematic-page .sql-cell-highlight-output,
+.database-cinematic-page .sql-cell-highlight-reject {
+  animation: sql-cell-pulse 900ms ease;
+  font-weight: 900;
+}
+
+.database-cinematic-page .sql-cell-highlight-active {
+  background: rgb(76 231 243 / 18%) !important;
+  box-shadow: inset 0 0 0 1px rgb(76 231 243 / 55%), 0 0 16px rgb(76 231 243 / 20%);
+  color: #f5feff;
+}
+
+.database-cinematic-page .sql-cell-highlight-join {
+  background: rgb(91 141 255 / 20%) !important;
+  box-shadow: inset 0 0 0 1px rgb(91 141 255 / 58%), 0 0 16px rgb(91 141 255 / 22%);
+  color: #eff4ff;
+}
+
+.database-cinematic-page .sql-cell-highlight-match {
+  background: rgb(41 220 130 / 20%) !important;
+  box-shadow: inset 0 0 0 1px rgb(41 220 130 / 58%), 0 0 16px rgb(41 220 130 / 22%);
+  color: #ebfff4;
+}
+
+.database-cinematic-page .sql-cell-highlight-output {
+  background: rgb(255 198 85 / 22%) !important;
+  box-shadow: inset 0 0 0 1px rgb(255 198 85 / 62%), 0 0 16px rgb(255 198 85 / 22%);
+  color: #fff7df;
+}
+
+.database-cinematic-page .sql-cell-highlight-reject {
+  background: rgb(255 94 112 / 20%) !important;
+  box-shadow: inset 0 0 0 1px rgb(255 94 112 / 58%);
+  color: #ffd6dc;
+  text-decoration: line-through;
+}
+
+@keyframes sql-cell-pulse {
+  0% {
+    filter: brightness(0.75);
+    transform: scale(0.98);
+  }
+
+  55% {
+    filter: brightness(1.2);
+    transform: scale(1.03);
+  }
+
+  100% {
+    filter: brightness(1);
+    transform: scale(1);
+  }
 }
 
 @keyframes sql-row-source {

@@ -2,66 +2,18 @@ import { type CSSProperties, useState } from "react";
 import { Link } from "react-router";
 
 import { useStepController } from "../../shared/useStepController";
-import { generateSelectLogicalExecutionTrace } from "../engine/selectLogicalExecution";
+import { tokenizeSqlLine } from "../code/sqlSyntaxHighlight";
+import { generateSqlOperationExamples } from "../engine/selectLogicalExecution";
 import type {
+  DatabaseCellHighlight,
   DatabaseCellValue,
   DatabaseInputTableState,
   DatabaseRow,
   DatabaseRowMotion,
-  SqlLogicalPhase
+  SqlLogicalPhase,
 } from "../types";
 
-const fullTrace = generateSelectLogicalExecutionTrace();
-
-const sqlExamples = [
-  {
-    id: "join",
-    title: "SQL: JOIN",
-    tabLabel: "JOIN",
-    intro: "sales와 regions 두 테이블의 region 열을 맞춰 주문 행에 담당자 정보를 붙입니다.",
-    trace: fullTrace.slice(0, 2)
-  },
-  {
-    id: "group-by",
-    title: "SQL: GROUP BY",
-    tabLabel: "GROUP BY",
-    intro: "조건을 통과한 행을 manager와 region으로 묶고 합계와 개수를 계산합니다.",
-    trace: fullTrace.slice(2, 4)
-  },
-  {
-    id: "having-select",
-    title: "SQL: HAVING / SELECT",
-    tabLabel: "HAVING",
-    intro: "집계된 그룹에 HAVING 조건을 적용하고 최종 출력 열과 별칭을 만듭니다.",
-    trace: fullTrace.slice(4, 6)
-  },
-  {
-    id: "union",
-    title: "SQL: UNION ALL",
-    tabLabel: "UNION",
-    intro: "첫 번째 SELECT 결과와 online_sales 집계 결과를 같은 열 구조로 아래에 붙입니다.",
-    trace: fullTrace.slice(5, 7)
-  },
-  {
-    id: "order-limit",
-    title: "SQL: ORDER BY / LIMIT",
-    tabLabel: "ORDER/LIMIT",
-    intro: "UNION 결과를 total_amount 기준으로 정렬하고 상위 행만 남깁니다.",
-    trace: fullTrace.slice(7, 9)
-  }
-] as const;
-
-const pseudoCode = [
-  "FROM 절의 기준 테이블을 읽는다.",
-  "JOIN 조건으로 관련 테이블의 열을 붙인다.",
-  "조건 amount >= 50을 만족하는 행만 남긴다.",
-  "담당자와 지역 값을 기준으로 행을 그룹화한다.",
-  "집계 결과에 HAVING 조건을 적용한다.",
-  "SELECT 절의 출력 열과 별칭을 만든다.",
-  "UNION ALL로 같은 형태의 결과를 이어 붙인다.",
-  "ORDER BY 기준으로 최종 결과를 정렬한다.",
-  "LIMIT으로 반환할 행 수를 제한한다."
-];
+const sqlExamples = generateSqlOperationExamples();
 
 const phaseLabels: Record<SqlLogicalPhase, string> = {
   from: "FROM",
@@ -70,17 +22,18 @@ const phaseLabels: Record<SqlLogicalPhase, string> = {
   groupBy: "GROUP BY",
   having: "HAVING",
   select: "SELECT",
-  union: "UNION ALL",
+  union: "UNION",
   orderBy: "ORDER BY",
-  limit: "LIMIT"
+  limit: "LIMIT",
 };
 
 export function DatabasePage() {
   const [activeExampleIndex, setActiveExampleIndex] = useState(0);
-  const activeExample = sqlExamples[activeExampleIndex];
+  const activeExample = sqlExamples[activeExampleIndex]!;
   const controller = useStepController(activeExample.trace.length, 900);
   const currentIndex = Math.min(controller.currentIndex, activeExample.trace.length - 1);
-  const currentStep = activeExample.trace[currentIndex];
+  const currentStep = activeExample.trace[currentIndex]!;
+  const cellHighlights = currentStep.state.cellHighlights ?? [];
   const progressPercent =
     activeExample.trace.length <= 1
       ? 100
@@ -92,7 +45,7 @@ export function DatabasePage() {
   }
 
   return (
-    <main className="page-shell learning-page">
+    <main className="page-shell learning-page database-cinematic-page">
       <Link className="back-link" to="/">
         홈으로
       </Link>
@@ -130,18 +83,6 @@ export function DatabasePage() {
           </div>
 
           <SqlStageSummary items={currentStep.state.summaryItems ?? []} />
-
-          <SqlInputTables tables={currentStep.state.inputTables ?? []} />
-
-          <section className="sql-output-section" aria-label="SQL 결과 테이블">
-            <h3>결과 테이블</h3>
-            <SqlDataTable
-              activeColumns={currentStep.state.activeColumns ?? []}
-              ariaLabel="SQL 중간 결과 테이블"
-              rowMotionByKey={currentStep.state.rowMotionByKey ?? {}}
-              rows={currentStep.state.rows}
-            />
-          </section>
 
           <div className="timeline-controls" aria-label="SQL 단계 재생 컨트롤">
             <div className="timeline-row">
@@ -186,13 +127,30 @@ export function DatabasePage() {
               />
             </label>
           </div>
+
+          <SqlInputTables
+            cellHighlights={cellHighlights}
+            tables={currentStep.state.inputTables ?? []}
+          />
+
+          <section className="sql-output-section" aria-label="SQL 결과 테이블">
+            <h3>결과 테이블</h3>
+            <SqlDataTable
+              activeColumns={currentStep.state.activeColumns ?? []}
+              activeRowKeys={currentStep.state.activeRowKeys ?? []}
+              ariaLabel="SQL 중간 결과 테이블"
+              cellHighlights={cellHighlights.filter((highlight) => highlight.scope === "output")}
+              rowMotionByKey={currentStep.state.rowMotionByKey ?? {}}
+              rows={currentStep.state.rows}
+            />
+          </section>
         </section>
 
         <section className="sql-query-section" aria-label="SQL 쿼리">
           <div className="code-example-header">
             <div>
               <h2>SQL 쿼리</h2>
-              <p>현재 단계에 해당하는 쿼리 라인이 강조됩니다.</p>
+              <p>현재 단계에 해당하는 쿼리 라인을 강조합니다.</p>
             </div>
             <span className="code-file-name">query.sql</span>
           </div>
@@ -200,38 +158,36 @@ export function DatabasePage() {
             activeLines={currentStep.state.activeQueryLines}
             query={currentStep.state.query}
           />
+
+          <div className="pseudo-panel sql-pseudo-panel">
+            <h2>논리 처리 순서</h2>
+            <ol className="pseudo-code">
+              {activeExample.pseudoCode.map((line, index) => (
+                <li
+                  className={
+                    currentStep.pseudoCodeLine === index + 1 ? "is-active" : ""
+                  }
+                  aria-current={
+                    currentStep.pseudoCodeLine === index + 1 ? "step" : undefined
+                  }
+                  key={line}
+                >
+                  {line}
+                </li>
+              ))}
+            </ol>
+          </div>
         </section>
       </section>
 
-      <section className="step-pseudo-layout" aria-label="SQL 의사 코드와 요약">
-        <div className="pseudo-panel">
-          <h2>논리 처리 순서</h2>
-          <ol className="pseudo-code">
-            {pseudoCode.map((line, index) => (
-              <li
-                className={
-                  currentStep.pseudoCodeLine === index + 1 ? "is-active" : ""
-                }
-                aria-current={
-                  currentStep.pseudoCodeLine === index + 1 ? "step" : undefined
-                }
-                key={line}
-              >
-                {line}
-              </li>
-            ))}
-          </ol>
-        </div>
-
-        <aside className="step-panel" aria-label="현재 SQL 단계 설명">
-          <h2>현재 단계</h2>
-          <p className="step-count">
-            {currentIndex + 1} / {activeExample.trace.length}
-          </p>
-          <h3>{currentStep.title}</h3>
-          <p>{currentStep.description}</p>
-        </aside>
-      </section>
+      <aside className="step-panel sql-step-panel" aria-label="현재 SQL 단계 설명">
+        <h2>현재 단계</h2>
+        <p className="step-count">
+          {currentIndex + 1} / {activeExample.trace.length}
+        </p>
+        <h3>{currentStep.title}</h3>
+        <p>{currentStep.description}</p>
+      </aside>
     </main>
   );
 }
@@ -261,7 +217,16 @@ function SqlQueryBlock({ activeLines, query }: SqlQueryBlockProps) {
               key={`${lineNumber}-${line}`}
             >
               <span className="sql-query-line-number">{lineNumber}</span>
-              <code>{line}</code>
+              <code>
+                {tokenizeSqlLine(line).map((token, tokenIndex) => (
+                  <span
+                    className={`sql-token-${token.type}`}
+                    key={`${token.text}-${tokenIndex}`}
+                  >
+                    {token.text}
+                  </span>
+                ))}
+              </code>
             </li>
           );
         })}
@@ -291,7 +256,12 @@ function SqlStageSummary({ items }: SqlStageSummaryProps) {
   );
 }
 
-function SqlInputTables({ tables }: { tables: DatabaseInputTableState[] }) {
+type SqlInputTablesProps = {
+  cellHighlights: DatabaseCellHighlight[];
+  tables: DatabaseInputTableState[];
+};
+
+function SqlInputTables({ cellHighlights, tables }: SqlInputTablesProps) {
   if (tables.length === 0) {
     return null;
   }
@@ -307,6 +277,11 @@ function SqlInputTables({ tables }: { tables: DatabaseInputTableState[] }) {
               activeColumns={table.activeColumns ?? []}
               activeRowKeys={table.activeRowKeys ?? []}
               ariaLabel={`${table.name} 입력 테이블`}
+              cellHighlights={cellHighlights.filter(
+                (highlight) =>
+                  highlight.scope === "input" && highlight.tableName === table.name,
+              )}
+              rowMotionByKey={table.rowMotionByKey ?? {}}
               rows={table.rows}
             />
           </div>
@@ -320,6 +295,7 @@ type SqlDataTableProps = {
   activeColumns: string[];
   activeRowKeys?: string[];
   ariaLabel: string;
+  cellHighlights?: DatabaseCellHighlight[];
   rowMotionByKey?: Record<string, DatabaseRowMotion>;
   rows: DatabaseRow[];
 };
@@ -328,11 +304,18 @@ function SqlDataTable({
   activeColumns,
   activeRowKeys = [],
   ariaLabel,
+  cellHighlights = [],
   rowMotionByKey = {},
-  rows
+  rows,
 }: SqlDataTableProps) {
   const columns = rows.length > 0 ? Object.keys(rows[0]!) : [];
   const activeRowKeySet = new Set(activeRowKeys);
+  const highlightByCell = new Map(
+    cellHighlights.map((highlight) => [
+      `${highlight.rowKey}:${highlight.column}`,
+      highlight,
+    ]),
+  );
 
   return (
     <div className="sql-table-scroll">
@@ -363,14 +346,25 @@ function SqlDataTable({
                 data-active-row={isActiveRow ? "true" : undefined}
                 key={`${rowIndex}-${rowKey}`}
               >
-                {columns.map((column) => (
-                  <td
-                    className={activeColumns.includes(column) ? "is-active-column" : ""}
-                    key={column}
-                  >
-                    {formatCellValue(row[column])}
-                  </td>
-                ))}
+                {columns.map((column) => {
+                  const highlight = highlightByCell.get(`${rowKey}:${column}`);
+                  const className = [
+                    activeColumns.includes(column) ? "is-active-column" : "",
+                    highlight ? `sql-cell-highlight-${highlight.tone}` : "",
+                  ]
+                    .filter(Boolean)
+                    .join(" ");
+
+                  return (
+                    <td
+                      className={className}
+                      data-cell-highlight={highlight?.tone}
+                      key={column}
+                    >
+                      {formatCellValue(row[column])}
+                    </td>
+                  );
+                })}
               </tr>
             );
           })}
@@ -389,7 +383,26 @@ function formatCellValue(value: DatabaseCellValue): string {
 }
 
 function getDatabaseRowKey(row: DatabaseRow): string {
-  return Object.entries(row)
-    .map(([key, value]) => `${key}:${String(value)}`)
-    .join("|");
+  if (row.cid !== undefined && row.status !== undefined && row.color !== undefined) {
+    return `${row.cid}:${row.status}:${row.color}`;
+  }
+
+  if (row.cid !== undefined && row.status !== undefined && row.product_id !== undefined) {
+    return `${row.cid}:${row.status}:${row.product_id}`;
+  }
+
+  if (row.source !== undefined && row.email !== undefined) {
+    return `${row.source}:${row.email}`;
+  }
+
+  return String(
+    row.order_id ??
+      row.id ??
+      row.client_id ??
+      row.email ??
+      row.product ??
+      row.region ??
+      row.department ??
+      JSON.stringify(row),
+  );
 }

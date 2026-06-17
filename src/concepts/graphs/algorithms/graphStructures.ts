@@ -1,4 +1,5 @@
 import type { TraceStep } from "../../shared/types";
+import type { CodeLanguage } from "../../sorting/code/types";
 import type {
   GraphAdjacencyRow,
   GraphEdgeState,
@@ -487,12 +488,84 @@ function getEdgeId(edge: ExampleEdge): string {
   return `${edge.fromId}-${edge.toId}`;
 }
 
-function createLanguageHighlights(codeLines: number[]): Record<string, number[]> {
+const graphStructureLineHighlights: Record<string, Record<CodeLanguage, number[]>> = {
+  "1": {
+    C: [1],
+    "C++": [1],
+    Java: [1],
+    Python: [1],
+    JavaScript: [1],
+  },
+  "3,4": {
+    C: [3, 4],
+    "C++": [3, 4],
+    Java: [3, 4],
+    Python: [3, 4],
+    JavaScript: [3, 4],
+  },
+  "7,8,9": {
+    C: [7, 8, 9],
+    "C++": [7, 8, 9],
+    Java: [7, 8, 9],
+    Python: [6, 7, 8],
+    JavaScript: [7, 8, 9],
+  },
+  "12,13": {
+    C: [12, 13],
+    "C++": [12, 13],
+    Java: [12, 13],
+    Python: [10, 11],
+    JavaScript: [12, 13],
+  },
+  "16,17": {
+    C: [16, 17],
+    "C++": [16, 17],
+    Java: [16, 17],
+    Python: [13, 14],
+    JavaScript: [16, 17],
+  },
+  "20,21": {
+    C: [20, 21],
+    "C++": [20, 21],
+    Java: [20, 21],
+    Python: [16, 17],
+    JavaScript: [20, 21],
+  },
+  "22,23,24": {
+    C: [22, 23, 24],
+    "C++": [22, 23, 24],
+    Java: [22, 23, 24],
+    Python: [18, 19, 20],
+    JavaScript: [22, 23, 24],
+  },
+  "27,28,29": {
+    C: [27, 28, 29],
+    "C++": [27, 28, 29],
+    Java: [27, 28, 29],
+    Python: [22, 23, 24],
+    JavaScript: [27, 28, 29],
+  },
+  "32,33": {
+    C: [32, 33],
+    "C++": [32, 33],
+    Java: [32, 33],
+    Python: [26, 27],
+    JavaScript: [32, 33],
+  },
+};
+
+function createLanguageHighlights(codeLines: number[]): Record<CodeLanguage, number[]> {
+  const mappedHighlights = graphStructureLineHighlights[codeLines.join(",")];
+
+  if (mappedHighlights !== undefined) {
+    return mappedHighlights;
+  }
+
   return {
     C: codeLines,
     "C++": codeLines,
     Java: codeLines,
     Python: codeLines,
-    JavaScript: codeLines
+    JavaScript: codeLines,
   };
 }

@@ -1,4 +1,5 @@
 import type { TraceStep } from "../../shared/types";
+import type { CodeLanguage } from "../../sorting/code/types";
 import type {
   GraphAdjacencyRow,
   GraphEdgeState,
@@ -149,7 +150,7 @@ function generateBfsTrace(): TraceStep<GraphTraversalState>[] {
             currentNodeId: current,
             skippedNodeIds: [next],
             pseudoCodeLine: 4,
-            codeLines: [22, 23]
+            codeLines: [22]
           })
         );
         continue;
@@ -255,7 +256,7 @@ function generateDfsTrace(): TraceStep<GraphTraversalState>[] {
             currentNodeId: current,
             skippedNodeIds: [next],
             pseudoCodeLine: 4,
-            codeLines: [41, 42, 43]
+            codeLines: [41]
           })
         );
         continue;
@@ -280,7 +281,7 @@ function generateDfsTrace(): TraceStep<GraphTraversalState>[] {
           activeEdgeIds: [edgeId],
           currentNodeId: current,
           pseudoCodeLine: 5,
-          codeLines: [44, 45]
+          codeLines: [43, 44]
         })
       );
     }
@@ -415,12 +416,91 @@ function getEdgeId(firstId: string, secondId: string): string {
   return [firstId, secondId].sort().join("-");
 }
 
-function createLanguageHighlights(codeLines: number[]): Record<string, number[]> {
+const graphTraversalLineHighlights: Record<string, Record<CodeLanguage, number[]>> = {
+  "14,15": {
+    C: [14, 15],
+    "C++": [14, 15],
+    Java: [14, 15],
+    Python: [10, 11],
+    JavaScript: [14, 15],
+  },
+  "18,19,20": {
+    C: [18, 19, 20],
+    "C++": [18, 19, 20],
+    Java: [18, 19, 20],
+    Python: [14, 15, 16],
+    JavaScript: [18, 19, 20],
+  },
+  "22": {
+    C: [22],
+    "C++": [22],
+    Java: [22],
+    Python: [18],
+    JavaScript: [22],
+  },
+  "24,25": {
+    C: [24, 25],
+    "C++": [24, 25],
+    Java: [24, 25],
+    Python: [20, 21],
+    JavaScript: [24, 25],
+  },
+  "28": {
+    C: [28],
+    "C++": [28],
+    Java: [28],
+    Python: [22],
+    JavaScript: [28],
+  },
+  "33,34": {
+    C: [33, 34],
+    "C++": [33, 34],
+    Java: [33, 34],
+    Python: [25, 26],
+    JavaScript: [33, 34],
+  },
+  "37,38,39": {
+    C: [37, 38, 39],
+    "C++": [37, 38, 39],
+    Java: [37, 38, 39],
+    Python: [29, 30, 31],
+    JavaScript: [37, 38, 39],
+  },
+  "41": {
+    C: [41],
+    "C++": [42],
+    Java: [42],
+    Python: [33],
+    JavaScript: [41],
+  },
+  "43,44": {
+    C: [43, 44],
+    "C++": [44, 45],
+    Java: [44, 45],
+    Python: [35, 36],
+    JavaScript: [43, 44],
+  },
+  "47": {
+    C: [47],
+    "C++": [48],
+    Java: [48],
+    Python: [37],
+    JavaScript: [47],
+  },
+};
+
+function createLanguageHighlights(codeLines: number[]): Record<CodeLanguage, number[]> {
+  const mappedHighlights = graphTraversalLineHighlights[codeLines.join(",")];
+
+  if (mappedHighlights !== undefined) {
+    return mappedHighlights;
+  }
+
   return {
     C: codeLines,
     "C++": codeLines,
     Java: codeLines,
     Python: codeLines,
-    JavaScript: codeLines
+    JavaScript: codeLines,
   };
 }

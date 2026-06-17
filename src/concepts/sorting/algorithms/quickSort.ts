@@ -7,60 +7,67 @@ export const QUICK_SORT_DEFAULT_INPUT = [
 
 const codeLineHighlights = {
   initial: {
-    C: [19],
-    Java: [18],
-    "C++": [20],
+    C: [20],
+    Java: [19],
+    "C++": [17],
     JavaScript: [1, 2],
     Python: [1, 2]
+  },
+  base: {
+    C: [21],
+    Java: [20],
+    "C++": [18],
+    JavaScript: [8],
+    Python: [5, 6]
   },
   choosePivot: {
     C: [5],
     Java: [4],
     "C++": [6],
-    JavaScript: [8],
-    Python: [8]
+    JavaScript: [9],
+    Python: [7]
   },
   scan: {
     C: [6],
     Java: [5],
     "C++": [7],
-    JavaScript: [10],
-    Python: [10]
+    JavaScript: [11],
+    Python: [9]
   },
   compare: {
     C: [7],
     Java: [6],
     "C++": [8],
-    JavaScript: [11],
-    Python: [11]
+    JavaScript: [12],
+    Python: [10]
   },
   swap: {
     C: [8, 9, 10],
     Java: [7, 8, 9],
     "C++": [9],
-    JavaScript: [12],
-    Python: [12]
+    JavaScript: [13],
+    Python: [11]
   },
   placePivot: {
     C: [14, 15, 16],
     Java: [13, 14, 15],
-    "C++": [15],
+    "C++": [13, 14],
     JavaScript: [16],
-    Python: [16]
+    Python: [13]
   },
   recurse: {
-    C: [22, 23],
-    Java: [21, 22],
-    "C++": [23, 24],
-    JavaScript: [18, 19],
-    Python: [18, 19]
+    C: [23, 24],
+    Java: [22, 23],
+    "C++": [20, 21],
+    JavaScript: [17, 18],
+    Python: [14, 15]
   },
   complete: {
-    C: [24],
-    Java: [23],
-    "C++": [25],
-    JavaScript: [5],
-    Python: [21]
+    C: [25],
+    Java: [24],
+    "C++": [22],
+    JavaScript: [4],
+    Python: [18]
   }
 } satisfies Record<string, Record<string, number[]>>;
 
@@ -102,7 +109,7 @@ export function generateQuickSortTrace(
           sortedIndices: sortedList()
         },
         pseudoCodeLine: 7,
-        codeLineHighlights: codeLineHighlights.recurse
+        codeLineHighlights: codeLineHighlights.base
       });
 
       return;
