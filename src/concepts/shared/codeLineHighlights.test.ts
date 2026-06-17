@@ -49,6 +49,8 @@ import {
 } from "../graphs/algorithms/graphTraversal";
 import { graphStructureCodeExamples } from "../graphs/code/graphStructuresExample";
 import { graphTraversalCodeExamples } from "../graphs/code/graphTraversalExample";
+import { generateBinarySearchTrace } from "../search/algorithms/binarySearch";
+import { binarySearchCodeExamples } from "../search/code/binarySearchExamples";
 import { generateAvlRotationTrace } from "../trees/algorithms/avlTree";
 import { generateBPlusTreeTrace } from "../trees/algorithms/bPlusTree";
 import { generateBTreeTrace } from "../trees/algorithms/bTree";
@@ -166,6 +168,11 @@ const subjects: HighlightSubject[] = [
     codeExamples: graphTraversalCodeExamples,
   })),
   {
+    name: "search:binary",
+    trace: generateBinarySearchTrace(),
+    codeExamples: binarySearchCodeExamples,
+  },
+  {
     name: "tree:bst",
     trace: generateBinarySearchTreeTrace(),
     codeExamples: binarySearchTreeCodeExamples,
@@ -271,6 +278,15 @@ describe("code line highlight audit", () => {
       matcher: /queue\.append\(next_node\)/,
       step: generateGraphTraversalTrace("bfs").find(
         (traceStep) => traceStep.id === "bfs-discover-B-from-A",
+      ),
+    });
+
+    expectHighlightedText({
+      codeExamples: binarySearchCodeExamples,
+      language: "Python",
+      matcher: /mid = left \+ \(right - left\) \/\/ 2/,
+      step: generateBinarySearchTrace().find(
+        (traceStep) => traceStep.id === "binary-search-mid-6",
       ),
     });
 

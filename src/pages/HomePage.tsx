@@ -37,6 +37,12 @@ const categories: CategoryCard[] = [
     description: "DFS와 BFS가 스택과 큐로 방문 순서를 만드는 과정을 비교합니다.",
     href: "/graphs/traversal",
     status: "DFS와 BFS"
+  },
+  {
+    title: "이진 탐색",
+    description: "정렬된 배열에서 후보 구간을 절반씩 줄이며 target을 찾는 과정을 단계별로 관찰합니다.",
+    href: "/binary-search",
+    status: "O(log n) 탐색"
   }
 ];
 
