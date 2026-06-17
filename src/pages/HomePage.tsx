@@ -43,6 +43,12 @@ const categories: CategoryCard[] = [
     description: "정렬된 배열에서 후보 구간을 절반씩 줄이며 target을 찾는 과정을 단계별로 관찰합니다.",
     href: "/binary-search",
     status: "O(log n) 탐색"
+  },
+  {
+    title: "동적 계획법",
+    description: "0/1 배낭 DP 표를 채우며 작은 상태를 재사용하는 점화식 흐름을 관찰합니다.",
+    href: "/dynamic-programming",
+    status: "0/1 배낭 DP"
   }
 ];
 

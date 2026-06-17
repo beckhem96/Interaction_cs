@@ -1,6 +1,7 @@
 import { Navigate, Route, Routes } from "react-router";
 
 import { DatabasePage } from "./concepts/database/components/DatabasePage";
+import { DynamicProgrammingPage } from "./concepts/dynamic-programming/components/DynamicProgrammingPage";
 import { GraphPage } from "./concepts/graphs/components/GraphPage";
 import { GraphTraversalPage } from "./concepts/graphs/components/GraphTraversalPage";
 import { BinarySearchPage } from "./concepts/search/components/BinarySearchPage";
@@ -18,6 +19,7 @@ export function App() {
       <Route path="/graphs" element={<GraphPage />} />
       <Route path="/graphs/traversal" element={<GraphTraversalPage />} />
       <Route path="/binary-search" element={<BinarySearchPage />} />
+      <Route path="/dynamic-programming" element={<DynamicProgrammingPage />} />
       <Route path="*" element={<Navigate to="/" replace />} />
     </Routes>
   );

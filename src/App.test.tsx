@@ -69,4 +69,17 @@ describe("App routes", () => {
     ).toBeInTheDocument();
     expect(screen.getByText(/target 42/)).toBeInTheDocument();
   });
+
+  it("routes to the dynamic programming learning page", () => {
+    render(
+      <MemoryRouter initialEntries={["/dynamic-programming"]}>
+        <App />
+      </MemoryRouter>,
+    );
+
+    expect(
+      screen.getByRole("heading", { name: "동적 계획법: 0/1 배낭" }),
+    ).toBeInTheDocument();
+    expect(screen.getByText(/용량 10/)).toBeInTheDocument();
+  });
 });

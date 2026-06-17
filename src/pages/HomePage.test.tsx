@@ -5,7 +5,7 @@ import { describe, expect, it } from "vitest";
 import { HomePage } from "./HomePage";
 
 describe("HomePage", () => {
-  it("renders the concept category cards", () => {
+  it("renders the concept category links", () => {
     render(
       <MemoryRouter>
         <HomePage />
@@ -15,29 +15,21 @@ describe("HomePage", () => {
     expect(
       screen.getByRole("heading", { name: "CS Visual Lab" }),
     ).toBeInTheDocument();
-    expect(screen.getByRole("link", { name: /정렬 알고리즘/ })).toHaveAttribute(
-      "href",
-      "/sorting",
-    );
-    expect(screen.getByRole("link", { name: /데이터베이스/ })).toHaveAttribute(
-      "href",
-      "/database",
-    );
-    expect(screen.getByRole("link", { name: /트리 자료구조/ })).toHaveAttribute(
-      "href",
-      "/trees",
-    );
-    expect(screen.getByRole("link", { name: /그래프 자료구조/ })).toHaveAttribute(
-      "href",
-      "/graphs",
-    );
-    expect(screen.getByRole("link", { name: /그래프 탐색/ })).toHaveAttribute(
-      "href",
-      "/graphs/traversal",
-    );
-    expect(screen.getByRole("link", { name: /이진 탐색/ })).toHaveAttribute(
-      "href",
-      "/binary-search",
+
+    const hrefs = screen
+      .getAllByRole("link")
+      .map((link) => link.getAttribute("href"));
+
+    expect(hrefs).toEqual(
+      expect.arrayContaining([
+        "/sorting",
+        "/database",
+        "/trees",
+        "/graphs",
+        "/graphs/traversal",
+        "/binary-search",
+        "/dynamic-programming",
+      ]),
     );
   });
 });

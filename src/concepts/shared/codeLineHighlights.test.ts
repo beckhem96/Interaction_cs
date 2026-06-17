@@ -49,6 +49,8 @@ import {
 } from "../graphs/algorithms/graphTraversal";
 import { graphStructureCodeExamples } from "../graphs/code/graphStructuresExample";
 import { graphTraversalCodeExamples } from "../graphs/code/graphTraversalExample";
+import { generateKnapsackTrace } from "../dynamic-programming/algorithms/knapsack";
+import { knapsackCodeExamples } from "../dynamic-programming/code/knapsackExamples";
 import { generateBinarySearchTrace } from "../search/algorithms/binarySearch";
 import { binarySearchCodeExamples } from "../search/code/binarySearchExamples";
 import { generateAvlRotationTrace } from "../trees/algorithms/avlTree";
@@ -173,6 +175,11 @@ const subjects: HighlightSubject[] = [
     codeExamples: binarySearchCodeExamples,
   },
   {
+    name: "dynamic-programming:knapsack",
+    trace: generateKnapsackTrace(),
+    codeExamples: knapsackCodeExamples,
+  },
+  {
     name: "tree:bst",
     trace: generateBinarySearchTreeTrace(),
     codeExamples: binarySearchTreeCodeExamples,
@@ -287,6 +294,15 @@ describe("code line highlight audit", () => {
       matcher: /mid = left \+ \(right - left\) \/\/ 2/,
       step: generateBinarySearchTrace().find(
         (traceStep) => traceStep.id === "binary-search-mid-6",
+      ),
+    });
+
+    expectHighlightedText({
+      codeExamples: knapsackCodeExamples,
+      language: "Python",
+      matcher: /dp\[i\]\[w\] = max\(skip, take\)/,
+      step: generateKnapsackTrace().find(
+        (traceStep) => traceStep.id === "knapsack-fill-1-2",
       ),
     });
 
