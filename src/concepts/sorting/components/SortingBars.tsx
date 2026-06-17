@@ -13,6 +13,7 @@ type MotionState =
   | "shift"
   | "write"
   | "key"
+  | "maximum"
   | "minimum"
   | "pivot"
   | "sorted"
@@ -106,6 +107,10 @@ function getMotionState(state: SortingState): MotionState {
     return "minimum";
   }
 
+  if (state.maximumIndex !== undefined) {
+    return "maximum";
+  }
+
   if (state.pivotIndex !== undefined) {
     return "pivot";
   }
@@ -140,8 +145,16 @@ function getStateClassNames(state: SortingState, index: number): string[] {
     classNames.push("is-partition-range");
   }
 
+  if (isInRange(state.heapRange, index)) {
+    classNames.push("is-heap-range");
+  }
+
   if (isInRange(state.mergeRange, index)) {
     classNames.push("is-merge-range");
+  }
+
+  if (isInRange(state.searchRange, index)) {
+    classNames.push("is-search-range");
   }
 
   if (isInRange(state.leftRange, index)) {
@@ -170,6 +183,10 @@ function getStateClassNames(state: SortingState, index: number): string[] {
 
   if (state.minimumIndex === index) {
     classNames.push("is-minimum");
+  }
+
+  if (state.maximumIndex === index) {
+    classNames.push("is-maximum");
   }
 
   if (state.pivotIndex === index) {

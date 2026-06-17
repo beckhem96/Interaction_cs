@@ -1,5 +1,6 @@
 import type { TraceStep } from "../../shared/types";
 import type { SortingState } from "../types";
+import { sameLineHighlights } from "./codeLineMaps";
 
 export const MERGE_SORT_DEFAULT_INPUT = [
   14, 3, 17, 8, 6, 12, 1, 19, 4, 10
@@ -63,6 +64,16 @@ const codeLineHighlights = {
     Python: [12]
   }
 } satisfies Record<string, Record<string, number[]>>;
+
+const bottomUpCodeLineHighlights = {
+  initial: sameLineHighlights(1),
+  width: sameLineHighlights(2),
+  pair: sameLineHighlights(3, 4, 5),
+  compare: sameLineHighlights(6),
+  write: sameLineHighlights(6),
+  merged: sameLineHighlights(6),
+  complete: sameLineHighlights(8),
+};
 
 export function generateMergeSortTrace(
   input: readonly number[]
@@ -254,6 +265,189 @@ export function generateMergeSortTrace(
   });
 
   return trace;
+}
+
+export function generateMergeSortBottomUpTrace(
+  input: readonly number[]
+): TraceStep<SortingState>[] {
+  const array = [...input];
+  const trace: TraceStep<SortingState>[] = [
+    {
+      id: "merge-bottom-initial",
+      title: "초기 배열",
+      description: "한 칸짜리 구간부터 시작해 폭을 두 배씩 키우는 bottom-up 병합 정렬을 시작합니다.",
+      state: {
+        array: [...array],
+        mergeRange: array.length > 0 ? [0, 0] : undefined,
+      },
+      pseudoCodeLine: 1,
+      codeLineHighlights: bottomUpCodeLineHighlights.initial,
+    },
+  ];
+
+  let stepIndex = 1;
+
+  for (let width = 1; width < array.length; width *= 2) {
+    trace.push({
+      id: `merge-bottom-${stepIndex++}-width-${width}`,
+      title: `폭 ${width} 구간 병합 시작`,
+      description: `이미 정렬된 폭 ${width}짜리 구간들을 둘씩 묶어 병합합니다.`,
+      state: {
+        array: [...array],
+        mergeRange: [0, Math.min(width - 1, array.length - 1)],
+      },
+      pseudoCodeLine: 2,
+      codeLineHighlights: bottomUpCodeLineHighlights.width,
+    });
+
+    for (let start = 0; start < array.length; start += width * 2) {
+      const mid = Math.min(start + width - 1, array.length - 1);
+      const end = Math.min(start + width * 2 - 1, array.length - 1);
+
+      if (mid >= end) {
+        continue;
+      }
+
+      trace.push({
+        id: `merge-bottom-${stepIndex++}-pair-${start}-${end}`,
+        title: `${start}~${mid}, ${mid + 1}~${end} 구간 선택`,
+        description: "인접한 두 정렬 구간을 하나의 더 큰 정렬 구간으로 병합합니다.",
+        state: {
+          array: [...array],
+          mergeRange: [start, end],
+          leftRange: [start, mid],
+          rightRange: [mid + 1, end],
+        },
+        pseudoCodeLine: 3,
+        codeLineHighlights: bottomUpCodeLineHighlights.pair,
+      });
+
+      merge(start, mid, end);
+    }
+  }
+
+  trace.push({
+    id: "merge-bottom-complete",
+    title: "정렬 완료",
+    description: "반복적으로 병합 폭을 키워 배열 전체가 오름차순으로 정렬되었습니다.",
+    state: {
+      array: [...array],
+      sortedIndices: range(0, array.length),
+    },
+    pseudoCodeLine: 7,
+    codeLineHighlights: bottomUpCodeLineHighlights.complete,
+  });
+
+  return trace;
+
+  function merge(start: number, mid: number, end: number) {
+    const left = array.slice(start, mid + 1);
+    const right = array.slice(mid + 1, end + 1);
+    let leftPointer = 0;
+    let rightPointer = 0;
+    let writeIndex = start;
+
+    while (leftPointer < left.length && rightPointer < right.length) {
+      const leftValue = left[leftPointer]!;
+      const rightValue = right[rightPointer]!;
+      const leftIndex = start + leftPointer;
+      const rightIndex = mid + 1 + rightPointer;
+
+      trace.push({
+        id: `merge-bottom-${stepIndex++}-compare-${rightIndex}-${leftIndex}`,
+        title: `${leftValue}와 ${rightValue} 비교`,
+        description: "두 구간의 앞 값을 비교해 더 작은 값을 현재 write 위치에 기록합니다.",
+        state: {
+          array: [...array],
+          mergeRange: [start, end],
+          leftRange: [start, mid],
+          rightRange: [mid + 1, end],
+          comparingIndices: [leftIndex, rightIndex],
+          writeIndex,
+        },
+        pseudoCodeLine: 4,
+        codeLineHighlights: bottomUpCodeLineHighlights.compare,
+      });
+
+      if (leftValue <= rightValue) {
+        array[writeIndex] = leftValue;
+        leftPointer += 1;
+      } else {
+        array[writeIndex] = rightValue;
+        rightPointer += 1;
+      }
+
+      trace.push({
+        id: `merge-bottom-${stepIndex++}-write-${writeIndex}`,
+        title: `${array[writeIndex]}를 ${writeIndex}번 위치에 기록`,
+        description: "선택한 값을 병합 결과 위치에 씁니다.",
+        state: {
+          array: [...array],
+          mergeRange: [start, end],
+          leftRange: [start, mid],
+          rightRange: [mid + 1, end],
+          writeIndex,
+        },
+        pseudoCodeLine: 5,
+        codeLineHighlights: bottomUpCodeLineHighlights.write,
+      });
+
+      writeIndex += 1;
+    }
+
+    while (leftPointer < left.length) {
+      array[writeIndex] = left[leftPointer]!;
+      trace.push({
+        id: `merge-bottom-${stepIndex++}-left-${writeIndex}`,
+        title: `${array[writeIndex]}를 ${writeIndex}번 위치에 기록`,
+        description: "왼쪽 구간에 남은 값을 순서대로 기록합니다.",
+        state: {
+          array: [...array],
+          mergeRange: [start, end],
+          leftRange: [start, mid],
+          rightRange: [mid + 1, end],
+          writeIndex,
+        },
+        pseudoCodeLine: 5,
+        codeLineHighlights: bottomUpCodeLineHighlights.write,
+      });
+      leftPointer += 1;
+      writeIndex += 1;
+    }
+
+    while (rightPointer < right.length) {
+      array[writeIndex] = right[rightPointer]!;
+      trace.push({
+        id: `merge-bottom-${stepIndex++}-right-${writeIndex}`,
+        title: `${array[writeIndex]}를 ${writeIndex}번 위치에 기록`,
+        description: "오른쪽 구간에 남은 값을 순서대로 기록합니다.",
+        state: {
+          array: [...array],
+          mergeRange: [start, end],
+          leftRange: [start, mid],
+          rightRange: [mid + 1, end],
+          writeIndex,
+        },
+        pseudoCodeLine: 5,
+        codeLineHighlights: bottomUpCodeLineHighlights.write,
+      });
+      rightPointer += 1;
+      writeIndex += 1;
+    }
+
+    trace.push({
+      id: `merge-bottom-${stepIndex++}-merged-${start}-${end}`,
+      title: `${start}~${end} 구간 병합 완료`,
+      description: "선택한 두 구간이 하나의 정렬된 구간으로 합쳐졌습니다.",
+      state: {
+        array: [...array],
+        mergeRange: [start, end],
+        sortedIndices: range(start, end + 1),
+      },
+      pseudoCodeLine: 6,
+      codeLineHighlights: bottomUpCodeLineHighlights.merged,
+    });
+  }
 }
 
 function range(start: number, end: number): number[] {

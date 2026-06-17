@@ -355,6 +355,60 @@ describe("SortingPage", () => {
     ).toHaveTextContent("int pivot =");
   });
 
+  it("switches sorting variants inside the selected algorithm", () => {
+    render(
+      <MemoryRouter>
+        <SortingPage />
+      </MemoryRouter>
+    );
+
+    expect(screen.getByRole("tab", { name: "기본" })).toHaveAttribute(
+      "aria-selected",
+      "true"
+    );
+    expect(screen.getByRole("tab", { name: "조기 종료" })).toBeInTheDocument();
+
+    fireEvent.click(screen.getByRole("tab", { name: "조기 종료" }));
+
+    expect(screen.getByRole("tab", { name: "조기 종료" })).toHaveAttribute(
+      "aria-selected",
+      "true"
+    );
+    expect(screen.getByText("bubbleSortEarlyExit.c")).toBeInTheDocument();
+
+    fireEvent.click(screen.getByRole("tab", { name: "퀵 정렬" }));
+    fireEvent.click(screen.getByRole("tab", { name: "중앙값 피벗" }));
+    fireEvent.click(screen.getByRole("button", { name: "도표 다음" }));
+
+    expect(screen.getByText("quickSortMedianPivot.c")).toBeInTheDocument();
+    expect(screen.getByText("0~9 구간 피벗 선택")).toBeInTheDocument();
+  });
+
+  it("adds Heap Sort with build strategy variants", () => {
+    render(
+      <MemoryRouter>
+        <SortingPage />
+      </MemoryRouter>
+    );
+
+    fireEvent.click(screen.getByRole("tab", { name: "힙 정렬" }));
+
+    expect(screen.getByRole("heading", { name: "힙 정렬" })).toBeInTheDocument();
+    expect(screen.getByRole("tab", { name: "Floyd heapify" })).toHaveAttribute(
+      "aria-selected",
+      "true"
+    );
+    expect(screen.getByText("heapSortFloyd.c")).toBeInTheDocument();
+
+    fireEvent.click(screen.getByRole("tab", { name: "삽입식 build" }));
+
+    expect(screen.getByRole("tab", { name: "삽입식 build" })).toHaveAttribute(
+      "aria-selected",
+      "true"
+    );
+    expect(screen.getByText("heapSortInsertionBuild.c")).toBeInTheDocument();
+  });
+
   it("renders code with language-aware syntax colors", () => {
     const { container } = render(
       <MemoryRouter>

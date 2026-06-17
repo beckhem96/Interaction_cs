@@ -1,8 +1,11 @@
 export type SortingState = {
   array: number[];
   currentIndex?: number;
+  heapRange?: [number, number];
   keyIndex?: number;
   minimumIndex?: number;
+  maximumIndex?: number;
+  searchRange?: [number, number];
   scanningIndex?: number;
   shiftedIndices?: number[];
   comparingIndices?: number[];

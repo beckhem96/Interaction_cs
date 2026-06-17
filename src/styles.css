@@ -171,6 +171,40 @@ h1 {
   color: #ffffff;
 }
 
+.variant-tabs {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin-top: 12px;
+}
+
+.variant-tab {
+  min-height: 34px;
+  padding: 0 12px;
+  border: 1px solid #cbd6da;
+  border-radius: 999px;
+  background: #ffffff;
+  color: #31594f;
+  font-size: 0.88rem;
+  font-weight: 800;
+}
+
+.variant-tab[aria-selected="true"] {
+  border-color: #9b5f27;
+  background: #9b5f27;
+  color: #ffffff;
+}
+
+.variant-summary {
+  max-width: 820px;
+  margin: 12px 0 0;
+  color: #46545c;
+}
+
+.variant-summary strong {
+  color: #172026;
+}
+
 .visualization-layout {
   display: block;
   min-width: 0;
@@ -346,6 +380,11 @@ h1 {
   fill: #687982;
 }
 
+.sorting-bar.is-heap-range,
+.sorting-bar.is-search-range {
+  fill: #5c7378;
+}
+
 .sorting-bar.is-merge-range {
   fill: #687982;
 }
@@ -386,6 +425,10 @@ h1 {
   fill: #c28a1d;
 }
 
+.sorting-bar.is-maximum {
+  fill: #9b5f27;
+}
+
 .sorting-bar.is-pivot {
   fill: #c28a1d;
 }
@@ -399,7 +442,9 @@ h1 {
 }
 
 .array-cell.is-partition-range,
-.array-cell.is-merge-range {
+.array-cell.is-merge-range,
+.array-cell.is-heap-range,
+.array-cell.is-search-range {
   border-color: #aab8bf;
   background: #eef2f4;
 }
@@ -438,6 +483,11 @@ h1 {
   background: #f9edcf;
 }
 
+.array-cell.is-maximum {
+  border-color: #9b5f27;
+  background: #f7e8dc;
+}
+
 .array-cell.is-shifted {
   border-color: #8a6f2a;
   background: #f3edd2;
@@ -471,6 +521,7 @@ h1 {
 }
 
 .sorting-bar.is-minimum,
+.sorting-bar.is-maximum,
 .sorting-bar.is-pivot {
   animation: bar-marker-pop 700ms ease;
   filter: drop-shadow(0 9px 10px rgb(194 138 29 / 28%));
@@ -503,6 +554,7 @@ h1 {
 }
 
 .array-cell.is-minimum,
+.array-cell.is-maximum,
 .array-cell.is-pivot {
   animation: cell-marker-pop 700ms ease;
   box-shadow: 0 10px 20px rgb(194 138 29 / 20%);
@@ -519,6 +571,7 @@ h1 {
 .array-cell.is-write::before,
 .array-cell.is-shifted::before,
 .array-cell.is-minimum::before,
+.array-cell.is-maximum::before,
 .array-cell.is-pivot::before {
   animation: cell-sheen 720ms ease;
 }
@@ -529,6 +582,7 @@ h1 {
 .array-cell.is-key .array-cell-value,
 .array-cell.is-write .array-cell-value,
 .array-cell.is-minimum .array-cell-value,
+.array-cell.is-maximum .array-cell-value,
 .array-cell.is-pivot .array-cell-value {
   transform: translateY(-1px);
 }

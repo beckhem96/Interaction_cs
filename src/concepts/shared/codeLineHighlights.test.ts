@@ -2,16 +2,43 @@ import { describe, expect, it } from "vitest";
 
 import type { TraceStep } from "./types";
 import type { CodeLanguage, SortingCodeExample } from "../sorting/code/types";
-import { generateBubbleSortTrace } from "../sorting/algorithms/bubbleSort";
-import { generateInsertionSortTrace } from "../sorting/algorithms/insertionSort";
-import { generateMergeSortTrace } from "../sorting/algorithms/mergeSort";
+import {
+  generateBubbleSortEarlyExitTrace,
+  generateBubbleSortTrace,
+  generateCocktailSortTrace,
+} from "../sorting/algorithms/bubbleSort";
+import { generateHeapSortTrace } from "../sorting/algorithms/heapSort";
+import {
+  generateBinaryInsertionSortTrace,
+  generateInsertionSortTrace,
+} from "../sorting/algorithms/insertionSort";
+import {
+  generateMergeSortBottomUpTrace,
+  generateMergeSortTrace,
+} from "../sorting/algorithms/mergeSort";
 import { generateQuickSortTrace } from "../sorting/algorithms/quickSort";
-import { generateSelectionSortTrace } from "../sorting/algorithms/selectionSort";
+import {
+  generateSelectionSortBidirectionalTrace,
+  generateSelectionSortMaxTrace,
+  generateSelectionSortTrace,
+} from "../sorting/algorithms/selectionSort";
 import { bubbleSortCodeExamples } from "../sorting/code/bubbleSortExamples";
 import { insertionSortCodeExamples } from "../sorting/code/insertionSortExamples";
 import { mergeSortCodeExamples } from "../sorting/code/mergeSortExamples";
 import { quickSortCodeExamples } from "../sorting/code/quickSortExamples";
 import { selectionSortCodeExamples } from "../sorting/code/selectionSortExamples";
+import {
+  binaryInsertionSortCodeExamples,
+  bubbleSortEarlyExitCodeExamples,
+  cocktailSortCodeExamples,
+  heapSortFloydCodeExamples,
+  heapSortInsertionBuildCodeExamples,
+  mergeSortBottomUpCodeExamples,
+  quickSortFirstPivotCodeExamples,
+  quickSortMedianPivotCodeExamples,
+  selectionSortBidirectionalCodeExamples,
+  selectionSortMaxCodeExamples,
+} from "../sorting/code/sortingVariantExamples";
 import {
   GRAPH_STRUCTURE_KINDS,
   generateGraphStructureTrace,
@@ -59,9 +86,29 @@ const subjects: HighlightSubject[] = [
     codeExamples: bubbleSortCodeExamples,
   },
   {
+    name: "sorting:bubble:early-exit",
+    trace: generateBubbleSortEarlyExitTrace(sortingInput),
+    codeExamples: bubbleSortEarlyExitCodeExamples,
+  },
+  {
+    name: "sorting:bubble:cocktail",
+    trace: generateCocktailSortTrace(sortingInput),
+    codeExamples: cocktailSortCodeExamples,
+  },
+  {
     name: "sorting:selection",
     trace: generateSelectionSortTrace(sortingInput),
     codeExamples: selectionSortCodeExamples,
+  },
+  {
+    name: "sorting:selection:max",
+    trace: generateSelectionSortMaxTrace(sortingInput),
+    codeExamples: selectionSortMaxCodeExamples,
+  },
+  {
+    name: "sorting:selection:bidirectional",
+    trace: generateSelectionSortBidirectionalTrace(sortingInput),
+    codeExamples: selectionSortBidirectionalCodeExamples,
   },
   {
     name: "sorting:insertion",
@@ -69,14 +116,44 @@ const subjects: HighlightSubject[] = [
     codeExamples: insertionSortCodeExamples,
   },
   {
+    name: "sorting:insertion:binary",
+    trace: generateBinaryInsertionSortTrace(sortingInput),
+    codeExamples: binaryInsertionSortCodeExamples,
+  },
+  {
     name: "sorting:merge",
     trace: generateMergeSortTrace(sortingInput),
     codeExamples: mergeSortCodeExamples,
   },
   {
+    name: "sorting:merge:bottom-up",
+    trace: generateMergeSortBottomUpTrace(sortingInput),
+    codeExamples: mergeSortBottomUpCodeExamples,
+  },
+  {
     name: "sorting:quick",
     trace: generateQuickSortTrace(sortingInput),
     codeExamples: quickSortCodeExamples,
+  },
+  {
+    name: "sorting:quick:first-pivot",
+    trace: generateQuickSortTrace(sortingInput, "first"),
+    codeExamples: quickSortFirstPivotCodeExamples,
+  },
+  {
+    name: "sorting:quick:median-pivot",
+    trace: generateQuickSortTrace(sortingInput, "median"),
+    codeExamples: quickSortMedianPivotCodeExamples,
+  },
+  {
+    name: "sorting:heap:floyd",
+    trace: generateHeapSortTrace(sortingInput, "floyd"),
+    codeExamples: heapSortFloydCodeExamples,
+  },
+  {
+    name: "sorting:heap:insertion-build",
+    trace: generateHeapSortTrace(sortingInput, "insertion"),
+    codeExamples: heapSortInsertionBuildCodeExamples,
   },
   ...GRAPH_STRUCTURE_KINDS.map((kind) => ({
     name: `graph:structure:${kind}`,
