@@ -23,6 +23,7 @@ const phaseLabels: Record<SqlLogicalPhase, string> = {
   having: "HAVING",
   select: "SELECT",
   union: "UNION",
+  window: "WINDOW",
   orderBy: "ORDER BY",
   limit: "LIMIT",
 };
@@ -54,6 +55,9 @@ export function DatabasePage() {
         <p className="eyebrow">데이터베이스</p>
         <h1 id="database-title">{activeExample.title}</h1>
         <p className="intro-copy">{activeExample.intro}</p>
+        <p className="database-helper-copy">
+          이 워크벤치는 임의 SQL 입력이 아니라 검증된 고정 예제를 단계별로 추적합니다.
+        </p>
         <div className="algorithm-tabs" role="tablist" aria-label="SQL 동작 선택">
           {sqlExamples.map((example, index) => (
             <button
@@ -94,7 +98,6 @@ export function DatabasePage() {
                 이전
               </button>
               <button
-                className="primary-control"
                 type="button"
                 onClick={controller.togglePlay}
                 disabled={controller.isLastStep}
@@ -103,6 +106,7 @@ export function DatabasePage() {
               </button>
               <button
                 aria-label="SQL 다음 단계"
+                className="primary-control"
                 type="button"
                 onClick={controller.goNext}
                 disabled={controller.isLastStep}
@@ -140,6 +144,7 @@ export function DatabasePage() {
               activeRowKeys={currentStep.state.activeRowKeys ?? []}
               ariaLabel="SQL 중간 결과 테이블"
               cellHighlights={cellHighlights.filter((highlight) => highlight.scope === "output")}
+              emptyMessage="이 단계에서는 아직 결과 행이 없습니다."
               rowMotionByKey={currentStep.state.rowMotionByKey ?? {}}
               rows={currentStep.state.rows}
             />
@@ -281,6 +286,7 @@ function SqlInputTables({ cellHighlights, tables }: SqlInputTablesProps) {
                 (highlight) =>
                   highlight.scope === "input" && highlight.tableName === table.name,
               )}
+              emptyMessage={`${table.name}에서 표시할 행이 없습니다.`}
               rowMotionByKey={table.rowMotionByKey ?? {}}
               rows={table.rows}
             />
@@ -296,6 +302,7 @@ type SqlDataTableProps = {
   activeRowKeys?: string[];
   ariaLabel: string;
   cellHighlights?: DatabaseCellHighlight[];
+  emptyMessage?: string;
   rowMotionByKey?: Record<string, DatabaseRowMotion>;
   rows: DatabaseRow[];
 };
@@ -305,10 +312,11 @@ function SqlDataTable({
   activeRowKeys = [],
   ariaLabel,
   cellHighlights = [],
+  emptyMessage = "표시할 행이 없습니다.",
   rowMotionByKey = {},
   rows,
 }: SqlDataTableProps) {
-  const columns = rows.length > 0 ? Object.keys(rows[0]!) : [];
+  const columns = rows.length > 0 ? Object.keys(rows[0]!).filter((column) => !column.startsWith("__")) : [];
   const activeRowKeySet = new Set(activeRowKeys);
   const highlightByCell = new Map(
     cellHighlights.map((highlight) => [
@@ -319,6 +327,11 @@ function SqlDataTable({
 
   return (
     <div className="sql-table-scroll">
+      {rows.length === 0 ? (
+        <p className="sql-empty-state" role="status">
+          {emptyMessage}
+        </p>
+      ) : null}
       <table className="sql-result-table" aria-label={ariaLabel}>
         <thead>
           <tr>
@@ -383,6 +396,10 @@ function formatCellValue(value: DatabaseCellValue): string {
 }
 
 function getDatabaseRowKey(row: DatabaseRow): string {
+  if (row.__rowKey !== undefined) {
+    return String(row.__rowKey);
+  }
+
   if (row.cid !== undefined && row.status !== undefined && row.color !== undefined) {
     return `${row.cid}:${row.status}:${row.color}`;
   }

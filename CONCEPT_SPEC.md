@@ -310,6 +310,8 @@ The user should understand:
 * How grouping works
 * How aggregate functions are calculated
 * How `HAVING` differs from `WHERE`
+* How `UNION` removes duplicates while `UNION ALL` retains them
+* How `RANK()` handles ties and rank gaps
 * How selected columns become the final result
 * How ordering changes the final output
 
@@ -330,8 +332,10 @@ Use this order for educational visualization:
 5. HAVING
 6. SELECT
 7. DISTINCT, optional
-8. ORDER BY
-9. LIMIT / OFFSET
+8. UNION / UNION ALL, when teaching set operations
+9. WINDOW, when teaching window functions such as `RANK()`
+10. ORDER BY
+11. LIMIT / OFFSET
 
 ### 4.3 SQL State Type
 
@@ -498,17 +502,24 @@ IT         | 5000
 
 ### 4.6 Additional SQL Examples
 
-Add these after the MVP:
+Initial interactive SQL coverage should provide these fixed, manually traced examples:
+
+1. SUB QUERY
+2. JOIN
+3. GROUP BY
+4. HAVING
+5. UNION
+6. UNION ALL
+7. ORDER/LIMIT
+8. WINDOW RANK
+
+Additional topics can be added later after these eight examples remain stable:
 
 1. WHERE only
-2. GROUP BY + COUNT
-3. INNER JOIN
-4. LEFT JOIN
-5. DISTINCT
-6. UNION
-7. LIMIT
-8. Subquery, optional
-9. Index scan vs full scan, advanced
+2. LEFT JOIN
+3. DISTINCT
+4. `ROW_NUMBER()` and `DENSE_RANK()` comparison
+5. Index scan vs full scan, advanced
 
 ### 4.7 SQL Implementation Rules
 
@@ -883,4 +894,3 @@ It should include:
 * Unit test for trace generation
 
 After this is stable, add other languages and other concepts.
-

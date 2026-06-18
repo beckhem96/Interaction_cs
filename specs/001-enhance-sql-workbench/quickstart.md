@@ -32,6 +32,13 @@ npm run dev
 6. `WINDOW RANK`에서 동점 row와 rank gap이 보이는지 확인한다.
 7. mobile viewport에서도 text overlap 없이 query/table/control을 사용할 수 있는지 확인한다.
 
+## 3.1 구현 후 확인 노트
+
+- `UNION ALL` 최종 단계는 같은 email이 두 번 남는 row를 결과 테이블에서 직접 보여준다.
+- `WINDOW RANK` 최종 단계는 rank sequence가 `1, 2, 2, 4, 5`로 표시되어 동점 후 rank gap을 확인할 수 있다.
+- 첫 단계처럼 결과 row가 아직 없는 상태는 빈 표만 두지 않고 한국어 empty state 설명을 보여준다.
+- 자동 재생은 보조 컨트롤이며, 수동 `다음` 버튼은 SQL query/table workbench 안에서 계속 보인다.
+
 ## 4. 자동화 테스트
 
 ```bash

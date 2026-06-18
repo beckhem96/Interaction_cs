@@ -16,6 +16,7 @@ const keywords = new Set([
   "AND",
   "AS",
   "ASC",
+  "ALL",
   "BY",
   "DESC",
   "FROM",
@@ -26,12 +27,14 @@ const keywords = new Set([
   "LIMIT",
   "ON",
   "ORDER",
+  "OVER",
+  "PARTITION",
   "SELECT",
   "UNION",
   "WHERE",
 ]);
 
-const functions = new Set(["AVG", "COUNT", "MAX", "MIN", "SUM"]);
+const functions = new Set(["AVG", "COUNT", "MAX", "MIN", "RANK", "SUM"]);
 
 const operatorPattern = /^[=<>!+\-*/.,();]$/;
 

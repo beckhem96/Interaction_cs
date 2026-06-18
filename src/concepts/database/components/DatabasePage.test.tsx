@@ -16,18 +16,33 @@ describe("DatabasePage", () => {
     const { container } = renderDatabasePage();
 
     expect(screen.getByRole("heading", { level: 1, name: "SUB QUERY 실행 흐름" })).toBeInTheDocument();
-    for (const tab of ["SUB QUERY", "JOIN", "GROUP BY", "HAVING", "UNION", "ORDER/LIMIT"]) {
+    for (const tab of [
+      "SUB QUERY",
+      "JOIN",
+      "GROUP BY",
+      "HAVING",
+      "UNION",
+      "UNION ALL",
+      "ORDER/LIMIT",
+      "WINDOW RANK",
+    ]) {
       expect(screen.getByRole("tab", { name: tab })).toBeInTheDocument();
     }
 
+    expect(screen.getByText(/검증된 고정 예제/)).toBeInTheDocument();
     expect(screen.getByRole("heading", { name: "SQL 쿼리" })).toBeInTheDocument();
     expect(screen.getByRole("region", { name: "SQL 입력 테이블" })).toBeInTheDocument();
     expect(screen.getByRole("region", { name: "SQL 결과 테이블" })).toBeInTheDocument();
     expect(screen.getAllByText("client").length).toBeGreaterThan(0);
     expect(container.querySelector(".database-workbench")).not.toBeNull();
     expect(container.querySelector(".database-cinematic-page")).not.toBeNull();
+    expect(container.querySelector(".database-table-panel")).not.toBeNull();
+    expect(container.querySelector(".sql-query-section")).not.toBeNull();
     expect(screen.getByRole("button", { name: "이전" })).toBeDisabled();
     expect(screen.getByRole("button", { name: "SQL 다음 단계" })).toBeEnabled();
+    expect(screen.getByRole("button", { name: "자동 재생" })).toBeInTheDocument();
+    expect(screen.getByRole("button", { name: "SQL 다음 단계" })).toHaveClass("primary-control");
+    expect(screen.getByRole("status")).toHaveTextContent("아직 결과 행이 없습니다");
     expect(
       screen.getByRole("listitem", {
         name: "현재 쿼리 1: SELECT id, name",
@@ -71,6 +86,7 @@ describe("DatabasePage", () => {
 
     expect(container.querySelector('td[data-cell-highlight="match"]')).not.toBeNull();
     expect(container.querySelector('td[data-cell-highlight="reject"]')).not.toBeNull();
+    expect(container.querySelector("tr[data-motion]")).not.toBeNull();
 
     fireEvent.click(screen.getByRole("tab", { name: "GROUP BY" }));
 
@@ -109,6 +125,30 @@ describe("DatabasePage", () => {
     expect(container.querySelector(".sql-query")?.textContent).not.toContain("UNION");
   });
 
+  it("renders each SQL tab with its own query and input table names", () => {
+    const { container } = renderDatabasePage();
+    const expectations = [
+      { tab: "SUB QUERY", query: "WHERE id IN", tables: ["client", "delivery", "product"] },
+      { tab: "JOIN", query: "JOIN customers", tables: ["orders", "customers"] },
+      { tab: "GROUP BY", query: "GROUP BY region", tables: ["orders"] },
+      { tab: "HAVING", query: "HAVING SUM(amount)", tables: ["department_sales"] },
+      { tab: "UNION", query: "UNION", tables: ["newsletter_signups", "purchasers"] },
+      { tab: "UNION ALL", query: "UNION ALL", tables: ["newsletter_signups", "purchasers"] },
+      { tab: "ORDER/LIMIT", query: "LIMIT 3", tables: ["product_sales"] },
+      { tab: "WINDOW RANK", query: "RANK() OVER", tables: ["exam_scores"] },
+    ];
+
+    for (const expectation of expectations) {
+      fireEvent.click(screen.getByRole("tab", { name: expectation.tab }));
+
+      expect(container.querySelector(".sql-query")?.textContent).toContain(expectation.query);
+      for (const tableName of expectation.tables) {
+        expect(screen.getAllByText(tableName).length).toBeGreaterThan(0);
+      }
+      expect(screen.getByText(/^1 \/ \d+$/)).toBeInTheDocument();
+    }
+  });
+
   it("shows UNION duplicate removal with two input tables", () => {
     const { container } = renderDatabasePage();
 
@@ -130,6 +170,26 @@ describe("DatabasePage", () => {
     expect(container.querySelectorAll('tbody tr[data-motion="deduped"]').length).toBeGreaterThan(0);
   });
 
+  it("shows UNION ALL retained duplicate rows", () => {
+    const { container } = renderDatabasePage();
+
+    fireEvent.click(screen.getByRole("tab", { name: "UNION ALL" }));
+    for (let index = 0; index < 4; index += 1) {
+      fireEvent.click(screen.getByRole("button", { name: "SQL 다음 단계" }));
+    }
+
+    expect(container.querySelector(".database-table-header h2")?.textContent).toContain("중복 포함");
+    expect(
+      screen.getByRole("listitem", {
+        name: "현재 쿼리 2: UNION ALL",
+      }),
+    ).toHaveAttribute("aria-current", "step");
+    const outputSection = screen.getByRole("region", { name: "SQL 결과 테이블" });
+    expect(within(outputSection).getAllByRole("cell", { name: "hyun@example.com" })).toHaveLength(2);
+    expect(container.querySelectorAll('tbody tr[data-motion="retainedDuplicate"]').length).toBeGreaterThan(0);
+    expect(container.querySelector('td[data-cell-highlight="duplicate"]')).not.toBeNull();
+  });
+
   it("shows ORDER/LIMIT cutoff and final top three output", () => {
     const { container } = renderDatabasePage();
 
@@ -148,5 +208,45 @@ describe("DatabasePage", () => {
     expect(within(outputSection).getByRole("cell", { name: "Headset" })).toBeInTheDocument();
     expect(within(outputSection).getByRole("cell", { name: "Laptop Stand" })).toBeInTheDocument();
     expect(within(outputSection).queryByRole("cell", { name: "Keyboard" })).not.toBeInTheDocument();
+  });
+
+  it("shows WINDOW RANK ties and resets when switching examples", () => {
+    const { container } = renderDatabasePage();
+
+    fireEvent.click(screen.getByRole("tab", { name: "JOIN" }));
+    fireEvent.click(screen.getByRole("button", { name: "SQL 다음 단계" }));
+    expect(screen.getByText("2 / 5")).toBeInTheDocument();
+
+    fireEvent.click(screen.getByRole("tab", { name: "WINDOW RANK" }));
+
+    expect(screen.getByRole("heading", { level: 1, name: "WINDOW RANK 실행 흐름" })).toBeInTheDocument();
+    expect(screen.getByText("1 / 5")).toBeInTheDocument();
+    expect(container.querySelector(".sql-query")?.textContent).toContain("RANK() OVER");
+    expect(screen.getAllByText("exam_scores").length).toBeGreaterThan(0);
+
+    for (let index = 0; index < 3; index += 1) {
+      fireEvent.click(screen.getByRole("button", { name: "SQL 다음 단계" }));
+    }
+
+    expect(container.querySelector(".database-table-header h2")?.textContent).toContain("동점");
+    expect(container.querySelectorAll('tbody tr[data-motion="tie"]').length).toBeGreaterThan(0);
+    expect(container.querySelector('td[data-cell-highlight="tie"]')).not.toBeNull();
+
+    fireEvent.click(screen.getByRole("button", { name: "SQL 다음 단계" }));
+
+    const outputSection = screen.getByRole("region", { name: "SQL 결과 테이블" });
+    expect(within(outputSection).getByRole("cell", { name: "Mina" })).toBeInTheDocument();
+    expect(within(outputSection).getAllByRole("cell", { name: "2" })).toHaveLength(2);
+    expect(within(outputSection).getByRole("cell", { name: "4" })).toBeInTheDocument();
+  });
+
+  it("keeps reference videos out of the runtime database workbench", () => {
+    const { container } = renderDatabasePage();
+
+    expect(container.querySelector("video")).toBeNull();
+    expect(container.querySelector("iframe")).toBeNull();
+    expect(screen.getByRole("button", { name: "자동 재생" })).toBeInTheDocument();
+    expect(screen.getByRole("region", { name: "SQL 입력 테이블" })).toBeInTheDocument();
+    expect(screen.getByRole("heading", { name: "SQL 쿼리" })).toBeInTheDocument();
   });
 });

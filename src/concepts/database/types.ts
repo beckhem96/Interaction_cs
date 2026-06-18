@@ -8,6 +8,7 @@ export type SqlLogicalPhase =
   | "having"
   | "select"
   | "union"
+  | "window"
   | "orderBy"
   | "limit";
 
@@ -29,14 +30,20 @@ export type DatabaseRowMotion =
   | "deduped"
   | "sorted"
   | "limited"
-  | "cutoff";
+  | "cutoff"
+  | "ranked"
+  | "tie"
+  | "retainedDuplicate";
 
 export type DatabaseCellHighlightTone =
   | "active"
   | "join"
   | "match"
   | "output"
-  | "reject";
+  | "reject"
+  | "rank"
+  | "duplicate"
+  | "tie";
 
 export type DatabaseCellHighlight = {
   scope: "input" | "output";
@@ -74,7 +81,17 @@ export type SqlOperationExampleId =
   | "group-by"
   | "having"
   | "union"
-  | "order-limit";
+  | "union-all"
+  | "order-limit"
+  | "window-rank";
+
+export type DatabaseTopicCategory = {
+  id: SqlOperationExampleId;
+  label: string;
+  description: string;
+  isInteractive: boolean;
+  exampleIds: SqlOperationExampleId[];
+};
 
 export type DatabaseExample = {
   id: SqlOperationExampleId;

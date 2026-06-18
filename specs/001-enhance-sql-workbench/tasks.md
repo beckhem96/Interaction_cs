@@ -1,4 +1,4 @@
-# Tasks: SQL/DATABASE Workbench Enhancement
+﻿# Tasks: SQL/DATABASE Workbench Enhancement
 
 **Input**: Design documents from `specs/001-enhance-sql-workbench/`
 
@@ -18,9 +18,9 @@
 
 **Purpose**: Prepare shared database trace types and test expectations before user-story work.
 
-- [ ] T001 Extend SQL example ids, phases, row motions, and highlight tones for `UNION ALL` and `WINDOW RANK` in `src/concepts/database/types.ts`
-- [ ] T002 [P] Review SQL tokenization support for `UNION ALL`, `RANK`, `OVER`, and window clauses in `src/concepts/database/code/sqlSyntaxHighlight.ts`
-- [ ] T003 [P] Record current database workbench visual problem areas for implementation reference in `specs/001-enhance-sql-workbench/quickstart.md`
+- [X] T001 Extend SQL example ids, phases, row motions, and highlight tones for `UNION ALL` and `WINDOW RANK` in `src/concepts/database/types.ts`
+- [X] T002 [P] Review SQL tokenization support for `UNION ALL`, `RANK`, `OVER`, and window clauses in `src/concepts/database/code/sqlSyntaxHighlight.ts`
+- [X] T003 [P] Record current database workbench visual problem areas for implementation reference in `specs/001-enhance-sql-workbench/quickstart.md`
 
 ---
 
@@ -30,12 +30,12 @@
 
 **CRITICAL**: Complete this phase before changing the UI or adding new examples.
 
-- [ ] T004 [P] Add failing test that `generateSqlOperationExamples()` returns 8 examples including `union-all` and `window-rank` in `src/concepts/database/tests/selectLogicalExecution.test.ts`
-- [ ] T005 [P] Add failing trace validation test for `UNION ALL` duplicate-retained rows in `src/concepts/database/tests/selectLogicalExecution.test.ts`
-- [ ] T006 [P] Add failing trace validation test for `WINDOW RANK` tie rows and rank gaps in `src/concepts/database/tests/selectLogicalExecution.test.ts`
-- [ ] T007 [P] Add failing component test for 8 SQL example tabs and Korean workbench labels in `src/concepts/database/components/DatabasePage.test.tsx`
-- [ ] T008 [P] Add failing component test that switching examples resets the current SQL step in `src/concepts/database/components/DatabasePage.test.tsx`
-- [ ] T009 Add shared row-key handling for new duplicate/rank examples in `src/concepts/database/engine/selectLogicalExecution.ts`
+- [X] T004 [P] Add failing test that `generateSqlOperationExamples()` returns 8 examples including `union-all` and `window-rank` in `src/concepts/database/tests/selectLogicalExecution.test.ts`
+- [X] T005 [P] Add failing trace validation test for `UNION ALL` duplicate-retained rows in `src/concepts/database/tests/selectLogicalExecution.test.ts`
+- [X] T006 [P] Add failing trace validation test for `WINDOW RANK` tie rows and rank gaps in `src/concepts/database/tests/selectLogicalExecution.test.ts`
+- [X] T007 [P] Add failing component test for 8 SQL example tabs and Korean workbench labels in `src/concepts/database/components/DatabasePage.test.tsx`
+- [X] T008 [P] Add failing component test that switching examples resets the current SQL step in `src/concepts/database/components/DatabasePage.test.tsx`
+- [X] T009 Add shared row-key handling for new duplicate/rank examples in `src/concepts/database/engine/selectLogicalExecution.ts`
 
 **Checkpoint**: Required tests exist and fail for missing `UNION ALL`, `WINDOW RANK`, or reset behavior.
 
@@ -49,16 +49,16 @@
 
 ### Tests for User Story 1
 
-- [ ] T010 [P] [US1] Add component assertions for readable database workbench regions and visible Korean labels in `src/concepts/database/components/DatabasePage.test.tsx`
-- [ ] T011 [P] [US1] Add DOM/class assertions for state labels that do not rely only on color in `src/concepts/database/components/DatabasePage.test.tsx`
+- [X] T010 [P] [US1] Add component assertions for readable database workbench regions and visible Korean labels in `src/concepts/database/components/DatabasePage.test.tsx`
+- [X] T011 [P] [US1] Add DOM/class assertions for state labels that do not rely only on color in `src/concepts/database/components/DatabasePage.test.tsx`
 
 ### Implementation for User Story 1
 
-- [ ] T012 [US1] Remove or neutralize unreadable database cinematic dark overrides in `src/styles.css`
-- [ ] T013 [US1] Define WCAG AA-oriented database panel, table, query, tab, and control color tokens in `src/styles.css`
-- [ ] T014 [US1] Update SQL table row and cell highlight styles for distinguishable active, match, reject, output, duplicate, and rank states in `src/styles.css`
-- [ ] T015 [US1] Ensure the database workbench keeps the interaction stage and SQL query panel side by side on desktop in `src/styles.css`
-- [ ] T016 [US1] Ensure database workbench text does not overlap on mobile viewports in `src/styles.css`
+- [X] T012 [US1] Remove or neutralize unreadable database cinematic dark overrides in `src/styles.css`
+- [X] T013 [US1] Define WCAG AA-oriented database panel, table, query, tab, and control color tokens in `src/styles.css`
+- [X] T014 [US1] Update SQL table row and cell highlight styles for distinguishable active, match, reject, output, duplicate, and rank states in `src/styles.css`
+- [X] T015 [US1] Ensure the database workbench keeps the interaction stage and SQL query panel side by side on desktop in `src/styles.css`
+- [X] T016 [US1] Ensure database workbench text does not overlap on mobile viewports in `src/styles.css`
 
 **Checkpoint**: User Story 1 is independently verifiable through component tests and visual inspection.
 
@@ -72,19 +72,19 @@
 
 ### Tests for User Story 2
 
-- [ ] T017 [P] [US2] Add test that every trace step has in-range active SQL query lines in `src/concepts/database/tests/selectLogicalExecution.test.ts`
-- [ ] T018 [P] [US2] Add test that every cell highlight points to a real row and column in `src/concepts/database/tests/selectLogicalExecution.test.ts`
-- [ ] T019 [P] [US2] Add component test that Next updates active query line and result table together in `src/concepts/database/components/DatabasePage.test.tsx`
+- [X] T017 [P] [US2] Add test that every trace step has in-range active SQL query lines in `src/concepts/database/tests/selectLogicalExecution.test.ts`
+- [X] T018 [P] [US2] Add test that every cell highlight points to a real row and column in `src/concepts/database/tests/selectLogicalExecution.test.ts`
+- [X] T019 [P] [US2] Add component test that Next updates active query line and result table together in `src/concepts/database/components/DatabasePage.test.tsx`
 
 ### Implementation for User Story 2
 
-- [ ] T020 [US2] Add curated `UNION ALL` query, input rows, intermediate rows, and final rows in `src/concepts/database/engine/selectLogicalExecution.ts`
-- [ ] T021 [US2] Add `UNION ALL` trace steps showing source scan, append, retained duplicate rows, and final result in `src/concepts/database/engine/selectLogicalExecution.ts`
-- [ ] T022 [US2] Add curated `WINDOW RANK` query, input rows, sorted rows, tied rows, and ranked rows in `src/concepts/database/engine/selectLogicalExecution.ts`
-- [ ] T023 [US2] Add `WINDOW RANK` trace steps showing partition/order basis, tie handling, rank gap, and final result in `src/concepts/database/engine/selectLogicalExecution.ts`
-- [ ] T024 [US2] Extend phase labels for `UNION ALL` and `WINDOW RANK` display in `src/concepts/database/components/DatabasePage.tsx`
-- [ ] T025 [US2] Render empty or no-result table states with Korean explanation in `src/concepts/database/components/DatabasePage.tsx`
-- [ ] T026 [US2] Ensure SQL query line highlighting uses the current trace step as the single source of truth in `src/concepts/database/components/DatabasePage.tsx`
+- [X] T020 [US2] Add curated `UNION ALL` query, input rows, intermediate rows, and final rows in `src/concepts/database/engine/selectLogicalExecution.ts`
+- [X] T021 [US2] Add `UNION ALL` trace steps showing source scan, append, retained duplicate rows, and final result in `src/concepts/database/engine/selectLogicalExecution.ts`
+- [X] T022 [US2] Add curated `WINDOW RANK` query, input rows, sorted rows, tied rows, and ranked rows in `src/concepts/database/engine/selectLogicalExecution.ts`
+- [X] T023 [US2] Add `WINDOW RANK` trace steps showing partition/order basis, tie handling, rank gap, and final result in `src/concepts/database/engine/selectLogicalExecution.ts`
+- [X] T024 [US2] Extend phase labels for `UNION ALL` and `WINDOW RANK` display in `src/concepts/database/components/DatabasePage.tsx`
+- [X] T025 [US2] Render empty or no-result table states with Korean explanation in `src/concepts/database/components/DatabasePage.tsx`
+- [X] T026 [US2] Ensure SQL query line highlighting uses the current trace step as the single source of truth in `src/concepts/database/components/DatabasePage.tsx`
 
 **Checkpoint**: User Story 2 is independently verifiable by trace tests and stepping through all examples.
 
@@ -98,17 +98,17 @@
 
 ### Tests for User Story 3
 
-- [ ] T027 [P] [US3] Add trace test that all 8 required categories are independently selectable examples in `src/concepts/database/tests/selectLogicalExecution.test.ts`
-- [ ] T028 [P] [US3] Add component test that each tab renders its own query and input table names in `src/concepts/database/components/DatabasePage.test.tsx`
-- [ ] T029 [P] [US3] Add component test that switching from JOIN to WINDOW RANK resets step index and query content in `src/concepts/database/components/DatabasePage.test.tsx`
+- [X] T027 [P] [US3] Add trace test that all 8 required categories are independently selectable examples in `src/concepts/database/tests/selectLogicalExecution.test.ts`
+- [X] T028 [P] [US3] Add component test that each tab renders its own query and input table names in `src/concepts/database/components/DatabasePage.test.tsx`
+- [X] T029 [P] [US3] Add component test that switching from JOIN to WINDOW RANK resets step index and query content in `src/concepts/database/components/DatabasePage.test.tsx`
 
 ### Implementation for User Story 3
 
-- [ ] T030 [US3] Add topic category metadata for the 8 required SQL categories in `src/concepts/database/engine/selectLogicalExecution.ts`
-- [ ] T031 [US3] Update `generateSqlOperationExamples()` ordering to SUB QUERY, JOIN, GROUP BY, HAVING, UNION, UNION ALL, ORDER/LIMIT, WINDOW RANK in `src/concepts/database/engine/selectLogicalExecution.ts`
-- [ ] T032 [US3] Update tab labels and selected-example state handling for the 8 categories in `src/concepts/database/components/DatabasePage.tsx`
-- [ ] T033 [US3] Add Korean intro text and summary items for `UNION ALL` and `WINDOW RANK` in `src/concepts/database/engine/selectLogicalExecution.ts`
-- [ ] T034 [US3] Ensure planned categories beyond the initial 8 are not shown as interactive tabs in `src/concepts/database/components/DatabasePage.tsx`
+- [X] T030 [US3] Add topic category metadata for the 8 required SQL categories in `src/concepts/database/engine/selectLogicalExecution.ts`
+- [X] T031 [US3] Update `generateSqlOperationExamples()` ordering to SUB QUERY, JOIN, GROUP BY, HAVING, UNION, UNION ALL, ORDER/LIMIT, WINDOW RANK in `src/concepts/database/engine/selectLogicalExecution.ts`
+- [X] T032 [US3] Update tab labels and selected-example state handling for the 8 categories in `src/concepts/database/components/DatabasePage.tsx`
+- [X] T033 [US3] Add Korean intro text and summary items for `UNION ALL` and `WINDOW RANK` in `src/concepts/database/engine/selectLogicalExecution.ts`
+- [X] T034 [US3] Ensure planned categories beyond the initial 8 are not shown as interactive tabs in `src/concepts/database/components/DatabasePage.tsx`
 
 **Checkpoint**: User Story 3 is independently verifiable by selecting every SQL category.
 
@@ -122,14 +122,14 @@
 
 ### Tests for User Story 4
 
-- [ ] T035 [P] [US4] Add component test that auto play controls remain visible with SQL query and table regions in `src/concepts/database/components/DatabasePage.test.tsx`
-- [ ] T036 [P] [US4] Add component test that reference videos are not required for database page rendering in `src/concepts/database/components/DatabasePage.test.tsx`
+- [X] T035 [P] [US4] Add component test that auto play controls remain visible with SQL query and table regions in `src/concepts/database/components/DatabasePage.test.tsx`
+- [X] T036 [P] [US4] Add component test that reference videos are not required for database page rendering in `src/concepts/database/components/DatabasePage.test.tsx`
 
 ### Implementation for User Story 4
 
-- [ ] T037 [US4] Keep reference video material out of runtime database rendering in `src/concepts/database/components/DatabasePage.tsx`
-- [ ] T038 [US4] Add Korean helper copy that the workbench uses curated examples rather than arbitrary SQL input in `src/concepts/database/components/DatabasePage.tsx`
-- [ ] T039 [US4] Ensure play/pause remains a secondary control and manual Next remains visible in the database workbench in `src/concepts/database/components/DatabasePage.tsx`
+- [X] T037 [US4] Keep reference video material out of runtime database rendering in `src/concepts/database/components/DatabasePage.tsx`
+- [X] T038 [US4] Add Korean helper copy that the workbench uses curated examples rather than arbitrary SQL input in `src/concepts/database/components/DatabasePage.tsx`
+- [X] T039 [US4] Ensure play/pause remains a secondary control and manual Next remains visible in the database workbench in `src/concepts/database/components/DatabasePage.tsx`
 
 **Checkpoint**: User Story 4 is independently verifiable by using controls without any video dependency.
 
@@ -139,13 +139,13 @@
 
 **Purpose**: Validate the complete feature, remove regressions, and update supporting documentation where useful.
 
-- [ ] T040 [P] Update database quickstart verification notes after implementation in `specs/001-enhance-sql-workbench/quickstart.md`
-- [ ] T041 [P] Update concept-level SQL coverage notes if new examples change documented behavior in `CONCEPT_SPEC.md`
-- [ ] T042 Run focused database trace and component tests through `package.json`
-- [ ] T043 Run full test suite through `package.json`
-- [ ] T044 Run production build through `package.json`
-- [ ] T045 Review final database workbench against `specs/001-enhance-sql-workbench/contracts/database-workbench-ui.md`
-- [ ] T046 Confirm no unrelated domains were modified by reviewing `src/concepts/database/types.ts`
+- [X] T040 [P] Update database quickstart verification notes after implementation in `specs/001-enhance-sql-workbench/quickstart.md`
+- [X] T041 [P] Update concept-level SQL coverage notes if new examples change documented behavior in `CONCEPT_SPEC.md`
+- [X] T042 Run focused database trace and component tests through `package.json`
+- [X] T043 Run full test suite through `package.json`
+- [X] T044 Run production build through `package.json`
+- [X] T045 Review final database workbench against `specs/001-enhance-sql-workbench/contracts/database-workbench-ui.md`
+- [X] T046 Confirm no unrelated domains were modified by reviewing `src/concepts/database/types.ts`
 
 ---
 

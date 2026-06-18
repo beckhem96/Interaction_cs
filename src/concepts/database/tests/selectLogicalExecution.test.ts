@@ -1,9 +1,16 @@
 import { describe, expect, it } from "vitest";
 
-import { generateSqlOperationExamples } from "../engine/selectLogicalExecution";
+import {
+  generateSqlOperationExamples,
+  sqlTopicCategories,
+} from "../engine/selectLogicalExecution";
 import type { DatabaseRow } from "../types";
 
 const getDatabaseRowKey = (row: DatabaseRow): string => {
+  if (row.__rowKey !== undefined) {
+    return String(row.__rowKey);
+  }
+
   if (row.cid !== undefined && row.status !== undefined && row.color !== undefined) {
     return `${row.cid}:${row.status}:${row.color}`;
   }
@@ -38,7 +45,9 @@ describe("generateSqlOperationExamples", () => {
       "group-by",
       "having",
       "union",
+      "union-all",
       "order-limit",
+      "window-rank",
     ]);
 
     expect(new Set(examples.map((example) => example.query)).size).toBe(examples.length);
@@ -47,7 +56,26 @@ describe("generateSqlOperationExamples", () => {
     expect(examples.find((example) => example.id === "group-by")?.query).not.toContain("JOIN");
     expect(examples.find((example) => example.id === "having")?.query).toContain("HAVING");
     expect(examples.find((example) => example.id === "union")?.query).toContain("UNION");
+    expect(examples.find((example) => example.id === "union-all")?.query).toContain("UNION ALL");
     expect(examples.find((example) => example.id === "order-limit")?.query).toContain("LIMIT 3");
+    expect(examples.find((example) => example.id === "window-rank")?.query).toContain("RANK() OVER");
+  });
+
+  it("returns the 8 required SQL/DATABASE categories in the planned order", () => {
+    expect(examples.map((example) => example.tabLabel)).toEqual([
+      "SUB QUERY",
+      "JOIN",
+      "GROUP BY",
+      "HAVING",
+      "UNION",
+      "UNION ALL",
+      "ORDER/LIMIT",
+      "WINDOW RANK",
+    ]);
+    expect(sqlTopicCategories.map((category) => category.id)).toEqual(
+      examples.map((example) => example.id),
+    );
+    expect(sqlTopicCategories.every((category) => category.isInteractive)).toBe(true);
   });
 
   it("keeps every trace multi-step and query line highlights in range", () => {
@@ -145,6 +173,24 @@ describe("generateSqlOperationExamples", () => {
     expect(Object.values(dedupeStep?.state.rowMotionByKey ?? {})).toContain("deduped");
   });
 
+  it("shows UNION ALL with retained duplicate rows", () => {
+    const unionAll = examples.find((example) => example.id === "union-all");
+
+    expect(unionAll).toBeDefined();
+    expect(unionAll?.trace[0].state.inputTables).toHaveLength(2);
+
+    const appendStep = unionAll?.trace.find((step) => step.id === "union-all-append");
+    const finalStep = unionAll?.trace.find((step) => step.id === "union-all-output");
+    const finalEmails = finalStep?.state.rows.map((row) => row.email);
+
+    expect(appendStep?.state.rows).toHaveLength(8);
+    expect(finalStep?.state.rows).toHaveLength(8);
+    expect(finalEmails?.filter((email) => email === "hyun@example.com")).toHaveLength(2);
+    expect(finalEmails?.filter((email) => email === "minseo@example.com")).toHaveLength(2);
+    expect(Object.values(finalStep?.state.rowMotionByKey ?? {})).toContain("retainedDuplicate");
+    expect(finalStep?.state.cellHighlights?.some((highlight) => highlight.tone === "duplicate")).toBe(true);
+  });
+
   it("marks ORDER/LIMIT cutoff rows and keeps only the top three at the end", () => {
     const orderLimit = examples.find((example) => example.id === "order-limit");
 
@@ -159,5 +205,25 @@ describe("generateSqlOperationExamples", () => {
       { product: "Headset", total_sales: 640 },
       { product: "Laptop Stand", total_sales: 510 },
     ]);
+  });
+
+  it("shows WINDOW RANK tie rows and rank gaps", () => {
+    const windowRank = examples.find((example) => example.id === "window-rank");
+
+    expect(windowRank).toBeDefined();
+
+    const tieStep = windowRank?.trace.find((step) => step.id === "rank-tie-detected");
+    const finalStep = windowRank?.trace.find((step) => step.id === "rank-output");
+
+    expect(Object.values(tieStep?.state.rowMotionByKey ?? {})).toContain("tie");
+    expect(tieStep?.state.cellHighlights?.some((highlight) => highlight.tone === "tie")).toBe(true);
+    expect(finalStep?.state.rows).toEqual([
+      expect.objectContaining({ student: "Mina", score: 98, rank: 1 }),
+      expect.objectContaining({ student: "Joon", score: 92, rank: 2 }),
+      expect.objectContaining({ student: "Ara", score: 92, rank: 2 }),
+      expect.objectContaining({ student: "Sol", score: 87, rank: 4 }),
+      expect.objectContaining({ student: "Hyun", score: 81, rank: 5 }),
+    ]);
+    expect(Object.values(finalStep?.state.rowMotionByKey ?? {})).toContain("ranked");
   });
 });

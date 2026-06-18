@@ -5,9 +5,69 @@ import type {
   DatabaseInputTableState,
   DatabaseRow,
   DatabaseRowMotion,
+  DatabaseTopicCategory,
   DatabaseTraceState,
   SqlLogicalPhase,
 } from "../types";
+
+export const sqlTopicCategories: DatabaseTopicCategory[] = [
+  {
+    id: "sub-query",
+    label: "SUB QUERY",
+    description: "안쪽 query 결과를 바깥 query 조건으로 사용하는 흐름",
+    isInteractive: true,
+    exampleIds: ["sub-query"],
+  },
+  {
+    id: "join",
+    label: "JOIN",
+    description: "두 테이블의 key를 맞춰 row를 결합하는 흐름",
+    isInteractive: true,
+    exampleIds: ["join"],
+  },
+  {
+    id: "group-by",
+    label: "GROUP BY",
+    description: "같은 key의 row를 bucket으로 묶고 집계하는 흐름",
+    isInteractive: true,
+    exampleIds: ["group-by"],
+  },
+  {
+    id: "having",
+    label: "HAVING",
+    description: "집계가 끝난 group을 조건으로 다시 거르는 흐름",
+    isInteractive: true,
+    exampleIds: ["having"],
+  },
+  {
+    id: "union",
+    label: "UNION",
+    description: "두 SELECT 결과를 합치고 중복 row를 제거하는 흐름",
+    isInteractive: true,
+    exampleIds: ["union"],
+  },
+  {
+    id: "union-all",
+    label: "UNION ALL",
+    description: "두 SELECT 결과를 합치되 중복 row를 그대로 유지하는 흐름",
+    isInteractive: true,
+    exampleIds: ["union-all"],
+  },
+  {
+    id: "order-limit",
+    label: "ORDER/LIMIT",
+    description: "정렬 기준을 적용한 뒤 필요한 개수만 남기는 흐름",
+    isInteractive: true,
+    exampleIds: ["order-limit"],
+  },
+  {
+    id: "window-rank",
+    label: "WINDOW RANK",
+    description: "RANK() 윈도우 함수가 동점과 rank gap을 처리하는 흐름",
+    isInteractive: true,
+    exampleIds: ["window-rank"],
+  },
+];
 
 export const joinQuery = [
   "SELECT o.id, o.customer_id, c.name, c.tier, o.total",
@@ -34,11 +94,24 @@ export const unionQuery = [
   "SELECT email FROM purchasers;",
 ].join("\n");
 
+export const unionAllQuery = [
+  "SELECT email FROM newsletter_signups",
+  "UNION ALL",
+  "SELECT email FROM purchasers;",
+].join("\n");
+
 export const orderLimitQuery = [
   "SELECT product, total_sales",
   "FROM product_sales",
   "ORDER BY total_sales DESC",
   "LIMIT 3;",
+].join("\n");
+
+export const windowRankQuery = [
+  "SELECT student, score,",
+  "       RANK() OVER (ORDER BY score DESC) AS rank",
+  "FROM exam_scores",
+  "ORDER BY rank;",
 ].join("\n");
 
 export const subQueryQuery = [
@@ -99,6 +172,14 @@ const purchasers: DatabaseRow[] = [
   { email: "nari@example.com" },
   { email: "sol@example.com" },
   { email: "minseo@example.com" },
+];
+
+const examScores: DatabaseRow[] = [
+  { id: 1, student: "Mina", score: 98 },
+  { id: 2, student: "Joon", score: 92 },
+  { id: 3, student: "Ara", score: 92 },
+  { id: 4, student: "Sol", score: 87 },
+  { id: 5, student: "Hyun", score: 81 },
 ];
 
 const productSales: DatabaseRow[] = [
@@ -186,11 +267,34 @@ const unionResult: DatabaseRow[] = [
   { email: "sol@example.com" },
 ];
 
+const unionAllRows: DatabaseRow[] = unionAppendRows.map((row, index) => ({
+  __rowKey: `union-all-${index + 1}`,
+  email: row.email,
+}));
+
+const unionAllDuplicateRows = unionAllRows.filter(
+  (row) => row.email === "hyun@example.com" || row.email === "minseo@example.com",
+);
+
 const sortedProductSales: DatabaseRow[] = [...productSales].sort(
   (left, right) => Number(right.total_sales) - Number(left.total_sales),
 );
 
+const rankedScores: DatabaseRow[] = [
+  { __rowKey: "rank-mina", student: "Mina", score: 98, rank: 1 },
+  { __rowKey: "rank-joon", student: "Joon", score: 92, rank: 2 },
+  { __rowKey: "rank-ara", student: "Ara", score: 92, rank: 2 },
+  { __rowKey: "rank-sol", student: "Sol", score: 87, rank: 4 },
+  { __rowKey: "rank-hyun", student: "Hyun", score: 81, rank: 5 },
+];
+
+const rankTieRows = [rankedScores[1]!, rankedScores[2]!];
+
 const getDatabaseRowKey = (row: DatabaseRow): string => {
+  if (row.__rowKey !== undefined) {
+    return String(row.__rowKey);
+  }
+
   if (row.cid !== undefined && row.status !== undefined && row.color !== undefined) {
     return `${row.cid}:${row.status}:${row.color}`;
   }
@@ -1081,6 +1185,138 @@ const buildUnionExample = (): DatabaseExample => {
   };
 };
 
+const buildUnionAllExample = (): DatabaseExample => {
+  const pseudoCode = [
+    "첫 번째 SELECT 결과를 만든다.",
+    "두 번째 SELECT 결과를 만든다.",
+    "UNION ALL은 두 결과를 순서대로 이어 붙인다.",
+    "같은 email이 다시 나와도 제거하지 않고 retained duplicate로 표시한다.",
+    "중복을 포함한 전체 행을 최종 결과로 출력한다.",
+  ];
+
+  return {
+    id: "union-all",
+    title: "UNION ALL 실행 흐름",
+    tabLabel: "UNION ALL",
+    intro:
+      "newsletter_signups와 purchasers의 email을 이어 붙이되, UNION과 달리 같은 email도 제거하지 않고 모두 남깁니다.",
+    query: unionAllQuery,
+    pseudoCode,
+    trace: [
+      createStep({
+        id: "union-all-first-select",
+        title: "첫 번째 SELECT 결과 준비",
+        description:
+          "newsletter_signups에서 email 열만 읽어 UNION ALL의 왼쪽 입력 결과를 만듭니다.",
+        pseudoCodeLine: 1,
+        phase: "select",
+        query: unionAllQuery,
+        activeQueryLines: [1],
+        inputTables: [
+          createInputTable("newsletter_signups", newsletterSignups, ["email"], newsletterSignups, createMotionMap(newsletterSignups, "projected")),
+          createInputTable("purchasers", purchasers, ["email"], []),
+        ],
+        rows: unionAllRows.slice(0, newsletterSignups.length),
+        activeColumns: ["email"],
+        activeRows: unionAllRows.slice(0, newsletterSignups.length),
+        rowMotionByKey: createMotionMap(unionAllRows.slice(0, newsletterSignups.length), "projected"),
+        summaryItems: [{ label: "왼쪽 결과", value: `${newsletterSignups.length} rows` }],
+      }),
+      createStep({
+        id: "union-all-second-select",
+        title: "두 번째 SELECT 결과 준비",
+        description:
+          "purchasers에서도 같은 email 열만 읽어 오른쪽 입력 결과를 만듭니다.",
+        pseudoCodeLine: 2,
+        phase: "select",
+        query: unionAllQuery,
+        activeQueryLines: [3],
+        inputTables: [
+          createInputTable("newsletter_signups", newsletterSignups, ["email"], newsletterSignups, createMotionMap(newsletterSignups, "projected")),
+          createInputTable("purchasers", purchasers, ["email"], purchasers, createMotionMap(purchasers, "projected")),
+        ],
+        rows: unionAllRows.slice(newsletterSignups.length),
+        activeColumns: ["email"],
+        activeRows: unionAllRows.slice(newsletterSignups.length),
+        rowMotionByKey: createMotionMap(unionAllRows.slice(newsletterSignups.length), "projected"),
+        summaryItems: [{ label: "오른쪽 결과", value: `${purchasers.length} rows` }],
+      }),
+      createStep({
+        id: "union-all-append",
+        title: "UNION ALL append",
+        description:
+          "UNION ALL 줄을 만나면 두 SELECT 결과를 DISTINCT 처리 없이 그대로 이어 붙입니다.",
+        pseudoCodeLine: 3,
+        phase: "union",
+        query: unionAllQuery,
+        activeQueryLines: [2],
+        inputTables: [
+          createInputTable("newsletter_signups", newsletterSignups, ["email"], newsletterSignups, createMotionMap(newsletterSignups, "unioned")),
+          createInputTable("purchasers", purchasers, ["email"], purchasers, createMotionMap(purchasers, "unioned")),
+        ],
+        rows: unionAllRows,
+        activeColumns: ["email"],
+        activeRows: unionAllRows,
+        rowMotionByKey: createMotionMap(unionAllRows, "unioned"),
+        summaryItems: [{ label: "append 결과", value: `${unionAllRows.length} rows` }],
+      }),
+      createStep({
+        id: "union-all-retain-duplicates",
+        title: "중복 row 유지",
+        description:
+          "hyun@example.com과 minseo@example.com은 양쪽 입력에 모두 있지만 UNION ALL에서는 제거하지 않고 두 번 남깁니다.",
+        pseudoCodeLine: 4,
+        phase: "union",
+        query: unionAllQuery,
+        activeQueryLines: [2],
+        inputTables: [
+          createInputTable("newsletter_signups", newsletterSignups, ["email"], newsletterSignups, createMotionMap(newsletterSignups, "unioned")),
+          createInputTable("purchasers", purchasers, ["email"], purchasers, createMotionMap(purchasers, "unioned")),
+        ],
+        rows: unionAllRows,
+        activeColumns: ["email"],
+        activeRows: unionAllDuplicateRows,
+        rowMotionByKey: {
+          ...createMotionMap(unionAllRows, "unioned"),
+          ...createMotionMap(unionAllDuplicateRows, "retainedDuplicate"),
+        },
+        cellHighlights: unionAllDuplicateRows.map((row) =>
+          cellHighlight("output", row, "email", "duplicate"),
+        ),
+        summaryItems: [
+          { label: "유지된 중복", value: "hyun, minseo" },
+          { label: "UNION과 차이", value: "DISTINCT 없음" },
+        ],
+      }),
+      createStep({
+        id: "union-all-output",
+        title: "중복 포함 최종 출력",
+        description:
+          "최종 결과도 8개 row 그대로이며, 같은 email이 반복되는 것이 UNION ALL의 핵심 차이입니다.",
+        pseudoCodeLine: 5,
+        phase: "select",
+        query: unionAllQuery,
+        activeQueryLines: [1, 2, 3],
+        inputTables: [
+          createInputTable("newsletter_signups", newsletterSignups, ["email"], newsletterSignups, createMotionMap(newsletterSignups, "unioned")),
+          createInputTable("purchasers", purchasers, ["email"], purchasers, createMotionMap(purchasers, "unioned")),
+        ],
+        rows: unionAllRows,
+        activeColumns: ["email"],
+        activeRows: unionAllDuplicateRows,
+        rowMotionByKey: {
+          ...createMotionMap(unionAllRows, "unioned"),
+          ...createMotionMap(unionAllDuplicateRows, "retainedDuplicate"),
+        },
+        cellHighlights: unionAllDuplicateRows.map((row) =>
+          cellHighlight("output", row, "email", "duplicate"),
+        ),
+        summaryItems: [{ label: "최종 결과", value: "8 rows, duplicates retained" }],
+      }),
+    ],
+  };
+};
+
 const buildOrderLimitExample = (): DatabaseExample => {
   const pseudoCode = [
     "product_sales에서 product와 total_sales를 읽는다.",
@@ -1186,13 +1422,157 @@ const buildOrderLimitExample = (): DatabaseExample => {
   };
 };
 
+const buildWindowRankExample = (): DatabaseExample => {
+  const pseudoCode = [
+    "exam_scores에서 student와 score를 읽는다.",
+    "RANK() OVER의 ORDER BY score DESC 기준을 적용한다.",
+    "가장 높은 score부터 rank 값을 부여한다.",
+    "같은 score는 같은 rank를 받고 다음 rank는 같은 수만큼 건너뛴다.",
+    "rank가 붙은 결과를 출력한다.",
+  ];
+
+  return {
+    id: "window-rank",
+    title: "WINDOW RANK 실행 흐름",
+    tabLabel: "WINDOW RANK",
+    intro:
+      "RANK() OVER (ORDER BY score DESC)가 점수 순서를 기준으로 순위를 붙이고, 동점 row가 있을 때 rank gap을 만드는 과정을 봅니다.",
+    query: windowRankQuery,
+    pseudoCode,
+    trace: [
+      createStep({
+        id: "rank-read-scores",
+        title: "점수 row 읽기",
+        description:
+          "exam_scores 테이블에서 student와 score를 읽어 윈도우 함수가 계산할 입력 row를 준비합니다.",
+        pseudoCodeLine: 1,
+        phase: "from",
+        query: windowRankQuery,
+        activeQueryLines: [1, 3],
+        inputTables: [
+          createInputTable("exam_scores", examScores, ["student", "score"], examScores, createMotionMap(examScores, "source")),
+        ],
+        rows: examScores.map((row) => ({
+          __rowKey: `rank-source-${row.id}`,
+          student: row.student,
+          score: row.score,
+        })),
+        activeColumns: ["student", "score"],
+        summaryItems: [{ label: "입력", value: `${examScores.length} scores` }],
+      }),
+      createStep({
+        id: "rank-order-basis",
+        title: "윈도우 정렬 기준 적용",
+        description:
+          "OVER 절 안의 ORDER BY score DESC가 rank 계산 순서를 만듭니다. score가 큰 row가 먼저 옵니다.",
+        pseudoCodeLine: 2,
+        phase: "window",
+        query: windowRankQuery,
+        activeQueryLines: [2],
+        inputTables: [
+          createInputTable("exam_scores", examScores, ["score"], examScores, createMotionMap(examScores, "sorted")),
+        ],
+        rows: rankedScores.map((row) => ({
+          __rowKey: row.__rowKey,
+          student: row.student,
+          score: row.score,
+        })),
+        activeColumns: ["score"],
+        activeRows: rankedScores.slice(0, 3),
+        rowMotionByKey: createMotionMap(rankedScores, "sorted"),
+        cellHighlights: rankedScores
+          .slice(0, 3)
+          .map((row) => cellHighlight("output", row, "score", "rank")),
+        summaryItems: [{ label: "정렬 기준", value: "score DESC" }],
+      }),
+      createStep({
+        id: "rank-first-row",
+        title: "첫 번째 rank 부여",
+        description:
+          "가장 높은 점수 98점을 가진 Mina가 첫 번째 row이므로 rank 1을 받습니다.",
+        pseudoCodeLine: 3,
+        phase: "window",
+        query: windowRankQuery,
+        activeQueryLines: [2],
+        inputTables: [
+          createInputTable("exam_scores", examScores, ["student", "score"], [examScores[0]!], createMotionMap([examScores[0]!], "ranked")),
+        ],
+        rows: rankedScores.slice(0, 1),
+        activeColumns: ["rank"],
+        activeRows: rankedScores.slice(0, 1),
+        rowMotionByKey: createMotionMap(rankedScores.slice(0, 1), "ranked"),
+        cellHighlights: [cellHighlight("output", rankedScores[0]!, "rank", "rank")],
+        summaryItems: [{ label: "현재 rank", value: "Mina = 1" }],
+      }),
+      createStep({
+        id: "rank-tie-detected",
+        title: "동점 row는 같은 rank",
+        description:
+          "Joon과 Ara는 모두 92점이므로 둘 다 rank 2를 받습니다. RANK는 동점 row 수만큼 다음 순위를 건너뜁니다.",
+        pseudoCodeLine: 4,
+        phase: "window",
+        query: windowRankQuery,
+        activeQueryLines: [2],
+        inputTables: [
+          createInputTable("exam_scores", examScores, ["score"], [examScores[1]!, examScores[2]!], {
+            [getDatabaseRowKey(examScores[1]!)]: "tie",
+            [getDatabaseRowKey(examScores[2]!)]: "tie",
+          }),
+        ],
+        rows: rankedScores.slice(0, 3),
+        activeColumns: ["score", "rank"],
+        activeRows: rankTieRows,
+        rowMotionByKey: {
+          [getDatabaseRowKey(rankedScores[0]!)]: "ranked",
+          ...createMotionMap(rankTieRows, "tie"),
+        },
+        cellHighlights: [
+          ...rankTieRows.map((row) => cellHighlight("output", row, "score", "tie")),
+          ...rankTieRows.map((row) => cellHighlight("output", row, "rank", "tie")),
+        ],
+        summaryItems: [
+          { label: "동점", value: "Joon, Ara = 92" },
+          { label: "다음 rank", value: "4" },
+        ],
+      }),
+      createStep({
+        id: "rank-output",
+        title: "rank gap 포함 최종 출력",
+        description:
+          "동점 2명이 rank 2를 공유했기 때문에 다음 row인 Sol은 rank 3이 아니라 rank 4를 받습니다.",
+        pseudoCodeLine: 5,
+        phase: "select",
+        query: windowRankQuery,
+        activeQueryLines: [1, 2, 4],
+        inputTables: [
+          createInputTable("exam_scores", examScores, ["student", "score"], examScores, createMotionMap(examScores, "ranked")),
+        ],
+        rows: rankedScores,
+        activeColumns: ["student", "score", "rank"],
+        activeRows: rankedScores,
+        rowMotionByKey: createMotionMap(rankedScores, "ranked"),
+        cellHighlights: [
+          ...rankTieRows.map((row) => cellHighlight("output", row, "rank", "tie")),
+          cellHighlight("output", rankedScores[3]!, "rank", "rank"),
+        ],
+        summaryItems: [
+          { label: "rank gap", value: "1, 2, 2, 4, 5" },
+          { label: "동점 처리", value: "같은 점수는 같은 rank" },
+        ],
+      }),
+    ],
+  };
+};
+
 export const generateSqlOperationExamples = (): DatabaseExample[] => [
   buildSubQueryExample(),
   buildJoinExample(),
   buildGroupByExample(),
   buildHavingExample(),
   buildUnionExample(),
+  buildUnionAllExample(),
   buildOrderLimitExample(),
+  buildWindowRankExample(),
 ];
 
 export const generateSelectLogicalExecutionTrace = (): TraceStep<DatabaseTraceState>[] =>

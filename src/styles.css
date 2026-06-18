@@ -1679,6 +1679,247 @@ button:disabled {
   text-decoration: line-through;
 }
 
+.sql-empty-state {
+  margin: 0;
+  padding: 14px 16px;
+  color: #52616a;
+  font-weight: 800;
+}
+
+.database-helper-copy {
+  max-width: 820px;
+  margin: 8px 0 0;
+  color: #52616a;
+  font-weight: 700;
+}
+
+.phase-window {
+  background: #8351a8;
+}
+
+.sql-row-motion-ranked {
+  animation-name: sql-row-limited;
+}
+
+.sql-row-motion-tie,
+.sql-row-motion-retainedDuplicate {
+  animation-name: sql-row-grouped;
+}
+
+.sql-row-motion-ranked td {
+  background: #eef4ff;
+}
+
+.sql-row-motion-tie td {
+  background: #f3ecff;
+}
+
+.sql-row-motion-retainedDuplicate td {
+  background: #fff0df;
+}
+
+.sql-cell-highlight-rank,
+.sql-cell-highlight-duplicate,
+.sql-cell-highlight-tie {
+  animation: sql-cell-pulse 900ms ease;
+  font-weight: 900;
+}
+
+.sql-cell-highlight-rank {
+  background: #e7f0ff !important;
+  box-shadow: inset 0 0 0 1px rgb(47 111 187 / 34%);
+  color: #173c69;
+}
+
+.sql-cell-highlight-duplicate {
+  background: #fff0df !important;
+  box-shadow: inset 0 0 0 1px rgb(184 101 27 / 38%);
+  color: #6d3b13;
+}
+
+.sql-cell-highlight-tie {
+  background: #f3ecff !important;
+  box-shadow: inset 0 0 0 1px rgb(111 91 184 / 36%);
+  color: #443574;
+}
+
+.database-cinematic-page {
+  color: #172026;
+}
+
+.database-cinematic-page .back-link {
+  color: #31594f;
+}
+
+.database-cinematic-page .learning-header h1,
+.database-cinematic-page .database-table-header h2,
+.database-cinematic-page .sql-query-section h2,
+.database-cinematic-page .sql-input-section h3,
+.database-cinematic-page .sql-output-section h3,
+.database-cinematic-page .sql-step-panel h2,
+.database-cinematic-page .sql-step-panel h3 {
+  color: #11181c;
+}
+
+.database-cinematic-page .eyebrow,
+.database-cinematic-page .intro-copy,
+.database-cinematic-page .database-helper-copy,
+.database-cinematic-page .code-example-header p {
+  color: #52616a;
+}
+
+.database-cinematic-page .algorithm-tab {
+  border-color: #c8d2d7;
+  background: #ffffff;
+  color: #31594f;
+}
+
+.database-cinematic-page .algorithm-tab[aria-selected="true"] {
+  border-color: #31594f;
+  background: #e9f4ee;
+  color: #172026;
+  box-shadow: inset 0 0 0 1px rgb(49 89 79 / 18%);
+}
+
+.database-cinematic-page .database-table-panel,
+.database-cinematic-page .sql-query-section,
+.database-cinematic-page .sql-step-panel {
+  border-color: #d9e0e4;
+  background: #ffffff;
+  box-shadow: 0 12px 28px rgb(17 24 28 / 8%);
+}
+
+.database-cinematic-page .database-workbench {
+  grid-template-columns: minmax(520px, 1fr) minmax(460px, 0.95fr);
+}
+
+.database-cinematic-page .phase-badge {
+  border-color: transparent;
+  box-shadow: none;
+}
+
+.database-cinematic-page .sql-stage-summary div,
+.database-cinematic-page .timeline-controls,
+.database-cinematic-page .sql-input-card {
+  border-color: #d9e0e4;
+  background: #fbfcfc;
+}
+
+.database-cinematic-page .sql-stage-summary dt,
+.database-cinematic-page .sql-input-card h4 {
+  color: #42635b;
+}
+
+.database-cinematic-page .sql-stage-summary dd {
+  color: #172026;
+}
+
+.database-cinematic-page .sql-table-scroll {
+  border-color: #d9e0e4;
+  background: #ffffff;
+  box-shadow: none;
+}
+
+.database-cinematic-page .sql-empty-state {
+  color: #52616a;
+}
+
+.database-cinematic-page .sql-result-table th,
+.database-cinematic-page .sql-result-table td {
+  border-bottom-color: #edf0f2;
+}
+
+.database-cinematic-page .sql-result-table th {
+  background: #f6f8f8;
+  color: #31594f;
+}
+
+.database-cinematic-page .sql-result-table td {
+  color: #172026;
+}
+
+.database-cinematic-page .sql-row-motion-candidate td {
+  background: #e8f6f8;
+}
+
+.database-cinematic-page .sql-row-motion-matched td,
+.database-cinematic-page .sql-row-motion-filtered td {
+  background: #e8f6ed;
+}
+
+.database-cinematic-page .sql-row-motion-joined td,
+.database-cinematic-page .sql-row-motion-unioned td {
+  background: #edf5ff;
+}
+
+.database-cinematic-page .sql-row-motion-rejected td,
+.database-cinematic-page .sql-row-motion-deduped td,
+.database-cinematic-page .sql-row-motion-cutoff td {
+  background: #f7e8e5;
+  color: #7a3d34;
+  opacity: 0.84;
+}
+
+.database-cinematic-page .sql-row-motion-ranked td {
+  background: #eef4ff;
+}
+
+.database-cinematic-page .sql-row-motion-tie td {
+  background: #f3ecff;
+}
+
+.database-cinematic-page .sql-row-motion-retainedDuplicate td {
+  background: #fff0df;
+}
+
+.database-cinematic-page .sql-cell-highlight-active {
+  background: #e6f6f8 !important;
+  box-shadow: inset 0 0 0 1px rgb(47 111 187 / 28%);
+  color: #173c69;
+}
+
+.database-cinematic-page .sql-cell-highlight-join {
+  background: #e7f0ff !important;
+  box-shadow: inset 0 0 0 1px rgb(47 111 187 / 32%);
+  color: #173c69;
+}
+
+.database-cinematic-page .sql-cell-highlight-match {
+  background: #e5f5eb !important;
+  box-shadow: inset 0 0 0 1px rgb(63 125 88 / 32%);
+  color: #234f34;
+}
+
+.database-cinematic-page .sql-cell-highlight-output {
+  background: #fff4cf !important;
+  box-shadow: inset 0 0 0 1px rgb(138 111 42 / 34%);
+  color: #5b4512;
+}
+
+.database-cinematic-page .sql-cell-highlight-reject {
+  background: #f7e1dd !important;
+  box-shadow: inset 0 0 0 1px rgb(125 46 34 / 32%);
+  color: #7d2e22;
+}
+
+.database-cinematic-page .sql-cell-highlight-rank {
+  background: #e7f0ff !important;
+  box-shadow: inset 0 0 0 1px rgb(47 111 187 / 34%);
+  color: #173c69;
+}
+
+.database-cinematic-page .sql-cell-highlight-duplicate {
+  background: #fff0df !important;
+  box-shadow: inset 0 0 0 1px rgb(184 101 27 / 38%);
+  color: #6d3b13;
+}
+
+.database-cinematic-page .sql-cell-highlight-tie {
+  background: #f3ecff !important;
+  box-shadow: inset 0 0 0 1px rgb(111 91 184 / 36%);
+  color: #443574;
+}
+
 @keyframes sql-cell-pulse {
   0% {
     filter: brightness(0.75);
