@@ -799,6 +799,24 @@ Do not introduce a complex graph layout library until the MVP is stable.
 * Graph DFS
 * Dijkstra
 
+### 6.1.1 Dijkstra Shortest Path
+
+Dijkstra visualization should show how a weighted graph shortest-path trace changes step by step.
+
+The user should understand:
+
+* Start node distance initialization
+* Current node selection from frontier candidates
+* Edge weight inspection
+* Relaxation when a shorter candidate distance is found
+* No-update decisions when the existing distance is already shorter or equal
+* Settled nodes that do not return to temporary candidate state
+* Final predecessor-based path reconstruction
+
+Initial examples should include both an undirected weighted graph and a directed weighted graph.
+Equal tentative distances should be resolved by node label alphabetical order so trace tests stay deterministic.
+The page should provide C, C++, Java, Python, and JavaScript code tabs with current-step line highlights.
+
 ### 6.2 Operating Systems
 
 * Process scheduling

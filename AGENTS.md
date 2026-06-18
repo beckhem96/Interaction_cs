@@ -97,5 +97,5 @@ A task is done only when:
 <!-- SPECKIT START -->
 For additional context about technologies to be used, project structure,
 shell commands, and other important information, read the current plan
-at specs/001-enhance-sql-workbench/plan.md
+at specs/002-dijkstra-graph-steps/plan.md
 <!-- SPECKIT END -->

@@ -39,6 +39,12 @@ const categories: CategoryCard[] = [
     status: "DFS와 BFS"
   },
   {
+    title: "다익스트라 최단 경로",
+    description: "가중 그래프에서 현재 노드 선택, 거리 갱신, 최종 경로 복원을 단계별로 따라갑니다.",
+    href: "/graphs/dijkstra",
+    status: "최단 경로"
+  },
+  {
     title: "이진 탐색",
     description: "정렬된 배열에서 후보 구간을 절반씩 줄이며 target을 찾는 과정을 단계별로 관찰합니다.",
     href: "/binary-search",

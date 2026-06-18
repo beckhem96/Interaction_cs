@@ -3309,6 +3309,252 @@ button:disabled {
   background: #f9e6e1;
 }
 
+.dijkstra-stage-panel {
+  min-height: 680px;
+}
+
+.dijkstra-table-scroll {
+  overflow: auto;
+  border: 1px solid #d9e0e4;
+  border-radius: 8px;
+  background: #ffffff;
+}
+
+.dijkstra-distance-table {
+  width: 100%;
+  min-width: 720px;
+  border-collapse: collapse;
+  color: #172026;
+  font-size: 0.88rem;
+}
+
+.dijkstra-distance-table th,
+.dijkstra-distance-table td {
+  padding: 9px 10px;
+  border-bottom: 1px solid #e3e8eb;
+  text-align: left;
+  vertical-align: top;
+}
+
+.dijkstra-distance-table thead th {
+  background: #f0f4f3;
+  color: #31594f;
+  font-size: 0.78rem;
+  font-weight: 950;
+}
+
+.dijkstra-distance-table tbody th {
+  color: #172026;
+  font-weight: 950;
+}
+
+.dijkstra-distance-table tr.is-current {
+  background: #f9e6e1;
+}
+
+.dijkstra-distance-table tr.is-frontier {
+  background: #fff7df;
+}
+
+.dijkstra-distance-table tr.is-updated {
+  background: #e5f2e9;
+}
+
+.dijkstra-distance-table tr.is-skipped {
+  background: #eef1f2;
+}
+
+.dijkstra-distance-table tr.is-settled {
+  background: #edf5ff;
+}
+
+.dijkstra-distance-table tr.is-final-path {
+  background: #eeeafb;
+}
+
+.dijkstra-node.is-current circle {
+  fill: #f9e6e1;
+  stroke: #c94f37;
+  animation: tree-node-found 720ms ease;
+}
+
+.dijkstra-node.is-frontier circle {
+  fill: #fff7df;
+  stroke: #c28a1d;
+}
+
+.dijkstra-node.is-updated circle {
+  fill: #e5f2e9;
+  stroke: #3f7d58;
+  animation: tree-node-visit 700ms ease;
+}
+
+.dijkstra-node.is-skipped circle {
+  fill: #eef1f2;
+  stroke: #7a8b93;
+  stroke-dasharray: 5 4;
+}
+
+.dijkstra-node.is-settled circle {
+  fill: #edf5ff;
+  stroke: #2f6fbb;
+}
+
+.dijkstra-node.is-final-path circle {
+  fill: #eeeafb;
+  stroke: #6f5bb8;
+  stroke-width: 5;
+}
+
+.dijkstra-node.is-unreached circle {
+  fill: #ffffff;
+  stroke: #b8c3c8;
+  stroke-dasharray: 4 5;
+}
+
+.dijkstra-edge.is-inspected line {
+  stroke: #c94f37;
+  stroke-width: 5;
+}
+
+.dijkstra-edge.is-relaxed line {
+  stroke: #3f7d58;
+  stroke-width: 5;
+  animation: tree-edge-draw 720ms ease;
+}
+
+.dijkstra-edge.is-skipped line {
+  stroke: #7a8b93;
+  stroke-dasharray: 7 5;
+}
+
+.dijkstra-edge.is-final-path line {
+  stroke: #6f5bb8;
+  stroke-width: 5;
+}
+
+.dijkstra-edge.is-final-path .graph-edge-weight rect {
+  stroke: #6f5bb8;
+}
+
+.dijkstra-frontier-panel,
+.dijkstra-comparison-panel,
+.dijkstra-final-panel {
+  display: grid;
+  gap: 12px;
+  padding: 16px;
+  border: 1px solid #d9e0e4;
+  border-radius: 10px;
+  background: #ffffff;
+}
+
+.dijkstra-frontier-panel h2,
+.dijkstra-comparison-panel h2,
+.dijkstra-final-panel h2 {
+  margin: 0;
+  color: #172026;
+  font-size: 1rem;
+}
+
+.dijkstra-candidate-list {
+  display: grid;
+  gap: 8px;
+}
+
+.dijkstra-candidate {
+  display: grid;
+  grid-template-columns: auto auto;
+  gap: 2px 10px;
+  align-items: center;
+  padding: 9px 10px;
+  border: 1px solid #d9e0e4;
+  border-radius: 8px;
+  background: #fbfcfc;
+}
+
+.dijkstra-candidate strong {
+  color: #172026;
+  font-weight: 950;
+}
+
+.dijkstra-candidate span {
+  color: #42635b;
+  font-size: 0.82rem;
+  font-weight: 900;
+}
+
+.dijkstra-candidate small {
+  grid-column: 1 / -1;
+  color: #52616a;
+  font-size: 0.78rem;
+  font-weight: 800;
+}
+
+.dijkstra-candidate.is-selected {
+  border-color: #c94f37;
+  background: #f9e6e1;
+}
+
+.dijkstra-comparison-panel dl {
+  display: grid;
+  gap: 8px;
+  margin: 0;
+}
+
+.dijkstra-comparison-panel dl div {
+  display: grid;
+  gap: 3px;
+  padding: 8px 0;
+  border-top: 1px solid #edf0f2;
+}
+
+.dijkstra-comparison-panel dl div:first-child {
+  border-top: 0;
+}
+
+.dijkstra-comparison-panel dt {
+  color: #42635b;
+  font-size: 0.78rem;
+  font-weight: 900;
+}
+
+.dijkstra-comparison-panel dd,
+.dijkstra-comparison-panel p,
+.dijkstra-final-panel p {
+  margin: 0;
+  color: #52616a;
+  font-size: 0.88rem;
+  font-weight: 750;
+}
+
+.dijkstra-final-panel label {
+  display: grid;
+  gap: 7px;
+  color: #42635b;
+  font-size: 0.86rem;
+  font-weight: 900;
+}
+
+.dijkstra-final-panel select {
+  min-height: 38px;
+  padding: 0 34px 0 12px;
+  border: 1px solid #c8d2d7;
+  border-radius: 8px;
+  background: #ffffff;
+  color: #172026;
+  font: inherit;
+  font-weight: 850;
+}
+
+.dijkstra-path-result {
+  display: grid;
+  gap: 8px;
+  padding: 10px 12px;
+  border: 1px solid #d8cfee;
+  border-radius: 8px;
+  background: #f3effb;
+}
+
 @keyframes tree-node-compare {
   0%,
   100% {

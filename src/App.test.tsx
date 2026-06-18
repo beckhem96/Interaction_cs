@@ -57,6 +57,19 @@ describe("App routes", () => {
     expect(screen.getByText(/시작 A/)).toBeInTheDocument();
   });
 
+  it("routes to the Dijkstra learning page", () => {
+    render(
+      <MemoryRouter initialEntries={["/graphs/dijkstra"]}>
+        <App />
+      </MemoryRouter>,
+    );
+
+    expect(
+      screen.getByRole("heading", { level: 1, name: "다익스트라 최단 경로" }),
+    ).toBeInTheDocument();
+    expect(screen.getByText(/무방향 · 노드/)).toBeInTheDocument();
+  });
+
   it("routes to the binary search learning page", () => {
     render(
       <MemoryRouter initialEntries={["/binary-search"]}>

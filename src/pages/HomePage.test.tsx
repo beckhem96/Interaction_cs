@@ -27,6 +27,7 @@ describe("HomePage", () => {
         "/trees",
         "/graphs",
         "/graphs/traversal",
+        "/graphs/dijkstra",
         "/binary-search",
         "/dynamic-programming",
       ]),
