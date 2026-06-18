@@ -65,7 +65,7 @@ export const dijkstraExamples: DijkstraExample[] = [
       { id: "A", label: "A", x: 90, y: 205, role: "start" },
       { id: "B", label: "B", x: 235, y: 95, role: "normal" },
       { id: "C", label: "C", x: 235, y: 305, role: "normal" },
-      { id: "D", label: "D", x: 395, y: 210, role: "normal" },
+      { id: "D", label: "D", x: 410, y: 260, role: "normal" },
       { id: "E", label: "E", x: 530, y: 105, role: "normal" },
       { id: "F", label: "F", x: 625, y: 230, role: "destination" },
       { id: "G", label: "G", x: 530, y: 335, role: "normal" }
@@ -90,13 +90,13 @@ export const dijkstraExamples: DijkstraExample[] = [
     startNodeId: "A",
     defaultDestinationId: "F",
     nodes: [
-      { id: "A", label: "A", x: 90, y: 210, role: "start" },
-      { id: "B", label: "B", x: 250, y: 120, role: "normal" },
-      { id: "C", label: "C", x: 250, y: 300, role: "normal" },
-      { id: "D", label: "D", x: 410, y: 180, role: "normal" },
-      { id: "E", label: "E", x: 540, y: 250, role: "normal" },
-      { id: "F", label: "F", x: 650, y: 155, role: "destination" },
-      { id: "G", label: "G", x: 630, y: 340, role: "normal" }
+      { id: "A", label: "A", x: 90, y: 220, role: "start" },
+      { id: "B", label: "B", x: 240, y: 95, role: "normal" },
+      { id: "C", label: "C", x: 240, y: 310, role: "normal" },
+      { id: "D", label: "D", x: 410, y: 105, role: "normal" },
+      { id: "E", label: "E", x: 500, y: 265, role: "normal" },
+      { id: "F", label: "F", x: 640, y: 125, role: "destination" },
+      { id: "G", label: "G", x: 640, y: 340, role: "normal" }
     ],
     edges: [
       createExampleEdge("directed", "A", "B", 4),

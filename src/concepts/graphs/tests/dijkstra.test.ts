@@ -2,6 +2,7 @@ import { describe, expect, it } from "vitest";
 
 import {
   DIJKSTRA_EXAMPLE_IDS,
+  dijkstraExamples,
   formatDistance,
   generateDijkstraTrace,
   getDijkstraPathResult
@@ -153,6 +154,34 @@ describe("generateDijkstraTrace", () => {
       "E->F"
     ]);
   });
+
+  it("keeps example edges visually clear of unrelated nodes", () => {
+    for (const example of dijkstraExamples) {
+      for (const edge of example.edges) {
+        const from = example.nodes.find((node) => node.id === edge.fromId)!;
+        const to = example.nodes.find((node) => node.id === edge.toId)!;
+        const midpoint = {
+          x: (from.x + to.x) / 2,
+          y: (from.y + to.y) / 2
+        };
+
+        for (const node of example.nodes) {
+          if (node.id === edge.fromId || node.id === edge.toId) {
+            continue;
+          }
+
+          expect(
+            distanceFromPointToSegment(node, from, to),
+            `${example.id} edge ${edge.id} overlaps node ${node.id}`
+          ).toBeGreaterThanOrEqual(48);
+          expect(
+            Math.hypot(node.x - midpoint.x, node.y - midpoint.y),
+            `${example.id} edge ${edge.id} weight label overlaps node ${node.id}`
+          ).toBeGreaterThanOrEqual(48);
+        }
+      }
+    }
+  });
 });
 
 function hasAllLanguageHighlights(step: {
@@ -177,4 +206,29 @@ function getCompleteState(exampleId: DijkstraExampleId) {
   expect(state).toBeDefined();
 
   return state!;
+}
+
+function distanceFromPointToSegment(
+  point: { x: number; y: number },
+  start: { x: number; y: number },
+  end: { x: number; y: number }
+) {
+  const dx = end.x - start.x;
+  const dy = end.y - start.y;
+  const lengthSquared = dx * dx + dy * dy;
+
+  if (lengthSquared === 0) {
+    return Math.hypot(point.x - start.x, point.y - start.y);
+  }
+
+  const t = Math.max(
+    0,
+    Math.min(1, ((point.x - start.x) * dx + (point.y - start.y) * dy) / lengthSquared)
+  );
+  const projection = {
+    x: start.x + t * dx,
+    y: start.y + t * dy
+  };
+
+  return Math.hypot(point.x - projection.x, point.y - projection.y);
 }
