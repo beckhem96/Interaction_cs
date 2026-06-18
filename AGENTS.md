@@ -6,13 +6,18 @@ This project is an interactive CS concept visualization web app.
 
 The goal is to help learners understand computer science concepts through step-by-step visual execution.
 
-Initial concept domains:
+Concept domains include:
 
 * Sorting algorithms
 * SQL query logical execution
 * Tree data structures
+* Graphs, search, and dynamic programming
+* Network communication concepts
+* Operating system behavior concepts
 
 ## Tech Stack
+
+Current implementation defaults:
 
 * React
 * TypeScript
@@ -20,7 +25,7 @@ Initial concept domains:
 * React Router
 * Vitest
 * SVG-based visualizations first
-* Canvas only when SVG becomes insufficient
+* Canvas, WebGL, Python helpers, parser/simulator libraries, SQL engines, or other external libraries may be used when the plan justifies the learning value and keeps trace generation testable.
 * SQL execution engine integration is optional and should be added after the manual SQL trace MVP
 
 ## Development Rules
@@ -32,7 +37,7 @@ Initial concept domains:
 * Do not scan or modify unrelated files.
 * Use repository-relative paths only.
 * Do not read node_modules, dist, build, coverage, .git, lock files, or large log files unless explicitly requested.
-* Use Korean All page, except when you need english
+* Use Korean All page, except when you need english.
 
 ## Architecture Rules
 
@@ -88,3 +93,9 @@ A task is done only when:
 * Build passes
 * Relevant tests are added or updated
 * The final response summarizes changed files, commands run, and remaining risks
+
+<!-- SPECKIT START -->
+For additional context about technologies to be used, project structure,
+shell commands, and other important information, read the current plan
+at specs/001-enhance-sql-workbench/plan.md
+<!-- SPECKIT END -->

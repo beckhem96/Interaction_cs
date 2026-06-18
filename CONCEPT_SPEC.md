@@ -12,11 +12,15 @@ The app should help users understand computer science concepts through:
 * Code examples
 * Interactive controls
 
-The initial domains are:
+The concept scope includes:
 
 * Sorting
 * Database / SQL
 * Trees
+* Graphs and search
+* Dynamic programming
+* Network communication
+* Operating system behavior
 
 ## 2. Shared Concept Model
 
@@ -32,7 +36,7 @@ Each concept page should include:
 4. Main visualization area
 5. Current step explanation
 6. Step controls
-7. Code tabs when useful
+7. Code, query, protocol, or phase tabs when useful
 8. Complexity or key-point summary
 
 ### 2.2 Common Controls
@@ -46,6 +50,8 @@ Each visualization should support:
 * Reset
 * Speed control, optional
 * Input reset, optional
+
+Manual stepping is required. Automatic play and semi-automatic guided progression are allowed when they make the concept easier to follow.
 
 ### 2.3 Shared Trace Step Model
 
@@ -69,6 +75,13 @@ Rules:
 * React components should not contain algorithm logic.
 * Each algorithm or concept engine should return `TraceStep[]`.
 * Every step must be explainable in natural language.
+* UI explanations should be Korean-first unless an established English technical term is clearer.
+
+### 2.4 Technology and Engine Rules
+
+The default renderer is SVG because it keeps educational state inspectable. Canvas, WebGL, WebAssembly, parser libraries, SQL engines, network simulators, operating-system simulators, Python helpers, or other external libraries may be introduced when a plan explains why they improve correctness, clarity, performance, or maintainability.
+
+Manual trace generation remains the baseline for new concept lessons. Real engines or simulators should be added after the manual trace MVP is correct and tested.
 
 ## 3. Sorting Concepts
 
@@ -258,8 +271,8 @@ src/concepts/sorting/code/
 ├─ bubbleSort.c.ts
 ├─ bubbleSort.java.ts
 ├─ bubbleSort.cpp.ts
-├─ bubbleSort.js.ts
-└─ bubbleSort.py.ts
+├─ bubbleSort.javascript.ts
+└─ bubbleSort.python.ts
 ```
 
 Each file should export a string.
@@ -492,9 +505,10 @@ Add these after the MVP:
 3. INNER JOIN
 4. LEFT JOIN
 5. DISTINCT
-6. LIMIT
-7. Subquery, optional
-8. Index scan vs full scan, advanced
+6. UNION
+7. LIMIT
+8. Subquery, optional
+9. Index scan vs full scan, advanced
 
 ### 4.7 SQL Implementation Rules
 
@@ -809,6 +823,12 @@ Do not introduce a complex graph layout library until the MVP is stable.
 * HTTP request and response
 * TLS handshake
 * Congestion control
+
+### 6.5 Cross-Domain Interaction Requirements
+
+Network and operating-system lessons should follow the same trace-first model as algorithms, SQL, and trees. Each lesson should identify actors or resources, show the active state transition, and explain why the next message, scheduling decision, memory event, or resource change occurs.
+
+Manual mode is required for every concept. Automatic and semi-automatic guided modes may be added when they make longer flows easier to follow without hiding intermediate states.
 
 ## 7. Implementation Priorities
 
