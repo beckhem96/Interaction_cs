@@ -97,5 +97,5 @@ A task is done only when:
 <!-- SPECKIT START -->
 For additional context about technologies to be used, project structure,
 shell commands, and other important information, read the current plan
-at specs/003-mst-graph-steps/plan.md
+at specs/004-topological-sort-steps/plan.md
 <!-- SPECKIT END -->
