@@ -236,3 +236,125 @@ export type DijkstraTraceState = {
     height: number;
   };
 };
+
+export type MstExampleId = "kruskal-basic";
+
+export type MstMotion =
+  | "initialize"
+  | "sort-edges"
+  | "inspect-edge"
+  | "select-edge"
+  | "skip-cycle"
+  | "complete";
+
+export type MstCodeAction = MstMotion;
+
+export type MstNodeStatus =
+  | "idle"
+  | "candidate"
+  | "selected"
+  | "merged"
+  | "complete";
+
+export type MstEdgeStatus =
+  | "pending"
+  | "candidate"
+  | "selected"
+  | "skipped-cycle"
+  | "not-needed";
+
+export type MstNode = {
+  id: string;
+  label: string;
+  x: number;
+  y: number;
+};
+
+export type MstEdge = {
+  id: string;
+  fromId: string;
+  toId: string;
+  weight: number;
+  label: string;
+  orderKey: string;
+};
+
+export type MstExample = {
+  id: MstExampleId;
+  title: string;
+  description: string;
+  nodes: MstNode[];
+  edges: MstEdge[];
+};
+
+export type MstNodeRenderState = GraphNodeState & {
+  componentId: string;
+  componentLabel: string;
+  status: MstNodeStatus;
+};
+
+export type MstEdgeRenderState = GraphEdgeState & {
+  label: string;
+  order: number;
+  status: MstEdgeStatus;
+  weight: number;
+};
+
+export type MstSortedEdgeRow = {
+  edgeId: string;
+  label: string;
+  weight: number;
+  order: number;
+  status: MstEdgeStatus;
+  decisionLabel: string;
+  componentRelation?: string;
+};
+
+export type MstComponentGroup = {
+  id: string;
+  nodeIds: string[];
+  label: string;
+  isMergedThisStep: boolean;
+};
+
+export type MstCandidateDecision = {
+  edgeId: string;
+  fromNodeId: string;
+  toNodeId: string;
+  weight: number;
+  fromComponentId: string;
+  toComponentId: string;
+  fromComponentLabel: string;
+  toComponentLabel: string;
+  willSelect: boolean;
+  reason: string;
+};
+
+export type MstResult = {
+  selectedEdgeIds: string[];
+  selectedEdgeLabels: string[];
+  coveredNodeIds: string[];
+  totalCost: number;
+  costFormulaLabel: string;
+  isComplete: boolean;
+};
+
+export type MstTraceState = {
+  exampleId: MstExampleId;
+  motion: MstMotion;
+  nodes: MstNodeRenderState[];
+  edges: MstEdgeRenderState[];
+  sortedEdges: MstSortedEdgeRow[];
+  components: MstComponentGroup[];
+  candidateDecision?: MstCandidateDecision;
+  selectedEdgeIds: string[];
+  skippedEdgeIds: string[];
+  totalCost: number;
+  selectedEdgeCount: number;
+  result?: MstResult;
+  summaryItems?: { label: string; value: string }[];
+  viewport: {
+    width: number;
+    height: number;
+  };
+};

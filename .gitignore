@@ -4,5 +4,11 @@ dist/
 build/
 *.log
 .env*
+.DS_Store
+Thumbs.db
+*.tmp
+*.swp
+.vscode/
+.idea/
 data/
 example/

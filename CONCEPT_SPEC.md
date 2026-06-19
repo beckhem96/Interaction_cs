@@ -798,6 +798,7 @@ Do not introduce a complex graph layout library until the MVP is stable.
 * Graph BFS
 * Graph DFS
 * Dijkstra
+* Minimum Spanning Tree
 
 ### 6.1.1 Dijkstra Shortest Path
 
@@ -815,6 +816,23 @@ The user should understand:
 
 Initial examples should include both an undirected weighted graph and a directed weighted graph.
 Equal tentative distances should be resolved by node label alphabetical order so trace tests stay deterministic.
+The page should provide C, C++, Java, Python, and JavaScript code tabs with current-step line highlights.
+
+### 6.1.2 Minimum Spanning Tree: Kruskal
+
+Kruskal MST visualization should show how a weighted undirected graph becomes a minimum spanning tree through deterministic edge decisions.
+
+The user should understand:
+
+* Sorting edges by weight, with equal weights resolved by edge label order
+* Inspecting the current candidate edge
+* Selecting an edge when it connects two different components
+* Skipping an edge when both endpoints are already in the same component and would form a cycle
+* Merging component groups after a selected edge
+* Verifying that the final MST uses `node count - 1` edges
+* Computing the final MST total cost from selected edge weights
+
+The initial example should use one fixed connected undirected weighted graph.
 The page should provide C, C++, Java, Python, and JavaScript code tabs with current-step line highlights.
 
 ### 6.2 Operating Systems

@@ -70,6 +70,19 @@ describe("App routes", () => {
     expect(screen.getByText(/무방향 · 노드/)).toBeInTheDocument();
   });
 
+  it("routes to the MST learning page", () => {
+    render(
+      <MemoryRouter initialEntries={["/graphs/mst"]}>
+        <App />
+      </MemoryRouter>,
+    );
+
+    expect(
+      screen.getByRole("heading", { level: 1, name: "최소 신장 트리: Kruskal" }),
+    ).toBeInTheDocument();
+    expect(screen.getByText(/목표 간선 5개/)).toBeInTheDocument();
+  });
+
   it("routes to the binary search learning page", () => {
     render(
       <MemoryRouter initialEntries={["/binary-search"]}>

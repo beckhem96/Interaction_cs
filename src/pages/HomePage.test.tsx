@@ -28,6 +28,7 @@ describe("HomePage", () => {
         "/graphs",
         "/graphs/traversal",
         "/graphs/dijkstra",
+        "/graphs/mst",
         "/binary-search",
         "/dynamic-programming",
       ]),

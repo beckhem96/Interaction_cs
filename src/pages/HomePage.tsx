@@ -45,6 +45,12 @@ const categories: CategoryCard[] = [
     status: "최단 경로"
   },
   {
+    title: "최소 신장 트리",
+    description: "Kruskal이 비용이 낮은 간선부터 선택하고 사이클 간선을 제외하는 과정을 따라갑니다.",
+    href: "/graphs/mst",
+    status: "Kruskal MST"
+  },
+  {
     title: "이진 탐색",
     description: "정렬된 배열에서 후보 구간을 절반씩 줄이며 target을 찾는 과정을 단계별로 관찰합니다.",
     href: "/binary-search",
