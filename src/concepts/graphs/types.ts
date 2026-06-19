@@ -358,3 +358,148 @@ export type MstTraceState = {
     height: number;
   };
 };
+
+export type TopologicalSortExampleId = "dag-basic";
+
+export type TopologicalSortMotion =
+  | "initialize"
+  | "inspect-candidates"
+  | "select-node"
+  | "remove-edge"
+  | "update-indegree"
+  | "enqueue-candidate"
+  | "complete"
+  | "cycle-blocked";
+
+export type TopologicalSortCodeAction =
+  | "initialize-indegree"
+  | "seed-queue"
+  | "inspect-candidates"
+  | "select-node"
+  | "append-result"
+  | "iterate-edge"
+  | "decrement-indegree"
+  | "enqueue-candidate"
+  | "complete"
+  | "cycle-blocked";
+
+export type TopologicalSortNodeStatus =
+  | "pending"
+  | "candidate"
+  | "selected"
+  | "processed"
+  | "opened"
+  | "blocked"
+  | "complete";
+
+export type TopologicalSortEdgeStatus =
+  | "pending"
+  | "active"
+  | "removed"
+  | "blocking"
+  | "cycle-blocked";
+
+export type TopologicalSortNode = {
+  id: string;
+  label: string;
+  x: number;
+  y: number;
+  description?: string;
+};
+
+export type TopologicalSortEdge = {
+  id: string;
+  fromId: string;
+  toId: string;
+  label: string;
+  labelX: number;
+  labelY: number;
+};
+
+export type TopologicalSortExample = {
+  id: TopologicalSortExampleId;
+  title: string;
+  description: string;
+  candidateTieRule: string;
+  nodes: TopologicalSortNode[];
+  edges: TopologicalSortEdge[];
+};
+
+export type TopologicalSortNodeRenderState = GraphNodeState & {
+  description?: string;
+  status: TopologicalSortNodeStatus;
+  inDegree: number;
+};
+
+export type TopologicalSortEdgeRenderState = GraphEdgeState & {
+  label: string;
+  labelX: number;
+  labelY: number;
+  status: TopologicalSortEdgeStatus;
+};
+
+export type TopologicalSortCandidate = {
+  nodeId: string;
+  label: string;
+  isSelected: boolean;
+  reason: string;
+};
+
+export type TopologicalSortCandidateQueue = {
+  items: TopologicalSortCandidate[];
+  selectedNodeId?: string;
+  tieReason?: string;
+};
+
+export type TopologicalSortInDegreeRow = {
+  nodeId: string;
+  label: string;
+  previousValue: number;
+  currentValue: number;
+  delta: number;
+  status: "waiting" | "candidate" | "selected" | "processed" | "opened" | "blocked";
+  sourceEdgeIds: string[];
+};
+
+export type TopologicalSortEdgeCheck = {
+  edgeId: string;
+  label: string;
+  fromNodeId: string;
+  toNodeId: string;
+  fromIndex: number;
+  toIndex: number;
+  isValid: boolean;
+};
+
+export type TopologicalSortResult = {
+  orderNodeIds: string[];
+  orderLabels: string[];
+  nodeCount: number;
+  processedCount: number;
+  edgeChecks: TopologicalSortEdgeCheck[];
+  isValid: boolean;
+  summaryText: string;
+};
+
+export type TopologicalSortTraceState = {
+  exampleId: TopologicalSortExampleId;
+  motion: TopologicalSortMotion;
+  nodes: TopologicalSortNodeRenderState[];
+  edges: TopologicalSortEdgeRenderState[];
+  candidateQueue: TopologicalSortCandidateQueue;
+  inDegreeRows: TopologicalSortInDegreeRow[];
+  resultOrder: string[];
+  resultOrderNodeIds: string[];
+  selectedNodeId?: string;
+  affectedEdgeIds: string[];
+  removedEdgeIds: string[];
+  newCandidateNodeIds: string[];
+  processedNodeIds: string[];
+  remainingNodeIds: string[];
+  validation?: TopologicalSortResult;
+  summaryItems?: { label: string; value: string }[];
+  viewport: {
+    width: number;
+    height: number;
+  };
+};

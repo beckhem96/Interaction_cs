@@ -83,6 +83,19 @@ describe("App routes", () => {
     expect(screen.getByText(/목표 간선 5개/)).toBeInTheDocument();
   });
 
+  it("routes to the topological sort learning page", () => {
+    render(
+      <MemoryRouter initialEntries={["/graphs/topological-sort"]}>
+        <App />
+      </MemoryRouter>,
+    );
+
+    expect(
+      screen.getByRole("heading", { level: 1, name: "위상 정렬: DAG" }),
+    ).toBeInTheDocument();
+    expect(screen.getByText(/방향 간선 8개/)).toBeInTheDocument();
+  });
+
   it("routes to the binary search learning page", () => {
     render(
       <MemoryRouter initialEntries={["/binary-search"]}>

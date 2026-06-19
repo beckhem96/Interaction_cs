@@ -1,4 +1,4 @@
-# Tasks: DAG Topological Sort Step Workbench
+﻿# Tasks: DAG Topological Sort Step Workbench
 
 **Input**: Design documents from `specs/004-topological-sort-steps/`
 
@@ -18,11 +18,11 @@
 
 **Purpose**: Create the topological sort file shells and shared graph-domain entry points.
 
-- [ ] T001 Add topological sort exported type declarations for examples, nodes, directed edges, in-degree rows, candidate queues, validation results, render states, and trace state in `src/concepts/graphs/types.ts`
-- [ ] T002 [P] Create the topological sort code example module shell with C, C++, Java, Python, and JavaScript entries in `src/concepts/graphs/code/topologicalSortExamples.ts`
-- [ ] T003 [P] Create the topological sort trace test file scaffold in `src/concepts/graphs/tests/topologicalSort.test.ts`
-- [ ] T004 [P] Create the topological sort page component test file scaffold in `src/concepts/graphs/components/TopologicalSortPage.test.tsx`
-- [ ] T005 Create the topological sort page component shell and export `TopologicalSortPage` in `src/concepts/graphs/components/TopologicalSortPage.tsx`
+- [X] T001 Add topological sort exported type declarations for examples, nodes, directed edges, in-degree rows, candidate queues, validation results, render states, and trace state in `src/concepts/graphs/types.ts`
+- [X] T002 [P] Create the topological sort code example module shell with C, C++, Java, Python, and JavaScript entries in `src/concepts/graphs/code/topologicalSortExamples.ts`
+- [X] T003 [P] Create the topological sort trace test file scaffold in `src/concepts/graphs/tests/topologicalSort.test.ts`
+- [X] T004 [P] Create the topological sort page component test file scaffold in `src/concepts/graphs/components/TopologicalSortPage.test.tsx`
+- [X] T005 Create the topological sort page component shell and export `TopologicalSortPage` in `src/concepts/graphs/components/TopologicalSortPage.tsx`
 
 ---
 
@@ -32,12 +32,12 @@
 
 **CRITICAL**: No user story UI work should begin until trace shape, code highlight keys, and example validation behavior are defined.
 
-- [ ] T006 [P] Add complete topological sort code examples and highlight map keys for initialize, seed-queue, inspect-candidates, select-node, append-result, iterate-edge, decrement-indegree, enqueue-candidate, complete, and cycle-blocked phases in `src/concepts/graphs/code/topologicalSortExamples.ts`
-- [ ] T007 [P] Add base trace tests for example validity, DAG acyclicity, initial in-degree values, deterministic candidate ordering, Korean titles/descriptions, and all-language code highlights in `src/concepts/graphs/tests/topologicalSort.test.ts`
-- [ ] T008 Create curated DAG example data with 6-7 nodes, 7-9 directed edges, fixed coordinates, at least one multi-candidate step, and at least one new-candidate step in `src/concepts/graphs/algorithms/topologicalSort.ts`
-- [ ] T009 Implement shared helpers for in-degree computation, outgoing edge lookup, candidate sorting, DAG validation, final edge-order validation, and cycle-blocked detection in `src/concepts/graphs/algorithms/topologicalSort.ts`
-- [ ] T010 Add graph layout clearance tests for topological sort node spacing, edge label placement, and arrow label readability in `src/concepts/graphs/tests/topologicalSort.test.ts`
-- [ ] T011 Implement shared render-state derivation for pending, candidate, selected, processed, newly opened, affected edge, removed edge, blocking edge, complete, and blocked states in `src/concepts/graphs/algorithms/topologicalSort.ts`
+- [X] T006 [P] Add complete topological sort code examples and highlight map keys for initialize, seed-queue, inspect-candidates, select-node, append-result, iterate-edge, decrement-indegree, enqueue-candidate, complete, and cycle-blocked phases in `src/concepts/graphs/code/topologicalSortExamples.ts`
+- [X] T007 [P] Add base trace tests for example validity, DAG acyclicity, initial in-degree values, deterministic candidate ordering, Korean titles/descriptions, and all-language code highlights in `src/concepts/graphs/tests/topologicalSort.test.ts`
+- [X] T008 Create curated DAG example data with 6-7 nodes, 7-9 directed edges, fixed coordinates, at least one multi-candidate step, and at least one new-candidate step in `src/concepts/graphs/algorithms/topologicalSort.ts`
+- [X] T009 Implement shared helpers for in-degree computation, outgoing edge lookup, candidate sorting, DAG validation, final edge-order validation, and cycle-blocked detection in `src/concepts/graphs/algorithms/topologicalSort.ts`
+- [X] T010 Add graph layout clearance tests for topological sort node spacing, edge label placement, and arrow label readability in `src/concepts/graphs/tests/topologicalSort.test.ts`
+- [X] T011 Implement shared render-state derivation for pending, candidate, selected, processed, newly opened, affected edge, removed edge, blocking edge, complete, and blocked states in `src/concepts/graphs/algorithms/topologicalSort.ts`
 
 **Checkpoint**: Trace model foundation is ready and story rendering can now begin.
 
@@ -51,19 +51,19 @@
 
 ### Tests for User Story 1
 
-- [ ] T012 [P] [US1] Add trace tests for initial zero-in-degree candidate queue, multi-candidate tie ordering, selected node id, and result-order append in `src/concepts/graphs/tests/topologicalSort.test.ts`
-- [ ] T013 [P] [US1] Add component tests for page title, SVG DAG stage, candidate queue, result order, controls, slider, and code tabs in `src/concepts/graphs/components/TopologicalSortPage.test.tsx`
-- [ ] T014 [P] [US1] Add route test coverage for `/graphs/topological-sort` rendering `위상 정렬: DAG` in `src/App.test.tsx`
+- [X] T012 [P] [US1] Add trace tests for initial zero-in-degree candidate queue, multi-candidate tie ordering, selected node id, and result-order append in `src/concepts/graphs/tests/topologicalSort.test.ts`
+- [X] T013 [P] [US1] Add component tests for page title, SVG DAG stage, candidate queue, result order, controls, slider, and code tabs in `src/concepts/graphs/components/TopologicalSortPage.test.tsx`
+- [X] T014 [P] [US1] Add route test coverage for `/graphs/topological-sort` rendering `위상 정렬: DAG` in `src/App.test.tsx`
 
 ### Implementation for User Story 1
 
-- [ ] T015 [US1] Implement `generateTopologicalSortTrace` initial, inspect-candidates, select-node, and append-result steps in `src/concepts/graphs/algorithms/topologicalSort.ts`
-- [ ] T016 [US1] Render SVG DAG nodes with pending, candidate, selected, and processed states from immutable trace state in `src/concepts/graphs/components/TopologicalSortPage.tsx`
-- [ ] T017 [US1] Render candidate queue, tie-rule explanation, accumulated result order, current step title, and Korean description in `src/concepts/graphs/components/TopologicalSortPage.tsx`
-- [ ] T018 [US1] Add Previous, Next, Reset, and step slider controls using the existing step controller pattern in `src/concepts/graphs/components/TopologicalSortPage.tsx`
-- [ ] T019 [US1] Render C, C++, Java, Python, and JavaScript code tabs with current-step highlight synchronization in `src/concepts/graphs/components/TopologicalSortPage.tsx`
-- [ ] T020 [US1] Register the `/graphs/topological-sort` route and page import in `src/App.tsx`
-- [ ] T021 [US1] Add base topological sort workbench, DAG stage, candidate queue, result order, timeline controls, and code panel styles in `src/styles.css`
+- [X] T015 [US1] Implement `generateTopologicalSortTrace` initial, inspect-candidates, select-node, and append-result steps in `src/concepts/graphs/algorithms/topologicalSort.ts`
+- [X] T016 [US1] Render SVG DAG nodes with pending, candidate, selected, and processed states from immutable trace state in `src/concepts/graphs/components/TopologicalSortPage.tsx`
+- [X] T017 [US1] Render candidate queue, tie-rule explanation, accumulated result order, current step title, and Korean description in `src/concepts/graphs/components/TopologicalSortPage.tsx`
+- [X] T018 [US1] Add Previous, Next, Reset, and step slider controls using the existing step controller pattern in `src/concepts/graphs/components/TopologicalSortPage.tsx`
+- [X] T019 [US1] Render C, C++, Java, Python, and JavaScript code tabs with current-step highlight synchronization in `src/concepts/graphs/components/TopologicalSortPage.tsx`
+- [X] T020 [US1] Register the `/graphs/topological-sort` route and page import in `src/App.tsx`
+- [X] T021 [US1] Add base topological sort workbench, DAG stage, candidate queue, result order, timeline controls, and code panel styles in `src/styles.css`
 
 **Checkpoint**: User Story 1 is fully functional and testable independently as the MVP.
 
@@ -77,18 +77,18 @@
 
 ### Tests for User Story 2
 
-- [ ] T022 [P] [US2] Add trace tests for outgoing edge processing, affected edge ids, in-degree decrement, and no-new-candidate explanation in `src/concepts/graphs/tests/topologicalSort.test.ts`
-- [ ] T023 [P] [US2] Add trace tests for newly opened candidate enqueue behavior and queue ordering after edge removal in `src/concepts/graphs/tests/topologicalSort.test.ts`
-- [ ] T024 [P] [US2] Add component tests for directed edge states, in-degree table rows, delta labels, affected edges, and newly opened candidate labels in `src/concepts/graphs/components/TopologicalSortPage.test.tsx`
+- [X] T022 [P] [US2] Add trace tests for outgoing edge processing, affected edge ids, in-degree decrement, and no-new-candidate explanation in `src/concepts/graphs/tests/topologicalSort.test.ts`
+- [X] T023 [P] [US2] Add trace tests for newly opened candidate enqueue behavior and queue ordering after edge removal in `src/concepts/graphs/tests/topologicalSort.test.ts`
+- [X] T024 [P] [US2] Add component tests for directed edge states, in-degree table rows, delta labels, affected edges, and newly opened candidate labels in `src/concepts/graphs/components/TopologicalSortPage.test.tsx`
 
 ### Implementation for User Story 2
 
-- [ ] T025 [US2] Extend `generateTopologicalSortTrace` with remove-edge, update-indegree, and enqueue-candidate phases in `src/concepts/graphs/algorithms/topologicalSort.ts`
-- [ ] T026 [US2] Populate `inDegreeRows`, `affectedEdgeIds`, `newCandidateNodeIds`, and step-specific queue snapshots for each edge-processing step in `src/concepts/graphs/algorithms/topologicalSort.ts`
-- [ ] T027 [US2] Render directed edges with arrow markers and pending, active outgoing, removed, blocking, and newly satisfied states in `src/concepts/graphs/components/TopologicalSortPage.tsx`
-- [ ] T028 [US2] Render the in-degree table with previous value, current value, delta, row status text, and source edge references in `src/concepts/graphs/components/TopologicalSortPage.tsx`
-- [ ] T029 [US2] Update code highlight mappings for outgoing edge iteration, in-degree decrement, and newly zero-in-degree enqueue phases in `src/concepts/graphs/code/topologicalSortExamples.ts`
-- [ ] T030 [US2] Add edge state, arrow marker, in-degree table, delta badge, opened candidate, and non-color status styles in `src/styles.css`
+- [X] T025 [US2] Extend `generateTopologicalSortTrace` with remove-edge, update-indegree, and enqueue-candidate phases in `src/concepts/graphs/algorithms/topologicalSort.ts`
+- [X] T026 [US2] Populate `inDegreeRows`, `affectedEdgeIds`, `newCandidateNodeIds`, and step-specific queue snapshots for each edge-processing step in `src/concepts/graphs/algorithms/topologicalSort.ts`
+- [X] T027 [US2] Render directed edges with arrow markers and pending, active outgoing, removed, blocking, and newly satisfied states in `src/concepts/graphs/components/TopologicalSortPage.tsx`
+- [X] T028 [US2] Render the in-degree table with previous value, current value, delta, row status text, and source edge references in `src/concepts/graphs/components/TopologicalSortPage.tsx`
+- [X] T029 [US2] Update code highlight mappings for outgoing edge iteration, in-degree decrement, and newly zero-in-degree enqueue phases in `src/concepts/graphs/code/topologicalSortExamples.ts`
+- [X] T030 [US2] Add edge state, arrow marker, in-degree table, delta badge, opened candidate, and non-color status styles in `src/styles.css`
 
 **Checkpoint**: User Stories 1 and 2 both work independently and explain why candidates become available.
 
@@ -102,18 +102,18 @@
 
 ### Tests for User Story 3
 
-- [ ] T031 [P] [US3] Add trace tests for final order containing every node once, every directed edge check passing, and deterministic replay in `src/concepts/graphs/tests/topologicalSort.test.ts`
-- [ ] T032 [P] [US3] Add trace tests for cycle-blocked guard behavior with a cyclic fixture or helper input in `src/concepts/graphs/tests/topologicalSort.test.ts`
-- [ ] T033 [P] [US3] Add component tests for final validation panel, edge check summary, reset replay behavior, and cycle-blocked messaging in `src/concepts/graphs/components/TopologicalSortPage.test.tsx`
+- [X] T031 [P] [US3] Add trace tests for final order containing every node once, every directed edge check passing, and deterministic replay in `src/concepts/graphs/tests/topologicalSort.test.ts`
+- [X] T032 [P] [US3] Add trace tests for cycle-blocked guard behavior with a cyclic fixture or helper input in `src/concepts/graphs/tests/topologicalSort.test.ts`
+- [X] T033 [P] [US3] Add component tests for final validation panel, edge check summary, reset replay behavior, and cycle-blocked messaging in `src/concepts/graphs/components/TopologicalSortPage.test.tsx`
 
 ### Implementation for User Story 3
 
-- [ ] T034 [US3] Extend `generateTopologicalSortTrace` with complete-state validation summary, processed count, node count, edge checks, and final Korean explanation in `src/concepts/graphs/algorithms/topologicalSort.ts`
-- [ ] T035 [US3] Add cycle-blocked trace support for unprocessed nodes with an empty candidate queue without adding a second UI example in `src/concepts/graphs/algorithms/topologicalSort.ts`
-- [ ] T036 [US3] Render final validation result, topological order, processed count, and directed-edge prerequisite checks in `src/concepts/graphs/components/TopologicalSortPage.tsx`
-- [ ] T037 [US3] Render cycle-blocked messaging for trace states that cannot complete topological sorting in `src/concepts/graphs/components/TopologicalSortPage.tsx`
-- [ ] T038 [US3] Add Play/Pause, speed selection, and pause-on-manual-change behavior for guided automatic progression in `src/concepts/graphs/components/TopologicalSortPage.tsx`
-- [ ] T039 [US3] Add final validation, edge check, auto-play, complete, and cycle-blocked styles in `src/styles.css`
+- [X] T034 [US3] Extend `generateTopologicalSortTrace` with complete-state validation summary, processed count, node count, edge checks, and final Korean explanation in `src/concepts/graphs/algorithms/topologicalSort.ts`
+- [X] T035 [US3] Add cycle-blocked trace support for unprocessed nodes with an empty candidate queue without adding a second UI example in `src/concepts/graphs/algorithms/topologicalSort.ts`
+- [X] T036 [US3] Render final validation result, topological order, processed count, and directed-edge prerequisite checks in `src/concepts/graphs/components/TopologicalSortPage.tsx`
+- [X] T037 [US3] Render cycle-blocked messaging for trace states that cannot complete topological sorting in `src/concepts/graphs/components/TopologicalSortPage.tsx`
+- [X] T038 [US3] Add Play/Pause, speed selection, and pause-on-manual-change behavior for guided automatic progression in `src/concepts/graphs/components/TopologicalSortPage.tsx`
+- [X] T039 [US3] Add final validation, edge check, auto-play, complete, and cycle-blocked styles in `src/styles.css`
 
 **Checkpoint**: All user stories work independently and together.
 
@@ -123,15 +123,15 @@
 
 **Purpose**: Integrate navigation, documentation, accessibility, responsive behavior, and final verification.
 
-- [ ] T040 [P] Add Home graph card/link coverage for `위상 정렬: DAG` in `src/pages/HomePage.tsx` and `src/pages/HomePage.test.tsx`
-- [ ] T041 [P] Update graph concept documentation with the DAG topological sort learning slice in `CONCEPT_SPEC.md`
-- [ ] T042 Audit Korean learner-facing copy, aria labels, legends, status labels, and non-color state cues in `src/concepts/graphs/components/TopologicalSortPage.tsx`
-- [ ] T043 Audit responsive desktop/mobile workbench layout and text fitting for topological sort styles in `src/styles.css`
-- [ ] T044 Run focused topological sort tests with `npm run test -- src/concepts/graphs/tests/topologicalSort.test.ts src/concepts/graphs/components/TopologicalSortPage.test.tsx --run` for `src/concepts/graphs/tests/topologicalSort.test.ts`
-- [ ] T045 Run route and Home coverage with `npm run test -- src/App.test.tsx src/pages/HomePage.test.tsx --run` for `src/App.test.tsx`
-- [ ] T046 Run the full test suite with `npm run test -- --run` using `package.json`
-- [ ] T047 Run the production build with `npm run build` using `package.json`
-- [ ] T048 Run whitespace validation with `git diff --check` for `specs/004-topological-sort-steps/tasks.md`
+- [X] T040 [P] Add Home graph card/link coverage for `위상 정렬: DAG` in `src/pages/HomePage.tsx` and `src/pages/HomePage.test.tsx`
+- [X] T041 [P] Update graph concept documentation with the DAG topological sort learning slice in `CONCEPT_SPEC.md`
+- [X] T042 Audit Korean learner-facing copy, aria labels, legends, status labels, and non-color state cues in `src/concepts/graphs/components/TopologicalSortPage.tsx`
+- [X] T043 Audit responsive desktop/mobile workbench layout and text fitting for topological sort styles in `src/styles.css`
+- [X] T044 Run focused topological sort tests with `npm run test -- src/concepts/graphs/tests/topologicalSort.test.ts src/concepts/graphs/components/TopologicalSortPage.test.tsx --run` for `src/concepts/graphs/tests/topologicalSort.test.ts`
+- [X] T045 Run route and Home coverage with `npm run test -- src/App.test.tsx src/pages/HomePage.test.tsx --run` for `src/App.test.tsx`
+- [X] T046 Run the full test suite with `npm run test -- --run` using `package.json`
+- [X] T047 Run the production build with `npm run build` using `package.json`
+- [X] T048 Run whitespace validation with `git diff --check` for `specs/004-topological-sort-steps/tasks.md`
 
 ---
 

@@ -3754,6 +3754,302 @@ button:disabled {
   background: #eaf5ee;
 }
 
+.topological-stage-panel {
+  min-height: 700px;
+}
+
+.topological-candidate-panel,
+.topological-result-panel,
+.topological-validation-panel {
+  display: grid;
+  gap: 12px;
+  padding: 16px;
+  border: 1px solid #d9e0e4;
+  border-radius: 10px;
+  background: #ffffff;
+}
+
+.topological-candidate-panel h2,
+.topological-result-panel h2,
+.topological-validation-panel h2 {
+  margin: 0;
+  color: #172026;
+  font-size: 1rem;
+}
+
+.topological-candidate-panel p,
+.topological-result-panel p,
+.topological-validation-panel p {
+  margin: 0;
+  color: #52616a;
+  font-size: 0.88rem;
+  font-weight: 750;
+  line-height: 1.5;
+}
+
+.topological-candidate-list {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  min-height: 38px;
+}
+
+.topological-candidate,
+.topological-empty {
+  display: inline-grid;
+  align-items: center;
+  justify-content: center;
+  min-width: 62px;
+  min-height: 36px;
+  padding: 6px 10px;
+  border-radius: 8px;
+  font-size: 0.84rem;
+  font-weight: 900;
+}
+
+.topological-candidate {
+  border: 1px solid #c28a1d;
+  background: #fff7df;
+  color: #172026;
+}
+
+.topological-candidate span {
+  color: #6a5c24;
+  font-size: 0.72rem;
+  font-weight: 850;
+}
+
+.topological-candidate.is-selected {
+  border-color: #c94f37;
+  background: #f9e6e1;
+}
+
+.topological-empty {
+  border: 1px dashed #bbc7cc;
+  color: #6a767d;
+}
+
+.topological-table-scroll {
+  overflow: auto;
+  border: 1px solid #d9e0e4;
+  border-radius: 8px;
+  background: #ffffff;
+}
+
+.topological-indegree-table {
+  width: 100%;
+  min-width: 760px;
+  border-collapse: collapse;
+  color: #172026;
+  font-size: 0.88rem;
+}
+
+.topological-indegree-table th,
+.topological-indegree-table td {
+  padding: 9px 10px;
+  border-bottom: 1px solid #e3e8eb;
+  text-align: left;
+  vertical-align: top;
+}
+
+.topological-indegree-table thead th {
+  background: #f0f4f3;
+  color: #31594f;
+  font-size: 0.78rem;
+  font-weight: 950;
+}
+
+.topological-indegree-table tbody th {
+  color: #172026;
+  font-weight: 950;
+}
+
+.topological-row.is-candidate {
+  background: #fff7df;
+}
+
+.topological-row.is-selected {
+  background: #f9e6e1;
+}
+
+.topological-row.is-processed {
+  background: #edf5ff;
+}
+
+.topological-row.is-opened {
+  background: #e5f2e9;
+}
+
+.topological-row.is-blocked {
+  background: #f6e4e8;
+}
+
+.topological-node.is-candidate circle {
+  fill: #fff7df;
+  stroke: #c28a1d;
+}
+
+.topological-node.is-selected circle {
+  fill: #f9e6e1;
+  stroke: #c94f37;
+  stroke-width: 5;
+  animation: tree-node-found 720ms ease;
+}
+
+.topological-node.is-processed circle {
+  fill: #edf5ff;
+  stroke: #2f6fbb;
+}
+
+.topological-node.is-opened circle {
+  fill: #e5f2e9;
+  stroke: #3f7d58;
+  stroke-width: 5;
+  animation: tree-node-visit 700ms ease;
+}
+
+.topological-node.is-blocked circle {
+  fill: #f6e4e8;
+  stroke: #8a4b5f;
+  stroke-dasharray: 5 4;
+}
+
+.topological-node.is-complete circle {
+  fill: #e5f2e9;
+  stroke: #3f7d58;
+  stroke-width: 4;
+}
+
+.topological-edge line {
+  stroke: #7a8b93;
+}
+
+.topological-edge.is-blocking line {
+  stroke: #c28a1d;
+}
+
+.topological-edge.is-active line {
+  stroke: #c94f37;
+  stroke-width: 5;
+  animation: tree-edge-draw 720ms ease;
+}
+
+.topological-edge.is-removed line {
+  stroke: #3f7d58;
+  stroke-width: 4;
+}
+
+.topological-edge.is-cycle-blocked line {
+  stroke: #8a4b5f;
+  stroke-dasharray: 7 5;
+  stroke-width: 4;
+}
+
+.topological-edge-label rect {
+  fill: #ffffff;
+  stroke: #c8d2d7;
+  stroke-width: 1.5;
+}
+
+.topological-edge-label text {
+  fill: #172026;
+  font-size: 0.68rem;
+  font-weight: 900;
+  text-anchor: middle;
+}
+
+.topological-edge.is-active .topological-edge-label rect {
+  stroke: #c94f37;
+  stroke-width: 2;
+}
+
+.topological-edge.is-removed .topological-edge-label rect {
+  stroke: #3f7d58;
+}
+
+.topological-order {
+  display: inline-flex;
+  align-items: center;
+  min-height: 36px;
+  padding: 8px 10px;
+  border: 1px solid #c6d8cc;
+  border-radius: 8px;
+  background: #eaf5ee;
+  color: #172026 !important;
+  font-weight: 950 !important;
+}
+
+.topological-progress strong {
+  color: #172026;
+}
+
+.topological-validation {
+  display: grid;
+  gap: 10px;
+  padding: 10px 12px;
+  border-radius: 8px;
+}
+
+.topological-validation.is-valid {
+  border: 1px solid #c6d8cc;
+  background: #eaf5ee;
+}
+
+.topological-validation.is-invalid {
+  border: 1px solid #dfbec7;
+  background: #f6e4e8;
+}
+
+.topological-edge-checks {
+  display: grid;
+  gap: 6px;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.topological-edge-checks li {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto;
+  gap: 8px;
+  align-items: center;
+  padding: 7px 9px;
+  border: 1px solid #d9e0e4;
+  border-radius: 8px;
+  background: #ffffff;
+  color: #52616a;
+  font-size: 0.82rem;
+  font-weight: 850;
+}
+
+.topological-edge-checks li.is-valid strong {
+  color: #3f7d58;
+}
+
+.topological-edge-checks li.is-invalid strong {
+  color: #8a4b5f;
+}
+
+.speed-control {
+  display: inline-grid;
+  gap: 4px;
+  align-items: center;
+  color: #42635b;
+  font-size: 0.78rem;
+  font-weight: 900;
+}
+
+.speed-control select {
+  min-height: 34px;
+  padding: 0 28px 0 10px;
+  border: 1px solid #c8d2d7;
+  border-radius: 8px;
+  background: #ffffff;
+  color: #172026;
+  font: inherit;
+  font-weight: 850;
+}
+
 @keyframes tree-node-compare {
   0%,
   100% {

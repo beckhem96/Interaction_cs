@@ -799,6 +799,7 @@ Do not introduce a complex graph layout library until the MVP is stable.
 * Graph DFS
 * Dijkstra
 * Minimum Spanning Tree
+* Topological Sort
 
 ### 6.1.1 Dijkstra Shortest Path
 
@@ -833,6 +834,25 @@ The user should understand:
 * Computing the final MST total cost from selected edge weights
 
 The initial example should use one fixed connected undirected weighted graph.
+The page should provide C, C++, Java, Python, and JavaScript code tabs with current-step line highlights.
+
+### 6.1.3 DAG Topological Sort
+
+Topological sort visualization should show how a directed acyclic graph becomes a valid prerequisite order through deterministic zero-in-degree decisions.
+
+The user should understand:
+
+* Computing each node's in-degree from directed edges
+* Finding all current zero-in-degree candidates
+* Resolving multiple candidates by a deterministic label rule
+* Appending the selected node to the result order
+* Removing outgoing edges from the selected node
+* Decrementing neighbor in-degree values
+* Opening newly zero-in-degree candidates
+* Verifying that the final order respects every directed edge
+* Recognizing that a remaining graph with no zero-in-degree candidate indicates a cycle
+
+The initial example should use one fixed DAG with at least one multi-candidate step.
 The page should provide C, C++, Java, Python, and JavaScript code tabs with current-step line highlights.
 
 ### 6.2 Operating Systems

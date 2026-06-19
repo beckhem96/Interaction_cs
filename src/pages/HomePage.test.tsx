@@ -29,6 +29,7 @@ describe("HomePage", () => {
         "/graphs/traversal",
         "/graphs/dijkstra",
         "/graphs/mst",
+        "/graphs/topological-sort",
         "/binary-search",
         "/dynamic-programming",
       ]),

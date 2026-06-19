@@ -51,6 +51,12 @@ const categories: CategoryCard[] = [
     status: "Kruskal MST"
   },
   {
+    title: "위상 정렬",
+    description: "DAG에서 진입 차수 0 후보를 고르고 간선을 해소해 순서를 만드는 과정을 따라갑니다.",
+    href: "/graphs/topological-sort",
+    status: "DAG 순서"
+  },
+  {
     title: "이진 탐색",
     description: "정렬된 배열에서 후보 구간을 절반씩 줄이며 target을 찾는 과정을 단계별로 관찰합니다.",
     href: "/binary-search",

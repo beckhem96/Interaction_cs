@@ -6,6 +6,7 @@ import { DijkstraPage } from "./concepts/graphs/components/DijkstraPage";
 import { GraphPage } from "./concepts/graphs/components/GraphPage";
 import { GraphTraversalPage } from "./concepts/graphs/components/GraphTraversalPage";
 import { MstPage } from "./concepts/graphs/components/MstPage";
+import { TopologicalSortPage } from "./concepts/graphs/components/TopologicalSortPage";
 import { BinarySearchPage } from "./concepts/search/components/BinarySearchPage";
 import { SortingPage } from "./concepts/sorting/components/SortingPage";
 import { TreePage } from "./concepts/trees/components/TreePage";
@@ -22,6 +23,7 @@ export function App() {
       <Route path="/graphs/traversal" element={<GraphTraversalPage />} />
       <Route path="/graphs/dijkstra" element={<DijkstraPage />} />
       <Route path="/graphs/mst" element={<MstPage />} />
+      <Route path="/graphs/topological-sort" element={<TopologicalSortPage />} />
       <Route path="/binary-search" element={<BinarySearchPage />} />
       <Route path="/dynamic-programming" element={<DynamicProgrammingPage />} />
       <Route path="*" element={<Navigate to="/" replace />} />
