@@ -18,6 +18,7 @@ import type {
   GraphTraversalMode,
   GraphTraversalState
 } from "../types";
+import { InteractiveGraphCanvas } from "./InteractiveGraphCanvas";
 
 const pseudoCode = [
   "시작 노드를 대기 목록에 넣고 발견 처리한다.",
@@ -352,75 +353,41 @@ function GraphTraversalCodePanel({
 }
 
 function GraphTraversalDiagram({ state }: { state: GraphTraversalState }) {
-  return (
-    <div className="graph-visual-scroll">
-      <svg
-        aria-label={`${modeLabels[state.mode]} 탐색 상태`}
-        className={`graph-visual motion-${state.motion}`}
-        role="img"
-        viewBox={`0 0 ${state.viewport.width} ${state.viewport.height}`}
-      >
-        <g className="graph-edges">
-          {state.edges.map((edge) => (
-            <GraphTraversalEdge edge={edge} key={edge.id} state={state} />
-          ))}
-        </g>
-        <g className="graph-nodes">
-          {state.nodes.map((node) => (
-            <g
-              aria-label={getGraphTraversalNodeAriaLabel(node, state)}
-              className={getGraphTraversalNodeClassName(node, state)}
-              key={node.id}
-              transform={`translate(${node.x} ${node.y})`}
-            >
-              <circle r="25" />
-              <text dy="6">{node.label}</text>
-              <text className="graph-node-note" dy="43">
-                {getGraphTraversalNodeNote(node, state)}
-              </text>
-            </g>
-          ))}
-        </g>
-      </svg>
-    </div>
-  );
-}
+  const nodes = state.nodes.map((node) => ({
+    id: node.id,
+    label: node.label,
+    note: getGraphTraversalNodeNote(node, state),
+    className: getGraphTraversalNodeClassName(node, state),
+    ariaLabel: getGraphTraversalNodeAriaLabel(node, state),
+    x: node.x,
+    y: node.y
+  }));
+  const edges = state.edges.map((edge) => {
+    const isActive = state.activeEdgeIds?.includes(edge.id) ?? false;
+    const isTreeEdge = state.treeEdgeIds.includes(edge.id);
+    const color = isActive ? "#c94f37" : isTreeEdge ? "#31594f" : "#9aa9b1";
 
-function GraphTraversalEdge({
-  edge,
-  state
-}: {
-  edge: GraphEdgeState;
-  state: GraphTraversalState;
-}) {
-  const geometry = getTrimmedEdgeGeometry(edge);
+    return {
+      id: edge.id,
+      source: edge.fromId,
+      target: edge.toId,
+      className: getGraphTraversalEdgeClassName(edge, state),
+      ariaLabel: `${edge.fromId}와 ${edge.toId}를 연결하는 간선`,
+      color,
+      strokeWidth: isActive ? 5 : isTreeEdge ? 4 : 3,
+      animated: isActive
+    };
+  });
 
   return (
-    <g className={getGraphTraversalEdgeClassName(edge, state)}>
-      <line
-        x1={geometry.x1}
-        y1={geometry.y1}
-        x2={geometry.x2}
-        y2={geometry.y2}
-      />
-    </g>
+    <InteractiveGraphCanvas
+      ariaLabel={`${modeLabels[state.mode]} 탐색 상태`}
+      className={`motion-${state.motion}`}
+      layoutAlgorithm="stress"
+      nodes={nodes}
+      edges={edges}
+    />
   );
-}
-
-function getTrimmedEdgeGeometry(edge: GraphEdgeState) {
-  const radius = 30;
-  const dx = edge.toX - edge.fromX;
-  const dy = edge.toY - edge.fromY;
-  const length = Math.max(Math.hypot(dx, dy), 1);
-  const offsetX = (dx / length) * radius;
-  const offsetY = (dy / length) * radius;
-
-  return {
-    x1: edge.fromX + offsetX,
-    y1: edge.fromY + offsetY,
-    x2: edge.toX - offsetX,
-    y2: edge.toY - offsetY
-  };
 }
 
 function getGraphTraversalNodeClassName(

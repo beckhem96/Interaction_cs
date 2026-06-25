@@ -30,6 +30,7 @@ describe("HomePage", () => {
         "/graphs/dijkstra",
         "/graphs/mst",
         "/graphs/topological-sort",
+        "/graphs/scc",
         "/binary-search",
         "/dynamic-programming",
       ]),

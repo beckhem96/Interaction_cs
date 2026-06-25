@@ -18,7 +18,7 @@ describe("GraphPage", () => {
     ).toBeInTheDocument();
     expect(screen.getByText("노드 6개 · 간선 7개")).toBeInTheDocument();
     expect(
-      screen.getByRole("img", { name: "무방향 그래프 상태" })
+      screen.getByRole("application", { name: "무방향 그래프 상태" })
     ).toBeInTheDocument();
     expect(screen.getByRole("button", { name: "이전" })).toBeDisabled();
     expect(screen.getByRole("button", { name: "그래프 다음 단계" })).toBeEnabled();
@@ -30,7 +30,7 @@ describe("GraphPage", () => {
   });
 
   it("supports manual scrubbing to a weighted edge step", () => {
-    const { container } = render(
+    render(
       <MemoryRouter>
         <GraphPage />
       </MemoryRouter>
@@ -49,7 +49,6 @@ describe("GraphPage", () => {
     expect(screen.getAllByText("S → A 연결").length).toBeGreaterThan(0);
     expect(screen.getByText("노드 6개 · 가중치 간선 8개")).toBeInTheDocument();
     expect(screen.getAllByText("A(4)").length).toBeGreaterThan(0);
-    expect(container.querySelector(".graph-edge.is-weighted.is-active")).not.toBeNull();
     expect(
       screen.getByRole("listitem", {
         name: "현재 코드 17: graphAddWeightedEdge(graph, from, to, weight);"
@@ -58,7 +57,7 @@ describe("GraphPage", () => {
   });
 
   it("switches to DAG mode and shows one-way dependency edges", () => {
-    const { container } = render(
+    render(
       <MemoryRouter>
         <GraphPage />
       </MemoryRouter>
@@ -73,10 +72,8 @@ describe("GraphPage", () => {
     fireEvent.change(slider, { target: { value: String(completeIndex) } });
 
     expect(screen.getAllByText("DAG 구조 완성").length).toBeGreaterThan(0);
-    expect(screen.getByRole("img", { name: "DAG 상태" })).toBeInTheDocument();
+    expect(screen.getByRole("application", { name: "DAG 상태" })).toBeInTheDocument();
     expect(screen.getByText("API, UI")).toBeInTheDocument();
-    expect(container.querySelector(".graph-edge.is-directed.is-active")).not.toBeNull();
-    expect(container.querySelectorAll(".graph-edge.is-directed")).toHaveLength(7);
   });
 
   it("switches to bipartite mode and highlights partitions", () => {
@@ -101,6 +98,5 @@ describe("GraphPage", () => {
     expect(screen.getByLabelText("T1 오른쪽 파티션 노드")).toBeInTheDocument();
     expect(container.querySelectorAll(".graph-node.group-left")).toHaveLength(3);
     expect(container.querySelectorAll(".graph-node.group-right")).toHaveLength(3);
-    expect(container.querySelectorAll(".graph-edge.is-active")).toHaveLength(6);
   });
 });

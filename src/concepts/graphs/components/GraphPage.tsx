@@ -19,6 +19,7 @@ import type {
   GraphNodeState,
   GraphTraceState
 } from "../types";
+import { InteractiveGraphCanvas } from "./InteractiveGraphCanvas";
 
 const pseudoCode = [
   "그래프를 빈 인접 리스트로 준비한다.",
@@ -341,132 +342,55 @@ function GraphCodePanel({
 }
 
 function GraphDiagram({ state }: { state: GraphTraceState }) {
-  return (
-    <div className="graph-visual-scroll">
-      <svg
-        aria-label={`${getGraphStructureTitle(state.kind)} 상태`}
-        className={`graph-visual motion-${state.motion}`}
-        role="img"
-        viewBox={`0 0 ${state.viewport.width} ${state.viewport.height}`}
-      >
-        <defs>
-          <GraphArrowMarker
-            color="#2f6fbb"
-            id={`graph-arrow-${state.kind}-directed`}
-          />
-          <GraphArrowMarker
-            color="#6f5bb8"
-            id={`graph-arrow-${state.kind}-weighted`}
-          />
-          <GraphArrowMarker
-            color="#c94f37"
-            id={`graph-arrow-${state.kind}-active`}
-          />
-        </defs>
-        <g className="graph-edges">
-          {state.edges.map((edge) => (
-            <GraphEdge edge={edge} key={edge.id} state={state} />
-          ))}
-        </g>
-        <g className="graph-nodes">
-          {state.nodes.map((node) => (
-            <g
-              aria-label={getGraphNodeAriaLabel(node)}
-              className={getGraphNodeClassName(node, state)}
-              key={node.id}
-              transform={`translate(${node.x} ${node.y})`}
-            >
-              <circle r="25" />
-              <text dy="6">{node.label}</text>
-              {node.group !== undefined && node.group !== "neutral" ? (
-                <text className="graph-node-note" dy="43">
-                  {groupLabels[node.group] ?? node.group}
-                </text>
-              ) : null}
-            </g>
-          ))}
-        </g>
-      </svg>
-    </div>
-  );
-}
+  const nodes = state.nodes.map((node) => ({
+    id: node.id,
+    label: node.label,
+    note:
+      node.group !== undefined && node.group !== "neutral"
+        ? groupLabels[node.group] ?? node.group
+        : undefined,
+    className: getGraphNodeClassName(node, state),
+    ariaLabel: getGraphNodeAriaLabel(node),
+    x: node.x,
+    y: node.y
+  }));
+  const edges = state.edges.map((edge) => {
+    const isActive = state.activeEdgeIds?.includes(edge.id) ?? false;
+    const color = isActive
+      ? "#c94f37"
+      : edge.weight !== undefined
+        ? "#6f5bb8"
+        : edge.directed
+          ? "#2f6fbb"
+          : "#9aa9b1";
 
-function GraphArrowMarker({ color, id }: { color: string; id: string }) {
-  return (
-    <marker
-      id={id}
-      markerHeight="9"
-      markerWidth="9"
-      orient="auto"
-      refX="8"
-      refY="4.5"
-    >
-      <path d="M0,0 L9,4.5 L0,9 Z" fill={color} />
-    </marker>
-  );
-}
-
-function GraphEdge({
-  edge,
-  state
-}: {
-  edge: GraphEdgeState;
-  state: GraphTraceState;
-}) {
-  const geometry = getTrimmedEdgeGeometry(edge);
-  const midX = (geometry.x1 + geometry.x2) / 2;
-  const midY = (geometry.y1 + geometry.y2) / 2;
+    return {
+      id: edge.id,
+      source: edge.fromId,
+      target: edge.toId,
+      label: edge.weight,
+      labelClassName: "graph-edge-weight",
+      className: getGraphEdgeClassName(edge, state),
+      ariaLabel: `${edge.fromId}에서 ${edge.toId}로 연결된${
+        edge.weight === undefined ? "" : ` 가중치 ${edge.weight}`
+      } 간선`,
+      directed: edge.directed,
+      color,
+      labelBorderColor: color,
+      strokeWidth: isActive ? 5 : 3,
+      animated: isActive
+    };
+  });
 
   return (
-    <g className={getGraphEdgeClassName(edge, state)}>
-      <line
-        markerEnd={
-          edge.directed ? `url(#${getGraphArrowMarkerId(edge, state)})` : undefined
-        }
-        x1={geometry.x1}
-        y1={geometry.y1}
-        x2={geometry.x2}
-        y2={geometry.y2}
-      />
-      {edge.weight !== undefined ? (
-        <g className="graph-edge-weight" transform={`translate(${midX} ${midY})`}>
-          <rect height="24" rx="6" width="34" x="-17" y="-12" />
-          <text dy="5">{edge.weight}</text>
-        </g>
-      ) : null}
-    </g>
+    <InteractiveGraphCanvas
+      ariaLabel={`${getGraphStructureTitle(state.kind)} 상태`}
+      className={`motion-${state.motion}`}
+      layoutAlgorithm={state.kind === "dag" || state.kind === "bipartite" ? "layered" : "stress"}
+      nodes={nodes}
+      edges={edges}
+    />
   );
-}
-
-function getTrimmedEdgeGeometry(edge: GraphEdgeState) {
-  const radius = 30;
-  const dx = edge.toX - edge.fromX;
-  const dy = edge.toY - edge.fromY;
-  const length = Math.max(Math.hypot(dx, dy), 1);
-  const offsetX = (dx / length) * radius;
-  const offsetY = (dy / length) * radius;
-
-  return {
-    x1: edge.fromX + offsetX,
-    y1: edge.fromY + offsetY,
-    x2: edge.toX - offsetX,
-    y2: edge.toY - offsetY
-  };
-}
-
-function getGraphArrowMarkerId(
-  edge: GraphEdgeState,
-  state: GraphTraceState
-): string {
-  if (state.activeEdgeIds?.includes(edge.id)) {
-    return `graph-arrow-${state.kind}-active`;
-  }
-
-  if (edge.weight !== undefined) {
-    return `graph-arrow-${state.kind}-weighted`;
-  }
-
-  return `graph-arrow-${state.kind}-directed`;
 }
 
 function getGraphNodeClassName(

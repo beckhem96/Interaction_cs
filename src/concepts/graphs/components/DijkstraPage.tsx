@@ -25,6 +25,7 @@ import type {
   DijkstraPathResult,
   DijkstraTraceState
 } from "../types";
+import { InteractiveGraphCanvas } from "./InteractiveGraphCanvas";
 
 const pseudoCode = [
   "시작 노드의 거리를 0, 나머지는 무한대로 둔다.",
@@ -494,140 +495,61 @@ function DijkstraDiagram({
 }) {
   const finalPathNodeIds = pathResult?.pathNodeIds ?? state.finalPathNodeIds ?? [];
   const finalPathEdgeIds = pathResult?.pathEdgeIds ?? state.finalPathEdgeIds ?? [];
+  const nodes = state.nodes.map((node) => ({
+    id: node.id,
+    label: node.label,
+    note: getDijkstraNodeNote(node, finalPathNodeIds),
+    className: getDijkstraNodeClassName(node, finalPathNodeIds),
+    ariaLabel: getDijkstraNodeAriaLabel(node, finalPathNodeIds),
+    x: node.x,
+    y: node.y
+  }));
+  const edges = state.edges.map((edge) => {
+    const isFinalPath = finalPathEdgeIds.includes(edge.id);
+    const status = isFinalPath ? "final-path" : edge.status;
+    const appearance = getDijkstraEdgeAppearance(status);
+
+    return {
+      id: edge.id,
+      source: edge.fromId,
+      target: edge.toId,
+      label: edge.weight,
+      labelClassName: "graph-edge-weight",
+      className: getDijkstraEdgeClassName(edge, isFinalPath),
+      ariaLabel: `${edge.fromId}에서 ${edge.toId} 비용 ${edge.weight} ${edgeStatusLabels[status]} 간선`,
+      directed: edge.directed,
+      color: appearance.color,
+      labelBorderColor: appearance.color,
+      strokeWidth: appearance.strokeWidth,
+      dashed: appearance.dashed,
+      animated: appearance.animated
+    };
+  });
 
   return (
-    <div className="graph-visual-scroll">
-      <svg
-        aria-label={`${directionLabels[state.exampleId]} 다익스트라 상태`}
-        className={`graph-visual dijkstra-visual motion-${state.motion}`}
-        role="img"
-        viewBox={`0 0 ${state.viewport.width} ${state.viewport.height}`}
-      >
-        <defs>
-          <GraphArrowMarker color="#2f6fbb" id={`dijkstra-arrow-${state.exampleId}`} />
-          <GraphArrowMarker
-            color="#c94f37"
-            id={`dijkstra-arrow-active-${state.exampleId}`}
-          />
-          <GraphArrowMarker
-            color="#3f7d58"
-            id={`dijkstra-arrow-final-${state.exampleId}`}
-          />
-        </defs>
-        <g className="graph-edges">
-          {state.edges.map((edge) => (
-            <DijkstraEdge
-              edge={edge}
-              finalPathEdgeIds={finalPathEdgeIds}
-              key={edge.id}
-              state={state}
-            />
-          ))}
-        </g>
-        <g className="graph-nodes">
-          {state.nodes.map((node) => (
-            <g
-              aria-label={getDijkstraNodeAriaLabel(node, finalPathNodeIds)}
-              className={getDijkstraNodeClassName(node, finalPathNodeIds)}
-              key={node.id}
-              transform={`translate(${node.x} ${node.y})`}
-            >
-              <circle r="25" />
-              <text dy="5">{node.label}</text>
-              <text className="graph-node-note" dy="42">
-                {getDijkstraNodeNote(node, finalPathNodeIds)}
-              </text>
-            </g>
-          ))}
-        </g>
-      </svg>
-    </div>
+    <InteractiveGraphCanvas
+      ariaLabel={`${directionLabels[state.exampleId]} 다익스트라 상태`}
+      className={`dijkstra-visual motion-${state.motion}`}
+      layoutAlgorithm={state.exampleId === "undirected" ? "stress" : "layered"}
+      nodes={nodes}
+      edges={edges}
+    />
   );
 }
 
-function GraphArrowMarker({ color, id }: { color: string; id: string }) {
-  return (
-    <marker
-      id={id}
-      markerHeight="9"
-      markerWidth="9"
-      orient="auto"
-      refX="8"
-      refY="4.5"
-    >
-      <path d="M0,0 L9,4.5 L0,9 Z" fill={color} />
-    </marker>
-  );
-}
-
-function DijkstraEdge({
-  edge,
-  finalPathEdgeIds,
-  state
-}: {
-  edge: DijkstraEdgeRenderState;
-  finalPathEdgeIds: string[];
-  state: DijkstraTraceState;
-}) {
-  const geometry = getTrimmedEdgeGeometry(edge);
-  const midX = (geometry.x1 + geometry.x2) / 2;
-  const midY = (geometry.y1 + geometry.y2) / 2;
-  const isFinalPath = finalPathEdgeIds.includes(edge.id);
-
-  return (
-    <g
-      aria-label={`${edge.fromId}에서 ${edge.toId} 비용 ${edge.weight} ${edgeStatusLabels[isFinalPath ? "final-path" : edge.status]} 간선`}
-      className={getDijkstraEdgeClassName(edge, isFinalPath)}
-    >
-      <line
-        markerEnd={
-          edge.directed
-            ? `url(#${getDijkstraArrowMarkerId(edge, state, isFinalPath)})`
-            : undefined
-        }
-        x1={geometry.x1}
-        y1={geometry.y1}
-        x2={geometry.x2}
-        y2={geometry.y2}
-      />
-      <g className="graph-edge-weight" transform={`translate(${midX} ${midY})`}>
-        <rect height="24" rx="6" width="34" x="-17" y="-12" />
-        <text dy="5">{edge.weight}</text>
-      </g>
-    </g>
-  );
-}
-
-function getTrimmedEdgeGeometry(edge: DijkstraEdgeRenderState) {
-  const radius = 30;
-  const dx = edge.toX - edge.fromX;
-  const dy = edge.toY - edge.fromY;
-  const length = Math.max(Math.hypot(dx, dy), 1);
-  const offsetX = (dx / length) * radius;
-  const offsetY = (dy / length) * radius;
-
-  return {
-    x1: edge.fromX + offsetX,
-    y1: edge.fromY + offsetY,
-    x2: edge.toX - offsetX,
-    y2: edge.toY - offsetY
-  };
-}
-
-function getDijkstraArrowMarkerId(
-  edge: DijkstraEdgeRenderState,
-  state: DijkstraTraceState,
-  isFinalPath: boolean
-): string {
-  if (isFinalPath) {
-    return `dijkstra-arrow-final-${state.exampleId}`;
+function getDijkstraEdgeAppearance(status: DijkstraEdgeStatus) {
+  switch (status) {
+    case "inspected":
+      return { color: "#c94f37", strokeWidth: 5, dashed: false, animated: true };
+    case "relaxed":
+      return { color: "#3f7d58", strokeWidth: 5, dashed: false, animated: true };
+    case "skipped":
+      return { color: "#7a8b93", strokeWidth: 3, dashed: true, animated: false };
+    case "final-path":
+      return { color: "#6f5bb8", strokeWidth: 5, dashed: false, animated: true };
+    default:
+      return { color: "#73818a", strokeWidth: 3, dashed: false, animated: false };
   }
-
-  if (edge.status === "inspected" || edge.status === "relaxed" || edge.status === "skipped") {
-    return `dijkstra-arrow-active-${state.exampleId}`;
-  }
-
-  return `dijkstra-arrow-${state.exampleId}`;
 }
 
 function getDijkstraNodeClassName(

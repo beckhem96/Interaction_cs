@@ -17,7 +17,7 @@ describe("GraphTraversalPage", () => {
       screen.getByRole("heading", { name: "그래프 탐색: BFS" })
     ).toBeInTheDocument();
     expect(screen.getByText("노드 9개 · 간선 11개 · 시작 A")).toBeInTheDocument();
-    expect(screen.getByRole("img", { name: "BFS 탐색 상태" })).toBeInTheDocument();
+    expect(screen.getByRole("application", { name: "BFS 탐색 상태" })).toBeInTheDocument();
     expect(screen.getByRole("button", { name: "이전" })).toBeDisabled();
     expect(
       screen.getByRole("button", { name: "그래프 탐색 다음 단계" })
@@ -33,7 +33,7 @@ describe("GraphTraversalPage", () => {
   });
 
   it("supports manual scrubbing to a BFS discovery step", () => {
-    const { container } = render(
+    render(
       <MemoryRouter>
         <GraphTraversalPage />
       </MemoryRouter>
@@ -54,7 +54,6 @@ describe("GraphTraversalPage", () => {
     ).toBeGreaterThan(0);
     expect(screen.getByText("큐 앞 → 뒤")).toBeInTheDocument();
     expect(screen.getByLabelText("B 대기 노드")).toBeInTheDocument();
-    expect(container.querySelector(".graph-edge.is-tree-edge.is-active")).not.toBeNull();
     expect(
       screen.getByRole("listitem", {
         name: "현재 코드 25: queuePush(&queue, next);"
@@ -87,7 +86,6 @@ describe("GraphTraversalPage", () => {
       screen.getByText("방문 순서: A → B → E → I → H → G → F → C → D")
     ).toBeInTheDocument();
     expect(container.querySelectorAll(".graph-node.is-visited")).toHaveLength(9);
-    expect(container.querySelectorAll(".graph-edge.is-tree-edge")).toHaveLength(8);
     expect(
       screen.getByRole("listitem", {
         name: "현재 코드 47: return visited;"

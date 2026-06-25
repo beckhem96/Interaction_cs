@@ -503,3 +503,169 @@ export type TopologicalSortTraceState = {
     height: number;
   };
 };
+
+export type SccExampleId = "kosaraju-basic";
+
+export type SccPhase =
+  | "original-dfs"
+  | "reverse-graph"
+  | "reversed-dfs"
+  | "condensation"
+  | "complete";
+
+export type SccMotion =
+  | "initialize"
+  | "start-dfs"
+  | "visit-node"
+  | "inspect-edge"
+  | "skip-edge"
+  | "finish-node"
+  | "reverse-edges"
+  | "pop-stack"
+  | "add-to-component"
+  | "finalize-component"
+  | "build-condensation"
+  | "complete";
+
+export type SccCodeAction =
+  | "initialize"
+  | "first-pass-start"
+  | "first-pass-visit"
+  | "inspect-edge"
+  | "skip-edge"
+  | "finish-stack-push"
+  | "reverse-graph"
+  | "second-pass-pop"
+  | "second-pass-visit"
+  | "add-to-component"
+  | "finalize-component"
+  | "build-condensation"
+  | "complete";
+
+export type SccNodeStatus =
+  | "unvisited"
+  | "first-active"
+  | "first-finished"
+  | "stack-top"
+  | "second-active"
+  | "current-component"
+  | "finalized"
+  | "singleton";
+
+export type SccEdgeStatus =
+  | "normal"
+  | "active-original"
+  | "skipped-original"
+  | "reversed"
+  | "active-reversed"
+  | "internal"
+  | "condensation";
+
+export type SccNode = {
+  id: string;
+  label: string;
+  x: number;
+  y: number;
+  description?: string;
+  expectedComponentId: string;
+};
+
+export type SccEdge = {
+  id: string;
+  fromId: string;
+  toId: string;
+  label: string;
+  labelX: number;
+  labelY: number;
+  curve?: number;
+};
+
+export type SccExample = {
+  id: SccExampleId;
+  title: string;
+  description: string;
+  nodes: SccNode[];
+  edges: SccEdge[];
+  traversalOrder: string[];
+  adjacencyOrder: Record<string, string[]>;
+};
+
+export type SccNodeRenderState = GraphNodeState & {
+  description?: string;
+  expectedComponentId: string;
+  componentId?: string;
+  componentLabel?: string;
+  status: SccNodeStatus;
+};
+
+export type SccEdgeRenderState = GraphEdgeState & {
+  label: string;
+  labelX: number;
+  labelY: number;
+  curve: number;
+  originalFromId: string;
+  originalToId: string;
+  status: SccEdgeStatus;
+};
+
+export type SccDfsPassState = {
+  pass: "none" | "first" | "second";
+  startedNodeId?: string;
+  activeNodeId?: string;
+  activeEdgeId?: string;
+  visitedNodeIds: string[];
+  pathNodeIds: string[];
+  skippedEdgeReason?: string;
+};
+
+export type SccFinishStack = {
+  items: string[];
+  topNodeId?: string;
+  lastPushedNodeId?: string;
+  lastPoppedNodeId?: string;
+};
+
+export type SccGroup = {
+  id: string;
+  label: string;
+  nodeIds: string[];
+  status: "candidate" | "finalized";
+  representativeNodeId: string;
+};
+
+export type SccCondensationEdge = {
+  id: string;
+  fromComponentId: string;
+  toComponentId: string;
+  sourceEdgeIds: string[];
+};
+
+export type SccValidationResult = {
+  componentCount: number;
+  nodeCoverage: string[];
+  components: SccGroup[];
+  condensationEdges: SccCondensationEdge[];
+  allNodesCovered: boolean;
+  hasDuplicateMembership: boolean;
+  summaryText: string;
+};
+
+export type SccTraceState = {
+  exampleId: SccExampleId;
+  phase: SccPhase;
+  motion: SccMotion;
+  nodes: SccNodeRenderState[];
+  edges: SccEdgeRenderState[];
+  dfs: SccDfsPassState;
+  finishStack: SccFinishStack;
+  currentComponent?: SccGroup;
+  finalizedComponents: SccGroup[];
+  condensationEdges: SccCondensationEdge[];
+  validation?: SccValidationResult;
+  isReversedGraph: boolean;
+  summaryItems?: { label: string; value: string }[];
+  viewport: {
+    width: number;
+    height: number;
+  };
+};

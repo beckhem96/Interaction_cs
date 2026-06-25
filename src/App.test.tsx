@@ -96,6 +96,19 @@ describe("App routes", () => {
     expect(screen.getByText(/방향 간선 8개/)).toBeInTheDocument();
   });
 
+  it("routes to the SCC learning page", () => {
+    render(
+      <MemoryRouter initialEntries={["/graphs/scc"]}>
+        <App />
+      </MemoryRouter>,
+    );
+
+    expect(
+      screen.getByRole("heading", { level: 1, name: "강한 연결 요소: SCC" }),
+    ).toBeInTheDocument();
+    expect(screen.getByText(/방향 간선 8개/)).toBeInTheDocument();
+  });
+
   it("routes to the binary search learning page", () => {
     render(
       <MemoryRouter initialEntries={["/binary-search"]}>

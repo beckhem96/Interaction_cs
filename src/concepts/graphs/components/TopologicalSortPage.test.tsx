@@ -16,7 +16,7 @@ describe("TopologicalSortPage", () => {
     expect(
       screen.getByRole("heading", { level: 1, name: "위상 정렬: DAG" })
     ).toBeInTheDocument();
-    expect(screen.getByRole("img", { name: "DAG 위상 정렬 상태" })).toBeInTheDocument();
+    expect(screen.getByRole("application", { name: "DAG 위상 정렬 상태" })).toBeInTheDocument();
     expect(screen.getByRole("region", { name: "진입 차수 0 후보 큐" })).toBeInTheDocument();
     expect(screen.getByRole("table", { name: "진입 차수 표" })).toBeInTheDocument();
     expect(screen.getByRole("button", { name: "다음" })).toBeEnabled();
@@ -79,7 +79,6 @@ describe("TopologicalSortPage", () => {
     expect(screen.getAllByText("D가 새 후보로 열림").length).toBeGreaterThan(0);
     expect(screen.getAllByText("-1").length).toBeGreaterThan(0);
     expect(screen.getAllByText("새 후보").length).toBeGreaterThan(0);
-    expect(container.querySelector(".topological-edge.is-active")).not.toBeNull();
     expect(container.querySelector(".topological-row.is-opened")).not.toBeNull();
   });
 

@@ -800,6 +800,7 @@ Do not introduce a complex graph layout library until the MVP is stable.
 * Dijkstra
 * Minimum Spanning Tree
 * Topological Sort
+* Strongly Connected Components
 
 ### 6.1.1 Dijkstra Shortest Path
 
@@ -854,6 +855,20 @@ The user should understand:
 
 The initial example should use one fixed DAG with at least one multi-candidate step.
 The page should provide C, C++, Java, Python, and JavaScript code tabs with current-step line highlights.
+
+### 6.1.4 Strongly Connected Components: Kosaraju
+
+SCC visualization should show how a directed graph is grouped into mutually reachable components through Kosaraju's two-pass DFS.
+
+The user should understand:
+
+* First DFS visit and finish events
+* Finish order stack updates
+* Reversed graph phase
+* Second DFS stack pop order
+* Current SCC candidate and finalized SCC groups
+* Final node coverage validation
+* Condensation graph summary that keeps only inter-component directed edges
 
 ### 6.2 Operating Systems
 

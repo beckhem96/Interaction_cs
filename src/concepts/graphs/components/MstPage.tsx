@@ -19,6 +19,7 @@ import type {
   MstSortedEdgeRow,
   MstTraceState
 } from "../types";
+import { InteractiveGraphCanvas } from "./InteractiveGraphCanvas";
 
 const pseudoCode = [
   "각 노드를 독립된 연결 성분으로 준비한다.",
@@ -326,57 +327,57 @@ function MstCodePanel({
 }
 
 function MstDiagram({ state }: { state: MstTraceState }) {
+  const nodes = state.nodes.map((node) => ({
+    id: node.id,
+    label: node.label,
+    note: nodeStatusLabels[node.status],
+    className: getMstNodeClassName(node),
+    ariaLabel: getMstNodeAriaLabel(node),
+    x: node.x,
+    y: node.y
+  }));
+  const edges = state.edges.map((edge) => {
+    const appearance = getMstEdgeAppearance(edge.status);
+    return {
+      id: edge.id,
+      source: edge.fromId,
+      target: edge.toId,
+      label: edge.weight,
+      labelClassName: "graph-edge-weight",
+      className: getMstEdgeClassName(edge),
+      ariaLabel: `${edge.label} 비용 ${edge.weight} ${edgeStatusLabels[edge.status]} 간선`,
+      color: appearance.color,
+      labelBorderColor: appearance.color,
+      strokeWidth: appearance.strokeWidth,
+      dashed: appearance.dashed,
+      animated: appearance.animated
+    };
+  });
+
   return (
-    <div className="graph-visual-scroll">
-      <svg
-        aria-label="Kruskal MST 상태"
-        className={`graph-visual mst-visual motion-${state.motion}`}
-        role="img"
-        viewBox={`0 0 ${state.viewport.width} ${state.viewport.height}`}
-      >
-        <g className="graph-edges">
-          {state.edges.map((edge) => (
-            <MstEdge edge={edge} key={edge.id} />
-          ))}
-        </g>
-        <g className="graph-nodes">
-          {state.nodes.map((node) => (
-            <g
-              aria-label={getMstNodeAriaLabel(node)}
-              className={getMstNodeClassName(node)}
-              key={node.id}
-              transform={`translate(${node.x} ${node.y})`}
-            >
-              <circle r="25" />
-              <text dy="5">{node.label}</text>
-              <text className="graph-node-note" dy="42">
-                {nodeStatusLabels[node.status]}
-              </text>
-            </g>
-          ))}
-        </g>
-      </svg>
-    </div>
+    <InteractiveGraphCanvas
+      ariaLabel="Kruskal MST 상태"
+      className={`mst-visual motion-${state.motion}`}
+      layoutAlgorithm="stress"
+      nodes={nodes}
+      edges={edges}
+    />
   );
 }
 
-function MstEdge({ edge }: { edge: MstEdgeRenderState }) {
-  const geometry = getTrimmedEdgeGeometry(edge);
-  const midX = (geometry.x1 + geometry.x2) / 2;
-  const midY = (geometry.y1 + geometry.y2) / 2;
-
-  return (
-    <g
-      aria-label={`${edge.label} 비용 ${edge.weight} ${edgeStatusLabels[edge.status]} 간선`}
-      className={getMstEdgeClassName(edge)}
-    >
-      <line x1={geometry.x1} y1={geometry.y1} x2={geometry.x2} y2={geometry.y2} />
-      <g className="graph-edge-weight" transform={`translate(${midX} ${midY})`}>
-        <rect height="24" rx="6" width="34" x="-17" y="-12" />
-        <text dy="5">{edge.weight}</text>
-      </g>
-    </g>
-  );
+function getMstEdgeAppearance(status: MstEdgeStatus) {
+  switch (status) {
+    case "candidate":
+      return { color: "#c94f37", strokeWidth: 5, dashed: false, animated: true };
+    case "selected":
+      return { color: "#3f7d58", strokeWidth: 5, dashed: false, animated: false };
+    case "skipped-cycle":
+      return { color: "#c28a1d", strokeWidth: 4, dashed: true, animated: false };
+    case "not-needed":
+      return { color: "#b8c3c8", strokeWidth: 3, dashed: true, animated: false };
+    default:
+      return { color: "#6f5bb8", strokeWidth: 3, dashed: false, animated: false };
+  }
 }
 
 function MstComponentPanel({ components }: { components: MstComponentGroup[] }) {
@@ -468,22 +469,6 @@ function MstFinalPanel({ state }: { state: MstTraceState }) {
       )}
     </section>
   );
-}
-
-function getTrimmedEdgeGeometry(edge: MstEdgeRenderState) {
-  const radius = 30;
-  const dx = edge.toX - edge.fromX;
-  const dy = edge.toY - edge.fromY;
-  const length = Math.max(Math.hypot(dx, dy), 1);
-  const offsetX = (dx / length) * radius;
-  const offsetY = (dy / length) * radius;
-
-  return {
-    x1: edge.fromX + offsetX,
-    y1: edge.fromY + offsetY,
-    x2: edge.toX - offsetX,
-    y2: edge.toY - offsetY
-  };
 }
 
 function getMstNodeClassName(node: MstNodeRenderState): string {

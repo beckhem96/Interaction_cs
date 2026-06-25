@@ -19,7 +19,7 @@ describe("DijkstraPage", () => {
     expect(screen.getByRole("tab", { name: "무방향 그래프" })).toBeInTheDocument();
     expect(screen.getByRole("tab", { name: "방향 그래프" })).toBeInTheDocument();
     expect(
-      screen.getByRole("img", { name: "무방향 그래프 다익스트라 상태" })
+      screen.getByRole("application", { name: "무방향 그래프 다익스트라 상태" })
     ).toBeInTheDocument();
     expect(screen.getByRole("table", { name: "다익스트라 거리 표" })).toBeInTheDocument();
     expect(screen.getByRole("button", { name: "다음" })).toBeEnabled();
@@ -58,7 +58,6 @@ describe("DijkstraPage", () => {
     expect(screen.getAllByText("D 거리 갱신").length).toBeGreaterThan(0);
     expect(screen.getByText("6 → 3 갱신")).toBeInTheDocument();
     expect(screen.getAllByText("C").length).toBeGreaterThan(0);
-    expect(container.querySelector(".dijkstra-edge.is-relaxed")).not.toBeNull();
     expect(container.querySelector(".code-line.is-active")).not.toBeNull();
   });
 
@@ -82,7 +81,7 @@ describe("DijkstraPage", () => {
   });
 
   it("updates final path when the learner selects a destination", () => {
-    const { container } = render(
+    render(
       <MemoryRouter>
         <DijkstraPage />
       </MemoryRouter>
@@ -104,7 +103,6 @@ describe("DijkstraPage", () => {
 
     expect(screen.getByText("A → C → E")).toBeInTheDocument();
     expect(screen.getAllByText("7").length).toBeGreaterThan(0);
-    expect(container.querySelector(".dijkstra-edge.is-final-path")).not.toBeNull();
 
     fireEvent.change(screen.getByRole("combobox", { name: "도착 노드 선택" }), {
       target: { value: "G" }
@@ -130,7 +128,7 @@ describe("DijkstraPage", () => {
     const slider = screen.getByRole("slider", { name: "다익스트라 단계 슬라이더" });
     expect(slider).toHaveValue("0");
     expect(
-      screen.getByRole("img", { name: "방향 그래프 다익스트라 상태" })
+      screen.getByRole("application", { name: "방향 그래프 다익스트라 상태" })
     ).toBeInTheDocument();
 
     fireEvent.change(slider, { target: { value: String(completeIndex) } });

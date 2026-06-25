@@ -19,6 +19,7 @@ import type {
   TopologicalSortNodeStatus,
   TopologicalSortTraceState
 } from "../types";
+import { InteractiveGraphCanvas } from "./InteractiveGraphCanvas";
 
 const pseudoCode = [
   "모든 노드의 진입 차수를 계산한다.",
@@ -399,83 +400,57 @@ function TopologicalCodePanel({
 }
 
 function TopologicalDiagram({ state }: { state: TopologicalSortTraceState }) {
+  const nodes = state.nodes.map((node) => ({
+    id: node.id,
+    label: node.label,
+    note: `${nodeStatusLabels[node.status]} · in ${node.inDegree}`,
+    className: getNodeClassName(node),
+    ariaLabel: getNodeAriaLabel(node),
+    x: node.x,
+    y: node.y
+  }));
+  const edges = state.edges.map((edge) => {
+    const appearance = getTopologicalEdgeAppearance(edge.status);
+    return {
+      id: edge.id,
+      source: edge.fromId,
+      target: edge.toId,
+      label: edge.label,
+      labelClassName: `topological-edge-label is-${edge.status}`,
+      className: getEdgeClassName(edge),
+      ariaLabel: `${edge.label} ${edgeStatusLabels[edge.status]} 간선`,
+      directed: true,
+      color: appearance.color,
+      labelBorderColor: appearance.color,
+      strokeWidth: appearance.strokeWidth,
+      dashed: appearance.dashed,
+      animated: appearance.animated
+    };
+  });
+
   return (
-    <div className="graph-visual-scroll">
-      <svg
-        aria-label="DAG 위상 정렬 상태"
-        className={`graph-visual topological-visual motion-${state.motion}`}
-        role="img"
-        viewBox={`0 0 ${state.viewport.width} ${state.viewport.height}`}
-      >
-        <defs>
-          <TopologicalArrowMarker color="#7a8b93" id="topological-arrow-pending" />
-          <TopologicalArrowMarker color="#c94f37" id="topological-arrow-active" />
-          <TopologicalArrowMarker color="#3f7d58" id="topological-arrow-removed" />
-          <TopologicalArrowMarker color="#c28a1d" id="topological-arrow-blocking" />
-          <TopologicalArrowMarker color="#8a4b5f" id="topological-arrow-cycle-blocked" />
-        </defs>
-        <g className="graph-edges">
-          {state.edges.map((edge) => (
-            <TopologicalEdge edge={edge} key={edge.id} />
-          ))}
-        </g>
-        <g className="graph-nodes">
-          {state.nodes.map((node) => (
-            <g
-              aria-label={getNodeAriaLabel(node)}
-              className={getNodeClassName(node)}
-              key={node.id}
-              transform={`translate(${node.x} ${node.y})`}
-            >
-              <circle r="25" />
-              <text dy="5">{node.label}</text>
-              <text className="graph-node-note" dy="42">
-                {nodeStatusLabels[node.status]} · in {node.inDegree}
-              </text>
-            </g>
-          ))}
-        </g>
-      </svg>
-    </div>
+    <InteractiveGraphCanvas
+      ariaLabel="DAG 위상 정렬 상태"
+      className={`topological-visual motion-${state.motion}`}
+      nodes={nodes}
+      edges={edges}
+    />
   );
 }
 
-function TopologicalArrowMarker({ color, id }: { color: string; id: string }) {
-  return (
-    <marker
-      id={id}
-      markerHeight="9"
-      markerWidth="9"
-      orient="auto"
-      refX="8"
-      refY="4.5"
-    >
-      <path d="M0,0 L9,4.5 L0,9 Z" fill={color} />
-    </marker>
-  );
-}
-
-function TopologicalEdge({ edge }: { edge: TopologicalSortEdgeRenderState }) {
-  const geometry = getTrimmedEdgeGeometry(edge);
-
-  return (
-    <g
-      aria-label={`${edge.label} ${edgeStatusLabels[edge.status]} 간선`}
-      className={getEdgeClassName(edge)}
-    >
-      <line
-        markerEnd={`url(#topological-arrow-${edge.status})`}
-        x1={geometry.x1}
-        y1={geometry.y1}
-        x2={geometry.x2}
-        y2={geometry.y2}
-      />
-      <g className="topological-edge-label" transform={`translate(${edge.labelX} ${edge.labelY})`}>
-        <rect height="24" rx="6" width="54" x="-27" y="-12" />
-        <text dy="5">{edge.label}</text>
-      </g>
-    </g>
-  );
+function getTopologicalEdgeAppearance(status: TopologicalSortEdgeStatus) {
+  switch (status) {
+    case "active":
+      return { color: "#c94f37", strokeWidth: 5, dashed: false, animated: true };
+    case "removed":
+      return { color: "#3f7d58", strokeWidth: 4, dashed: false, animated: false };
+    case "blocking":
+      return { color: "#c28a1d", strokeWidth: 4, dashed: false, animated: false };
+    case "cycle-blocked":
+      return { color: "#8a4b5f", strokeWidth: 4, dashed: true, animated: false };
+    default:
+      return { color: "#7a8b93", strokeWidth: 3, dashed: false, animated: false };
+  }
 }
 
 function TopologicalResultPanel({ state }: { state: TopologicalSortTraceState }) {
@@ -522,22 +497,6 @@ function TopologicalValidationPanel({ state }: { state: TopologicalSortTraceStat
       )}
     </section>
   );
-}
-
-function getTrimmedEdgeGeometry(edge: TopologicalSortEdgeRenderState) {
-  const radius = 32;
-  const dx = edge.toX - edge.fromX;
-  const dy = edge.toY - edge.fromY;
-  const length = Math.max(Math.hypot(dx, dy), 1);
-  const offsetX = (dx / length) * radius;
-  const offsetY = (dy / length) * radius;
-
-  return {
-    x1: edge.fromX + offsetX,
-    y1: edge.fromY + offsetY,
-    x2: edge.toX - offsetX,
-    y2: edge.toY - offsetY
-  };
 }
 
 function getNodeClassName(node: TopologicalSortNodeRenderState): string {

@@ -3014,7 +3014,7 @@ button:disabled {
 
 .graph-workbench {
   display: grid;
-  grid-template-columns: minmax(560px, 1.12fr) minmax(420px, 0.88fr);
+  grid-template-columns: minmax(0, 1.12fr) minmax(0, 0.88fr);
   gap: 16px;
   align-items: start;
   margin-top: 16px;
@@ -3036,11 +3036,12 @@ button:disabled {
 
 .graph-side-panel {
   grid-column: 1 / -1;
-  grid-template-columns: minmax(280px, 0.52fr) minmax(360px, 1fr);
+  grid-template-columns: minmax(0, 0.52fr) minmax(0, 1fr);
   align-items: start;
 }
 
 .graph-stage-panel {
+  min-width: 0;
   padding: 18px;
   border: 1px solid #d9e0e4;
   border-radius: 10px;
@@ -3066,6 +3067,155 @@ button:disabled {
   height: auto;
 }
 
+.flow-graph-scroll {
+  width: 100%;
+  max-width: 100%;
+  overflow: hidden;
+  background: #f8fafb;
+}
+
+.flow-graph-canvas {
+  min-width: 0;
+  height: clamp(380px, 46vw, 560px);
+  background: #f8fafb;
+}
+
+.flow-graph-canvas .react-flow__pane {
+  cursor: grab;
+}
+
+.flow-graph-canvas .react-flow__pane:active {
+  cursor: grabbing;
+}
+
+.flow-graph-canvas .react-flow__node {
+  width: 88px;
+  height: 88px;
+  border: 0;
+  background: transparent;
+}
+
+.flow-graph-canvas .react-flow__node:focus-visible {
+  outline: 3px solid rgb(47 111 187 / 28%);
+  outline-offset: 3px;
+}
+
+.flow-graph-node {
+  position: relative;
+  width: 88px;
+  height: 88px;
+  cursor: grab;
+}
+
+.flow-graph-node:active {
+  cursor: grabbing;
+}
+
+.flow-graph-node svg {
+  display: block;
+  width: 88px;
+  height: 88px;
+  overflow: visible;
+}
+
+.flow-graph-node .react-flow__handle {
+  width: 8px;
+  height: 8px;
+  border: 0;
+  opacity: 0;
+  pointer-events: none;
+}
+
+.flow-graph-node .react-flow__handle-top {
+  top: 9px;
+}
+
+.flow-graph-node .react-flow__handle-right {
+  top: 34px;
+  right: auto;
+  left: 69px;
+}
+
+.flow-graph-node .react-flow__handle-bottom {
+  top: 59px;
+  bottom: auto;
+}
+
+.flow-graph-node .react-flow__handle-left {
+  top: 34px;
+  left: 19px;
+}
+
+.flow-graph-canvas .react-flow__edge-path {
+  fill: none;
+  stroke-linecap: round;
+  transition:
+    stroke 180ms ease,
+    stroke-width 180ms ease,
+    opacity 180ms ease;
+}
+
+.flow-graph-canvas .react-flow__edge-interaction {
+  fill: none;
+  stroke: transparent;
+}
+
+.flow-graph-canvas .react-flow__edge.animated .react-flow__edge-path {
+  stroke-dasharray: 8 6;
+  animation-duration: 900ms;
+}
+
+.flow-graph-edge-label {
+  position: absolute;
+  z-index: 4;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 34px;
+  min-height: 24px;
+  padding: 3px 8px;
+  border: 2px solid #c8d2d7;
+  border-radius: 6px;
+  background: #ffffff;
+  box-shadow: 0 3px 9px rgb(23 32 38 / 10%);
+  color: #172026;
+  font-size: 0.72rem;
+  font-weight: 900;
+  line-height: 1;
+  pointer-events: none;
+  white-space: nowrap;
+}
+
+.flow-graph-edge-label.topological-edge-label,
+.flow-graph-edge-label.scc-edge-label {
+  min-width: 54px;
+}
+
+.flow-graph-edge-label.topological-edge-label.is-active,
+.flow-graph-edge-label.scc-edge-label.is-active-original,
+.flow-graph-edge-label.scc-edge-label.is-active-reversed {
+  background: #f9e6e1;
+}
+
+.flow-graph-edge-label.topological-edge-label.is-removed,
+.flow-graph-edge-label.scc-edge-label.is-condensation {
+  background: #e9f4ee;
+}
+
+.flow-graph-canvas .react-flow__controls {
+  overflow: hidden;
+  border: 1px solid #cfd8dd;
+  border-radius: 7px;
+  box-shadow: 0 8px 18px rgb(23 32 38 / 12%);
+}
+
+.flow-graph-canvas .react-flow__controls-button {
+  width: 30px;
+  height: 30px;
+  border-color: #e3e8eb;
+  color: #31594f;
+}
+
 .graph-edge line {
   stroke: #9aa9b1;
   stroke-linecap: round;
@@ -3076,16 +3226,8 @@ button:disabled {
     opacity 180ms ease;
 }
 
-.graph-edge path {
-  fill: #6a767d;
-}
-
 .graph-edge.is-directed line {
   stroke: #2f6fbb;
-}
-
-.graph-edge.is-directed path {
-  fill: #2f6fbb;
 }
 
 .graph-edge.is-weighted line {
@@ -3106,10 +3248,6 @@ button:disabled {
 .graph-edge.is-tree-edge.is-active line {
   stroke: #c94f37;
   stroke-width: 5;
-}
-
-.graph-edge.is-active path {
-  fill: #c94f37;
 }
 
 .graph-edge-weight rect {
@@ -4030,6 +4168,264 @@ button:disabled {
   color: #8a4b5f;
 }
 
+.scc-stage-panel {
+  align-content: start;
+}
+
+.scc-stack-panel,
+.scc-component-panel,
+.scc-condensation-panel {
+  display: grid;
+  gap: 12px;
+  padding: 16px;
+  border: 1px solid #d9e0e4;
+  border-radius: 8px;
+  background: #ffffff;
+}
+
+.scc-stack-panel {
+  grid-template-columns: minmax(220px, 1fr) minmax(220px, 1fr);
+}
+
+.scc-stack-panel h2,
+.scc-component-panel h2,
+.scc-condensation-panel h2,
+.scc-condensation-edges h3 {
+  margin: 0;
+  color: #172026;
+  font-size: 1rem;
+}
+
+.scc-stack-panel p,
+.scc-component-panel p,
+.scc-condensation-panel p {
+  margin: 0;
+  color: #4f5f67;
+  font-size: 0.9rem;
+}
+
+.scc-stack-list,
+.scc-path-list {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  align-items: center;
+  min-height: 34px;
+}
+
+.scc-path-list {
+  padding: 8px 10px;
+  border-radius: 8px;
+  background: #f7fafc;
+  color: #172026;
+  font-weight: 800;
+}
+
+.scc-stack-list span,
+.scc-empty {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 38px;
+  min-height: 30px;
+  padding: 5px 10px;
+  border: 1px solid #d9e0e4;
+  border-radius: 8px;
+  background: #f7fafc;
+  color: #172026;
+  font-weight: 900;
+}
+
+.scc-stack-list span.is-top {
+  border-color: #c28a1d;
+  background: #fff1c8;
+  box-shadow: 0 0 0 3px rgb(194 138 29 / 16%);
+}
+
+.scc-edge path {
+  fill: none;
+  stroke: #73818a;
+  stroke-linecap: round;
+  stroke-width: 3;
+  transition:
+    stroke 180ms ease,
+    stroke-width 180ms ease,
+    opacity 180ms ease;
+}
+
+.scc-edge.is-active-original path {
+  stroke: #c94f37;
+  stroke-width: 5;
+}
+
+.scc-edge.is-skipped-original path {
+  stroke: #8a6f2a;
+  stroke-dasharray: 7 5;
+  stroke-width: 4;
+}
+
+.scc-edge.is-reversed path {
+  stroke: #496f91;
+  stroke-dasharray: 6 5;
+}
+
+.scc-edge.is-active-reversed path {
+  stroke: #7b4b8a;
+  stroke-width: 5;
+}
+
+.scc-edge.is-internal path {
+  opacity: 0.45;
+  stroke: #8b949e;
+  stroke-dasharray: 4 5;
+}
+
+.scc-edge.is-condensation path {
+  stroke: #2f855a;
+  stroke-width: 5;
+}
+
+.scc-edge-label rect {
+  fill: #ffffff;
+  stroke: #cfd8dd;
+  stroke-width: 1.5;
+}
+
+.scc-edge-label text {
+  fill: #172026;
+  font-size: 0.72rem;
+  font-weight: 900;
+  text-anchor: middle;
+}
+
+.scc-edge.is-active-original .scc-edge-label rect,
+.scc-edge.is-active-reversed .scc-edge-label rect {
+  fill: #f9e6e1;
+  stroke: #c94f37;
+}
+
+.scc-edge.is-condensation .scc-edge-label rect {
+  fill: #e9f4ee;
+  stroke: #2f855a;
+}
+
+.scc-node.is-first-active circle,
+.scc-node.is-second-active circle {
+  fill: #f9e6e1;
+  stroke: #c94f37;
+  stroke-width: 5;
+}
+
+.scc-node.is-first-finished circle,
+.scc-node.is-stack-top circle {
+  fill: #fff1c8;
+  stroke: #c28a1d;
+}
+
+.scc-node.is-stack-top circle {
+  stroke-width: 5;
+}
+
+.scc-node.is-current-component circle {
+  fill: #edf5ff;
+  stroke: #2f6fbb;
+  stroke-width: 5;
+}
+
+.scc-node.is-finalized circle {
+  fill: #e9f4ee;
+  stroke: #31594f;
+}
+
+.scc-node.is-singleton circle {
+  fill: #f5edff;
+  stroke: #7b4b8a;
+}
+
+.scc-group-card {
+  display: grid;
+  gap: 6px;
+  padding: 12px;
+  border: 1px solid #d9e0e4;
+  border-radius: 8px;
+  background: #f7fafc;
+}
+
+.scc-group-card h3 {
+  margin: 0;
+  color: #172026;
+  font-size: 0.95rem;
+}
+
+.scc-group-card p {
+  color: #172026;
+  font-weight: 900;
+}
+
+.scc-group-card span {
+  color: #4f5f67;
+  font-size: 0.82rem;
+}
+
+.scc-group-card.is-candidate {
+  border-color: #2f6fbb;
+  background: #edf5ff;
+}
+
+.scc-group-card.is-finalized {
+  border-color: #31594f;
+  background: #e9f4ee;
+}
+
+.scc-finalized-list {
+  display: grid;
+  gap: 10px;
+}
+
+.scc-validation {
+  display: grid;
+  gap: 8px;
+  padding: 12px;
+  border: 1px solid #31594f;
+  border-radius: 8px;
+  background: #e9f4ee;
+}
+
+.scc-condensation-edges {
+  display: grid;
+  gap: 10px;
+}
+
+.scc-condensation-edges ul {
+  display: grid;
+  gap: 8px;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.scc-condensation-edges li {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px 12px;
+  align-items: center;
+  justify-content: space-between;
+  padding: 10px 12px;
+  border: 1px solid #d9e0e4;
+  border-radius: 8px;
+  background: #ffffff;
+}
+
+.scc-condensation-edges li strong {
+  color: #31594f;
+}
+
+.scc-condensation-edges li span {
+  color: #4f5f67;
+  font-size: 0.84rem;
+  font-weight: 800;
+}
+
 .speed-control {
   display: inline-grid;
   gap: 4px;
@@ -4211,6 +4607,14 @@ button:disabled {
 }
 
 @media (max-width: 720px) {
+  .graph-stage-panel {
+    padding: 14px;
+  }
+
+  .flow-graph-canvas {
+    height: 390px;
+  }
+
   .data-editor-header {
     display: grid;
   }

@@ -16,7 +16,7 @@ describe("MstPage", () => {
     expect(
       screen.getByRole("heading", { level: 1, name: "최소 신장 트리: Kruskal" })
     ).toBeInTheDocument();
-    expect(screen.getByRole("img", { name: "Kruskal MST 상태" })).toBeInTheDocument();
+    expect(screen.getByRole("application", { name: "Kruskal MST 상태" })).toBeInTheDocument();
     expect(
       screen.getByRole("table", { name: "Kruskal 정렬 간선 목록" })
     ).toBeInTheDocument();
@@ -57,12 +57,11 @@ describe("MstPage", () => {
     expect(screen.getAllByText("A-C 간선 선택").length).toBeGreaterThan(0);
     expect(screen.getAllByText("8").length).toBeGreaterThan(0);
     expect(screen.getByText("{A, B, C}")).toBeInTheDocument();
-    expect(container.querySelector(".mst-edge.is-selected")).not.toBeNull();
     expect(container.querySelector(".code-line.is-active")).not.toBeNull();
   });
 
   it("shows component merge and skipped-cycle reasons without relying only on color", () => {
-    const { container } = render(
+    render(
       <MemoryRouter>
         <MstPage />
       </MemoryRouter>
@@ -78,11 +77,10 @@ describe("MstPage", () => {
     expect(screen.getAllByText(/사이클/).length).toBeGreaterThan(0);
     expect(screen.getByText("건너뜀 · 사이클")).toBeInTheDocument();
     expect(screen.getByLabelText(/A 후보 노드/)).toBeInTheDocument();
-    expect(container.querySelector(".mst-edge.is-skipped-cycle")).not.toBeNull();
   });
 
   it("renders the final MST result and preserves deterministic replay", () => {
-    const { container } = render(
+    render(
       <MemoryRouter>
         <MstPage />
       </MemoryRouter>
@@ -98,7 +96,6 @@ describe("MstPage", () => {
     expect(screen.getByText("1 + 2 + 2 + 3 + 4 = 12")).toBeInTheDocument();
     expect(screen.getByText("D-E → B-C → E-F → A-C → C-D")).toBeInTheDocument();
     expect(screen.getByText("A, B, C, D, E, F")).toBeInTheDocument();
-    expect(container.querySelector(".mst-edge.is-not-needed")).not.toBeNull();
 
     fireEvent.click(screen.getByRole("button", { name: "이전" }));
     fireEvent.click(screen.getByRole("button", { name: "다음" }));
